@@ -1,0 +1,11 @@
+[
+  {
+    "name": "testunit",
+    "health": 10,
+    "damage": 5,
+    "actions": [
+      "moveOnLand",
+      "meleeAttack"
+    ]
+  }
+]

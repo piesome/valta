@@ -1,0 +1,24 @@
+[
+  {
+    "name": "base",
+    "dependsOn": null,
+    "automaticallyUnlocked": true,
+    "improvements": [
+      {
+        "type": "unlockUnit",
+        "target": "testunit"
+      }
+    ]
+  },
+  {
+    "name": "enhanced-something",
+    "dependsOn": ["base"],
+    "improvements": [
+      {
+        "type": "increaseUnitsDamage",
+        "target": "testunit",
+        "amount": 5
+      }
+    ]
+  }
+]

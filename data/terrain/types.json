@@ -1,0 +1,10 @@
+[
+  {
+    "name": "plains",
+    "movementPenalty": 0
+  },
+  {
+    "name": "impassable",
+    "movementPenalty": 999
+  }
+]
