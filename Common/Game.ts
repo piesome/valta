@@ -96,12 +96,13 @@ export class Game {
     }
 
     private deserializeTerrain(data: GS.TerrainSegment[][][]) {
+        this.terrain = [];
+
         for (const xkey in data) {
-            this.terrain[xkey] = [];
             for (const ykey in data[xkey]) {
-                this.terrain[xkey][ykey] = [];
                 for (const zkey in data[xkey][ykey]) {
-                    this.terrain[xkey][ykey][zkey] = TerrainSegment.deserialize(this, data[xkey][ykey][zkey]);
+                    const terrain = TerrainSegment.deserialize(this, data[xkey][ykey][zkey]);
+                    this.addTerrain(terrain);
                 }
             }
         }
