@@ -16,15 +16,19 @@ export class Game {
     public terrainTypes: TerrainTypeManager;
     public unitTypes: UnitTypeManager;
 
-    private terrain: TerrainSegment[][][];
+    private terrain: {[x: number]: {[y: number]: {[z: number]: TerrainSegment}}};
     private factions: Faction[];
 
-    constructor() {
+    constructor(
+        factionTypes?: FactionTypeManager,
+        terrainTypes?: TerrainTypeManager,
+        unitTypes?: UnitTypeManager
+    ) {
         this.terrain = [];
 
-        this.factionTypes = new FactionTypeManager();
-        this.terrainTypes = new TerrainTypeManager();
-        this.unitTypes = new UnitTypeManager();
+        this.factionTypes = factionTypes || new FactionTypeManager();
+        this.terrainTypes = terrainTypes || new TerrainTypeManager();
+        this.unitTypes = unitTypes || new UnitTypeManager();
     }
 
     public getFaction(id: GS.ID) {
@@ -60,11 +64,11 @@ export class Game {
 
     private addTerrain(terrain: TerrainSegment) {
         if (!this.terrain[terrain.x]) {
-            this.terrain[terrain.x] = [];
+            this.terrain[terrain.x] = {};
         }
 
         if (!this.terrain[terrain.x][terrain.y]) {
-            this.terrain[terrain.x][terrain.y] = [];
+            this.terrain[terrain.x][terrain.y] = {};
         }
 
         this.terrain[terrain.x][terrain.y][terrain.z] = terrain;
@@ -90,13 +94,13 @@ export class Game {
         }
     }
 
-    private serializeTerrain(): GS.TerrainSegment[][][] {
-        const terrain: GS.TerrainSegment[][][] = [];
+    private serializeTerrain(): GS.TerrainData {
+        const terrain: GS.TerrainData = {};
 
         for (const xkey in this.terrain) {
-            terrain[xkey] = [];
+            terrain[xkey] = {};
             for (const ykey in this.terrain[xkey]) {
-                terrain[xkey][ykey] = [];
+                terrain[xkey][ykey] = {};
                 for (const zkey in this.terrain[xkey][ykey]) {
                     terrain[xkey][ykey][zkey] = this.terrain[xkey][ykey][zkey].serialize();
                 }
@@ -106,8 +110,8 @@ export class Game {
         return terrain;
     }
 
-    private deserializeTerrain(data: GS.TerrainSegment[][][]) {
-        this.terrain = [];
+    private deserializeTerrain(data: GS.TerrainData) {
+        this.terrain = {};
 
         for (const xkey in data) {
             for (const ykey in data[xkey]) {

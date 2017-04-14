@@ -1,7 +1,8 @@
 {
   "name": "valta.common",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "repository": "git@github.com:piesome/valta.git",
   "author": "piesome",
   "license": "MIT",

@@ -4,8 +4,10 @@
 
 export type ID = string;
 
+export type TerrainData = {[x: number]: {[y: number]: {[z: number]: TerrainSegment}}};
+
 export interface GameState {
-    terrain: TerrainSegment[][][];
+    terrain: TerrainData;
     factions: Faction[];
 }
 
