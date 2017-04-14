@@ -1,3 +1,0 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", {value: true});
-exports.data = {"faction":{"types.json":[{"name":"faction-1"},{"name":"faction-2"}]},"terrain":{"types.json":[{"name":"plains","movementPenalty":0},{"name":"impassable","movementPenalty":999}]},"unit":{"types.json":[{"name":"testunit","health":10,"damage":5,"actions":["moveOnLand","meleeAttack"]}]},"upgade":{"types.json":[{"name":"base","dependsOn":null,"automaticallyUnlocked":true,"improvements":[{"type":"unlockUnit","target":"testunit"}]},{"name":"enhanced-something","dependsOn":["base"],"improvements":[{"type":"increaseUnitsDamage","target":"testunit","amount":5}]}]}};
