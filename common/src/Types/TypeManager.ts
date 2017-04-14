@@ -1,4 +1,4 @@
-import {data} from "./data";
+import {data} from "../data";
 
 export abstract class TypeManager<T> {
     protected typeName: string;

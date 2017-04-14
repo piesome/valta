@@ -1,7 +1,8 @@
-import * as GS from "./GameState";
-import {Game} from "./Game";
+import * as GS from "../GameState";
+import {Game} from "../Game";
+import {UnitType} from "../Types";
+
 import {Faction} from "./Faction";
-import {UnitType} from "./UnitType";
 
 export class Unit {
     constructor(

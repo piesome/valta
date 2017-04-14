@@ -1,11 +1,15 @@
 import {v4 as uuid} from "uuid";
 
 import * as GS from "./GameState";
-import {FactionTypeManager} from "./FactionType";
-import {TerrainTypeManager} from "./TerrainType";
-import {UnitTypeManager} from "./UnitType";
-import {TerrainSegment} from "./TerrainSegment";
-import {Faction} from "./Faction";
+import {
+    FactionTypeManager,
+    TerrainTypeManager,
+    UnitTypeManager
+} from "./Types";
+import {
+    Faction,
+    TerrainSegment
+} from "./Models";
 
 export class Game {
     public factionTypes: FactionTypeManager;

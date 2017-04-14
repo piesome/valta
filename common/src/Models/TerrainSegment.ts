@@ -1,6 +1,7 @@
-import * as GS from "./GameState";
-import {TerrainType} from "./TerrainType";
-import {Game} from "./Game";
+import * as GS from "../GameState";
+import {TerrainType} from "../Types";
+import {Game} from "../Game";
+
 import {Unit} from "./Unit";
 
 export class TerrainSegment {

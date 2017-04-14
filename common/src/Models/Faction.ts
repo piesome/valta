@@ -1,6 +1,6 @@
-import * as GS from "./GameState";
-import {FactionType} from "./FactionType";
-import {Game} from "./Game";
+import * as GS from "../GameState";
+import {FactionType} from "../Types";
+import {Game} from "../Game";
 
 export class Faction {
     constructor(
