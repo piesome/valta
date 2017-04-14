@@ -10,6 +10,7 @@ import {
 import {
     RPCPeer,
     RemoteRPCPeer,
+    ListGames,
     CreateGame,
     GetGameState
 } from "valta.common/dist/RPC";
@@ -85,6 +86,12 @@ class GameManager {
         }
     }
 
+    listGames(client: string, params: ListGames.Params): ListGames.Response {
+        return {
+            games: Object.keys(this.games)
+        };
+    }
+
     createGame(client: string, params: CreateGame.Params): CreateGame.Response {
         const game = new Game(
             this.factionTypes,
@@ -116,6 +123,11 @@ class GameManager {
     }
 
     register(peer: RPCPeer) {
+        peer.register<ListGames.Params, ListGames.Response>(
+            ListGames.name,
+            (client, data) => this.listGames(client, data)
+        );
+
         peer.register<CreateGame.Params, CreateGame.Response>(
             CreateGame.name,
             (client, data) => this.createGame(client, data)

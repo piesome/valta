@@ -3,7 +3,15 @@ import {v4 as uuid} from "uuid";
 import * as GS from "./GameState";
 
 export interface RPC<Params, Response> {
-    (client: string, params: Params): Response
+    (client: string, params: Params): Response;
+}
+
+export namespace ListGames {
+    export const name = "ListGames";
+    export interface Params {}
+    export interface Response {
+        games: GS.ID[];
+    }
 }
 
 export namespace CreateGame {
