@@ -1,7 +1,6 @@
-import {inject, injectable} from "inversify";
+import {injectable} from "inversify";
 
 import {TypeManager} from "./TypeManager";
-import {DataManager, RawTypes} from "./DataManager";
 
 export class FactionType {
     public name: string;
@@ -16,10 +15,8 @@ export class FactionType {
  */
 @injectable()
 export class FactionTypeManager extends TypeManager<FactionType> {
-    constructor(
-        @inject(DataManager) dataManager: DataManager
-    ) {
-        super(dataManager);
+    constructor() {
+        super();
         this.typeName = "factions";
     }
 

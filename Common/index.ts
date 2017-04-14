@@ -11,6 +11,7 @@ game.load()
         game.deserialize(serialized);
         const reserialized = game.serialize();
         expect(serialized).to.deep.equal(reserialized);
+        console.log(serialized);
     })
     .catch((err) => {
         console.error(err);

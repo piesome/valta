@@ -9,9 +9,10 @@ export abstract class TypeManager<T> {
     protected typeName: string;
     private types: {[name: string]: T};
 
-    constructor(
-        private dataManager: DataManager,
-    ) {
+    @inject(DataManager)
+    private dataManager: DataManager;
+
+    constructor() {
         this.types = {};
     }
 

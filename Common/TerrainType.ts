@@ -1,7 +1,6 @@
-import {inject, injectable} from "inversify";
+import {injectable} from "inversify";
 
 import {TypeManager} from "./TypeManager";
-import {DataManager, RawTypes} from "./DataManager";
 
 export class TerrainType {
     constructor(
@@ -15,10 +14,8 @@ export class TerrainType {
  */
 @injectable()
 export class TerrainTypeManager extends TypeManager<TerrainType> {
-    constructor(
-        @inject(DataManager) dataManager: DataManager
-    ) {
-        super(dataManager);
+    constructor() {
+        super();
         this.typeName = "terrain";
     }
 
