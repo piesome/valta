@@ -1,5 +1,3 @@
-import {injectable} from "inversify";
-
 import {TypeManager} from "./TypeManager";
 
 export class UnitType {
@@ -11,7 +9,6 @@ export class UnitType {
     ) {}
 }
 
-@injectable()
 export class UnitTypeManager extends TypeManager<UnitType> {
     constructor() {
         super();

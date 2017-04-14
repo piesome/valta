@@ -1,9 +1,8 @@
 import {expect} from "chai";
 
-import {container} from "./inversify.config";
 import {Game} from "./Game";
 
-const game = container.get<Game>(Game);
+const game = new Game();
 
 game.load()
     .then(() => {

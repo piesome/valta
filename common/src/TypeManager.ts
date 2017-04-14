@@ -1,16 +1,8 @@
-import {inject, injectable} from "inversify";
+import {data} from "./data";
 
-import {TYPES} from "./types";
-import {DataLoader} from "./DataManager";
-
-
-@injectable()
 export abstract class TypeManager<T> {
     protected typeName: string;
     private types: {[name: string]: T};
-
-    @inject(TYPES.DataLoader)
-    private dataManager: DataLoader;
 
     constructor() {
         this.types = {};
@@ -23,7 +15,7 @@ export abstract class TypeManager<T> {
 
     async load(): Promise<void> {
         try {
-            const rawTypes = await this.dataManager.loadTypes(this.typeName);
+            const rawTypes = data[this.typeName]["types.json"];
             for (const raw of rawTypes) {
                 this.types[raw.name] = this.transformRaw(raw);
             }

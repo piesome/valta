@@ -1,24 +1,15 @@
-import {inject, injectable} from "inversify";
 import {v4 as uuid} from "uuid";
 
 import * as GS from "./GameState";
-import {TYPES} from "./types";
 import {FactionTypeManager} from "./FactionType";
 import {TerrainTypeManager} from "./TerrainType";
 import {UnitTypeManager} from "./UnitType";
 import {TerrainSegment} from "./TerrainSegment";
 import {Faction} from "./Faction";
 
-
-@injectable()
 export class Game {
-    @inject(TYPES.FactionTypeManager)
     public factionTypes: FactionTypeManager;
-
-    @inject(TYPES.TerrainTypeManager)
     public terrainTypes: TerrainTypeManager;
-
-    @inject(TYPES.UnitTypeManager)
     public unitTypes: UnitTypeManager;
 
     private terrain: TerrainSegment[][][];
@@ -26,6 +17,10 @@ export class Game {
 
     constructor() {
         this.terrain = [];
+
+        this.factionTypes = new FactionTypeManager();
+        this.terrainTypes = new TerrainTypeManager();
+        this.unitTypes = new UnitTypeManager();
     }
 
     public getFaction(id: GS.ID) {

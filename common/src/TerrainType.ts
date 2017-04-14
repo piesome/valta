@@ -1,5 +1,3 @@
-import {injectable} from "inversify";
-
 import {TypeManager} from "./TypeManager";
 
 export class TerrainType {
@@ -9,10 +7,6 @@ export class TerrainType {
     ) {}
 }
 
-/**
- * Singleton for managing TerrainType
- */
-@injectable()
 export class TerrainTypeManager extends TypeManager<TerrainType> {
     constructor() {
         super();

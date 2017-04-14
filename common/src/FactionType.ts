@@ -1,5 +1,3 @@
-import {injectable} from "inversify";
-
 import {TypeManager} from "./TypeManager";
 
 export class FactionType {
@@ -10,10 +8,6 @@ export class FactionType {
     }
 }
 
-/**
- * Singleton for managing FactionTypes
- */
-@injectable()
 export class FactionTypeManager extends TypeManager<FactionType> {
     constructor() {
         super();
