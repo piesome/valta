@@ -118,4 +118,4 @@ class GameManager {
     }
 }
 
-const server = new Server();
+new Server();

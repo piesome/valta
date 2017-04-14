@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "license": "MIT",
+  "private": true,
+  "scripts": {
+    "lint": "tslint -c ../tslint.json --project ./tsconfig.json --type-check src/**/*.ts",
+    "run": "ts-node server/index.ts"
+  },
   "dependencies": {
     "@types/uuid": "^2.0.29",
     "@types/ws": "^0.0.39",
     "ts-node": "^3.0.2",
+    "tslint": "4",
     "typescript": "^2.2.2",
     "uuid": "^3.0.1",
     "ws": "^2.2.3"
