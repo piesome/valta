@@ -1,7 +1,7 @@
-import * as R from "ramda";
-
 import {inject, injectable} from "inversify";
-import {DataManager} from "./DataManager";
+
+import {TYPES} from "./types";
+import {DataLoader} from "./DataManager";
 
 
 @injectable()
@@ -9,8 +9,8 @@ export abstract class TypeManager<T> {
     protected typeName: string;
     private types: {[name: string]: T};
 
-    @inject(DataManager)
-    private dataManager: DataManager;
+    @inject(TYPES.DataLoader)
+    private dataManager: DataLoader;
 
     constructor() {
         this.types = {};
@@ -24,9 +24,8 @@ export abstract class TypeManager<T> {
     async load(): Promise<void> {
         try {
             const rawTypes = await this.dataManager.loadTypes(this.typeName);
-            for (const name in rawTypes) {
-                const type = this.transformRaw(rawTypes[name]);
-                this.types[name] = type;
+            for (const raw of rawTypes) {
+                this.types[raw.name] = this.transformRaw(raw);
             }
         } catch (err) {
             throw err;

@@ -17,7 +17,7 @@ export class FactionType {
 export class FactionTypeManager extends TypeManager<FactionType> {
     constructor() {
         super();
-        this.typeName = "factions";
+        this.typeName = "faction";
     }
 
     transformRaw(data: any): FactionType {

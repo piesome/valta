@@ -2,22 +2,34 @@ import {inject, injectable} from "inversify";
 import {v4 as uuid} from "uuid";
 
 import * as GS from "./GameState";
+import {TYPES} from "./types";
 import {FactionTypeManager} from "./FactionType";
 import {TerrainTypeManager} from "./TerrainType";
+import {UnitTypeManager} from "./UnitType";
 import {TerrainSegment} from "./TerrainSegment";
 import {Faction} from "./Faction";
 
 
 @injectable()
 export class Game {
+    @inject(TYPES.FactionTypeManager)
+    public factionTypes: FactionTypeManager;
+
+    @inject(TYPES.TerrainTypeManager)
+    public terrainTypes: TerrainTypeManager;
+
+    @inject(TYPES.UnitTypeManager)
+    public unitTypes: UnitTypeManager;
+
     private terrain: TerrainSegment[][][];
     private factions: Faction[];
 
-    constructor(
-        @inject(FactionTypeManager) public factionTypes: FactionTypeManager,
-        @inject(TerrainTypeManager) public terrainTypes: TerrainTypeManager
-    ) {
+    constructor() {
         this.terrain = [];
+    }
+
+    public getFaction(id: GS.ID) {
+        return this.factions.filter((x) => x.id === id)[0];
     }
 
     public async load() {
@@ -61,7 +73,6 @@ export class Game {
 
     private generateRandomTerrain() {
         const n = 3;
-        const results = [];
         for (let dx = -n; dx <= n; dx++) {
             for (let dy = Math.max(-n, -dx - n); dy <= Math.min(n, -dx + n); dy++) {
                 const dz = -dx - dy;
@@ -71,7 +82,8 @@ export class Game {
                     this.terrainTypes.getType("plains"),
                     dx,
                     dy,
-                    dz
+                    dz,
+                    []
                 );
 
                 this.addTerrain(terrain);

@@ -1,6 +1,7 @@
 import * as GS from "./GameState";
 import {TerrainType} from "./TerrainType";
 import {Game} from "./Game";
+import {Unit} from "./Unit";
 
 export class TerrainSegment {
 
@@ -9,7 +10,8 @@ export class TerrainSegment {
         public type: TerrainType,
         public x: number,
         public y: number,
-        public z: number
+        public z: number,
+        public units: Unit[]
     ) {
         if (x + y + z !== 0) {
             throw new Error("TerrainSegment x + y + z should equal 0");
@@ -22,7 +24,8 @@ export class TerrainSegment {
             game.terrainTypes.getType(data.terrainType),
             data.x,
             data.y,
-            data.z
+            data.z,
+            data.units.map((x) => Unit.deserialize(game, x))
         );
     }
 
@@ -33,7 +36,7 @@ export class TerrainSegment {
             x: this.x,
             y: this.y,
             z: this.z,
-            units: [],
+            units: this.units.map((x) => x.serialize()),
             naturalResources: {},
             city: null
         };

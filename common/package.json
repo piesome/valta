@@ -1,22 +1,29 @@
 {
-  "name": "valta",
+  "name": "valta.common",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "git@github.com:piesome/valta.git",
   "author": "piesome",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "lint": "tslint -c ../tslint.json --project ./tsconfig.json --type-check src/**/*.ts",
+    "build": "npm-run-all build:tsc build:data",
+    "build:tsc": "tsc",
+    "build:data": "ts-node datapacker.ts",
+    "try": "node dist/index.js"
+  },
   "dependencies": {
     "@types/chai": "^3.5.0",
     "@types/ramda": "^0.0.6",
     "@types/uuid": "^2.0.29",
     "chai": "^3.5.0",
     "inversify": "^3.3.0",
+    "npm-run-all": "^4.0.2",
     "ramda": "^0.23.0",
     "reflect-metadata": "^0.1.10",
     "ts-node": "^3.0.2",
-    "tslint": "^5.1.0",
-    "typedoc": "^0.5.10",
+    "tslint": "4",
     "typescript": "^2.2.2",
     "uuid": "^3.0.1"
   }
