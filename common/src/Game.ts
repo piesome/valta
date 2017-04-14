@@ -1,5 +1,3 @@
-import {v4 as uuid} from "uuid";
-
 import * as GS from "./GameState";
 import {
     FactionTypeManager,
@@ -24,7 +22,8 @@ export class Game {
         terrainTypes?: TerrainTypeManager,
         unitTypes?: UnitTypeManager
     ) {
-        this.terrain = [];
+        this.terrain = {};
+        this.factions = [];
 
         this.factionTypes = factionTypes || new FactionTypeManager();
         this.terrainTypes = terrainTypes || new TerrainTypeManager();
@@ -39,12 +38,7 @@ export class Game {
         try {
             await this.factionTypes.load();
             await this.terrainTypes.load();
-
-            this.generateRandomTerrain();
-            this.factions = [
-                new Faction(uuid(), this.factionTypes.getType("faction-1"), true),
-                new Faction(uuid(), this.factionTypes.getType("faction-2"), true)
-            ];
+            await this.unitTypes.load();
         } catch (err) {
             throw err;
         }
@@ -62,7 +56,7 @@ export class Game {
         };
     }
 
-    private addTerrain(terrain: TerrainSegment) {
+    public addTerrain(terrain: TerrainSegment) {
         if (!this.terrain[terrain.x]) {
             this.terrain[terrain.x] = {};
         }
@@ -72,26 +66,6 @@ export class Game {
         }
 
         this.terrain[terrain.x][terrain.y][terrain.z] = terrain;
-    }
-
-    private generateRandomTerrain() {
-        const n = 3;
-        for (let dx = -n; dx <= n; dx++) {
-            for (let dy = Math.max(-n, -dx - n); dy <= Math.min(n, -dx + n); dy++) {
-                const dz = -dx - dy;
-
-                const terrain = new TerrainSegment(
-                    uuid(),
-                    this.terrainTypes.getType("plains"),
-                    dx,
-                    dy,
-                    dz,
-                    []
-                );
-
-                this.addTerrain(terrain);
-            }
-        }
     }
 
     private serializeTerrain(): GS.TerrainData {

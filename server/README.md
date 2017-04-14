@@ -4,7 +4,7 @@ Websocket server
 
 ## runnig
 
-    yarn run
+    yarn start
 
 ## lint
 

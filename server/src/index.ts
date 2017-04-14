@@ -13,6 +13,8 @@ import {
     CreateGame,
     GetGameState
 } from "valta.common/dist/RPC";
+import {TerrainGenerator} from "valta.common/dist/TerrainGenerator";
+
 
 class RemotePeer extends RemoteRPCPeer {
     public ws: WS;
@@ -25,13 +27,9 @@ class RemotePeer extends RemoteRPCPeer {
 
 class Server extends RPCPeer {
     private wss: WS.Server;
-    private gameManager: GameManager;
 
     constructor() {
         super(uuid());
-
-        this.gameManager = new GameManager();
-        this.gameManager.register(this);
 
         this.wss = new WS.Server({
             perMessageDeflate: false,
@@ -77,13 +75,25 @@ class GameManager {
         this.unitTypes = new UnitTypeManager();
     }
 
+    async load() {
+        try {
+            await this.factionTypes.load();
+            await this.terrainTypes.load();
+            await this.unitTypes.load();
+        } catch (err) {
+            throw err;
+        }
+    }
+
     createGame(client: string, params: CreateGame.Params): CreateGame.Response {
         const game = new Game(
             this.factionTypes,
             this.terrainTypes,
             this.unitTypes
         );
-        game.load();
+
+        const gen = new TerrainGenerator(game, 3);
+        gen.generate();
 
         const id = uuid();
         this.games[id] = game;
@@ -118,4 +128,14 @@ class GameManager {
     }
 }
 
-new Server();
+const server = new Server();
+const gameManager = new GameManager();
+gameManager.register(server);
+
+gameManager.load()
+    .then(() => {
+        console.log("GameManager loaded")
+    }, (err) => {
+        console.error(err);
+        process.exit(1);
+    });
