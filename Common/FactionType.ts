@@ -15,32 +15,18 @@ export class FactionType {
  * Singleton for managing FactionTypes
  */
 @injectable()
-export class FactionTypeManager implements TypeManager<FactionType> {
-    private types: {[name: string]: FactionType};
-
+export class FactionTypeManager extends TypeManager<FactionType> {
     constructor(
-        @inject(DataManager) private dataManager: DataManager
+        @inject(DataManager) dataManager: DataManager
     ) {
-        this.types = {};
+        super(dataManager);
+        this.typeName = "factions";
     }
 
-    getType(name: string): FactionType {
-        return this.types[name];
-    }
-
-    async load() {
-        try {
-            const data = await this.dataManager.loadTypes("factions");
-            this.loadData(data);
-        } catch (err) {
-            throw err;
-        }
-    }
-
-    private loadData(rawTypes: RawTypes) {
-        for (const name in rawTypes) {
-            const type = new FactionType(name);
-            this.types[name] = type;
-        }
+    transformRaw(data: any): FactionType {
+        return new FactionType(
+            data.name
+        );
     }
 }
+

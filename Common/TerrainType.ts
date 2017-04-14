@@ -14,33 +14,18 @@ export class TerrainType {
  * Singleton for managing TerrainType
  */
 @injectable()
-export class TerrainTypeManager implements TypeManager<TerrainType> {
-    public types: {[name: string]: TerrainType};
-
+export class TerrainTypeManager extends TypeManager<TerrainType> {
     constructor(
-        @inject(DataManager) private dataManager: DataManager
+        @inject(DataManager) dataManager: DataManager
     ) {
-        this.types = {};
+        super(dataManager);
+        this.typeName = "terrain";
     }
 
-    getType(name: string): TerrainType {
-        return this.types[name];
-    }
-
-    async load() {
-        try {
-            const data = await this.dataManager.loadTypes("terrain");
-            this.loadData(data);
-        } catch (err) {
-            throw err;
-        }
-    }
-
-    private loadData(rawTypes: RawTypes) {
-        for (const name in rawTypes) {
-            const data = rawTypes[name];
-            const type = new TerrainType(name, data.movementPenalty);
-            this.types[name] = type;
-        }
+    transformRaw(data: any): TerrainType {
+        return new TerrainType(
+            data.name,
+            data.movementPenalty
+        );
     }
 }
