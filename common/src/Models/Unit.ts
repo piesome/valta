@@ -15,7 +15,7 @@ export class Unit {
     static deserialize(game: Game, data: GS.Unit): Unit {
         return new Unit(
             data.id,
-            game.unitTypes.getType(data.unitType),
+            game.types.unit.getType(data.unitType),
             game.getFaction(data.faction),
             data.currentHealth,
         );

@@ -17,11 +17,11 @@ export interface Faction {
     id: ID;
 
     factionType: FactionType;
-    unlockedTechnologies: Technology[];
+    unlockedUpgrades: UpgradeName[];
     canAct: boolean;
 }
 
-export type Technology = string;
+export type UpgradeName = string;
 
 export type TerrainType = string;
 

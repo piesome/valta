@@ -1,0 +1,31 @@
+[
+  {
+    "name": "base",
+    "dependsOn": null,
+    "automaticallyUnlocked": true,
+    "improvements": [
+      {
+        "name": "Unlock testuint",
+        "type": "unlock",
+        "target": {
+          "unitType": "testunit"
+        }
+      }
+    ]
+  },
+  {
+    "name": "enhanced-something",
+    "dependsOn": ["base"],
+    "improvements": [
+      {
+        "name": "Increase testunit damage",
+        "type": "multiplier",
+        "target": {
+          "unitType": "testunit",
+          "value": "damage"
+        },
+        "amount": 1.5
+      }
+    ]
+  }
+]

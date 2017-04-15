@@ -18,9 +18,9 @@ function insertDir(pathParts: string[]) {
     return pos;
 }
 
-function insertFile(pathParts: string[], data: any) {
+function insertFile(pathParts: string[], dataToInsert: any) {
     const pos = insertDir(pathParts.slice(0, pathParts.length - 1));
-    pos[pathParts[pathParts.length - 1]] = data;
+    pos[pathParts[pathParts.length - 1]] = dataToInsert;
 }
 
 function walk(pathParts: string[]) {

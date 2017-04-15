@@ -17,7 +17,7 @@ export class TerrainGenerator {
 
                 const terrain = new TerrainSegment(
                     uuid(),
-                    this.game.terrainTypes.getType("plains"),
+                    this.game.types.terrain.getType("plains"),
                     dx,
                     dy,
                     dz,

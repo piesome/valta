@@ -1,44 +1,59 @@
+import {v4 as uuid} from "uuid";
+
 import * as GS from "./GameState";
-import {
-    FactionTypeManager,
-    TerrainTypeManager,
-    UnitTypeManager
-} from "./Types";
+import {Types} from "./Types";
 import {
     Faction,
     TerrainSegment
 } from "./Models";
 
 export class Game {
-    public factionTypes: FactionTypeManager;
-    public terrainTypes: TerrainTypeManager;
-    public unitTypes: UnitTypeManager;
+    public types: Types;
 
     private terrain: {[x: number]: {[y: number]: {[z: number]: TerrainSegment}}};
     private factions: Faction[];
 
     constructor(
-        factionTypes?: FactionTypeManager,
-        terrainTypes?: TerrainTypeManager,
-        unitTypes?: UnitTypeManager
+        types?: Types
     ) {
         this.terrain = {};
         this.factions = [];
 
-        this.factionTypes = factionTypes || new FactionTypeManager();
-        this.terrainTypes = terrainTypes || new TerrainTypeManager();
-        this.unitTypes = unitTypes || new UnitTypeManager();
+        this.types = types || new Types();
+    }
+
+    public createFaction(factionType: string): Faction {
+        const faction = new Faction(
+            uuid(),
+            this.types.faction.getType(factionType),
+            false,
+            this.types.upgrade.automaticallyUnlocked()
+        );
+
+        this.factions.push(faction);
+
+        return faction;
     }
 
     public getFaction(id: GS.ID) {
         return this.factions.filter((x) => x.id === id)[0];
     }
 
+    public addTerrain(terrain: TerrainSegment) {
+        if (!this.terrain[terrain.x]) {
+            this.terrain[terrain.x] = {};
+        }
+
+        if (!this.terrain[terrain.x][terrain.y]) {
+            this.terrain[terrain.x][terrain.y] = {};
+        }
+
+        this.terrain[terrain.x][terrain.y][terrain.z] = terrain;
+    }
+
     public async load() {
         try {
-            await this.factionTypes.load();
-            await this.terrainTypes.load();
-            await this.unitTypes.load();
+            await this.types.load();
         } catch (err) {
             throw err;
         }
@@ -54,18 +69,6 @@ export class Game {
             factions: this.factions.map((x) => x.serialize()),
             terrain: this.serializeTerrain()
         };
-    }
-
-    public addTerrain(terrain: TerrainSegment) {
-        if (!this.terrain[terrain.x]) {
-            this.terrain[terrain.x] = {};
-        }
-
-        if (!this.terrain[terrain.x][terrain.y]) {
-            this.terrain[terrain.x][terrain.y] = {};
-        }
-
-        this.terrain[terrain.x][terrain.y][terrain.z] = terrain;
     }
 
     private serializeTerrain(): GS.TerrainData {

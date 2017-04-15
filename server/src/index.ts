@@ -2,17 +2,14 @@ import * as WS from "ws";
 import {v4 as uuid} from "uuid";
 
 import {Game} from "valta.common/src/Game";
-import {
-    FactionTypeManager,
-    UnitTypeManager,
-    TerrainTypeManager
-} from "valta.common/src/Types";
+import {Types} from "valta.common/src/Types";
 import {
     RPCPeer,
     RemoteRPCPeer,
     ListGames,
     CreateGame,
-    GetGameState
+    GetGameState,
+    JoinGame
 } from "valta.common/src/RPC";
 import {TerrainGenerator} from "valta.common/src/TerrainGenerator";
 
@@ -64,26 +61,30 @@ class Server extends RPCPeer {
 class GameManager {
     private games: {[id: string]: Game};
 
-    private factionTypes: FactionTypeManager;
-    private terrainTypes: TerrainTypeManager;
-    private unitTypes: UnitTypeManager;
+    private types: Types;
 
     constructor() {
         this.games = {};
 
-        this.factionTypes = new FactionTypeManager();
-        this.terrainTypes = new TerrainTypeManager();
-        this.unitTypes = new UnitTypeManager();
+        this.types = new Types();
     }
 
     async load() {
         try {
-            await this.factionTypes.load();
-            await this.terrainTypes.load();
-            await this.unitTypes.load();
+            await this.types.load();
         } catch (err) {
             throw err;
         }
+    }
+
+    getGame(gameid: string): Game {
+        const game = this.games[gameid];
+
+        if (!game) {
+            throw new Error("No such game");
+        }
+
+        return game;
     }
 
     listGames(client: string, params: ListGames.Params): ListGames.Response {
@@ -94,9 +95,7 @@ class GameManager {
 
     createGame(client: string, params: CreateGame.Params): CreateGame.Response {
         const game = new Game(
-            this.factionTypes,
-            this.terrainTypes,
-            this.unitTypes
+            this.types
         );
 
         const gen = new TerrainGenerator(game, 3);
@@ -110,12 +109,18 @@ class GameManager {
         };
     }
 
-    getGameState(client: string, params: GetGameState.Params): GetGameState.Response {
-        const game = this.games[params.game];
+    joinGame(client: string, params: JoinGame.Params): JoinGame.Response {
+        const game = this.getGame(params.game);
 
-        if (!game) {
-            throw new Error("No such game");
-        }
+        const faction = game.createFaction(params.factionType);
+
+        return {
+            faction: faction.id
+        };
+    }
+
+    getGameState(client: string, params: GetGameState.Params): GetGameState.Response {
+        const game = this.getGame(params.game);
 
         return {
             gameState: game.serialize()
@@ -137,6 +142,11 @@ class GameManager {
             GetGameState.name,
             (client, data) => this.getGameState(client, data)
         );
+
+        peer.register<JoinGame.Params, JoinGame.Response>(
+            JoinGame.name,
+            (client, data) => this.joinGame(client, data)
+        );
     }
 }
 
@@ -146,7 +156,7 @@ gameManager.register(server);
 
 gameManager.load()
     .then(() => {
-        console.log("GameManager loaded")
+        console.log("GameManager: loaded");
     }, (err) => {
         console.error(err);
         process.exit(1);

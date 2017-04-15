@@ -22,7 +22,7 @@ export class TerrainSegment {
     public static deserialize(game: Game, data: GS.TerrainSegment): TerrainSegment {
         return new TerrainSegment(
             data.id,
-            game.terrainTypes.getType(data.terrainType),
+            game.types.terrain.getType(data.terrainType),
             data.x,
             data.y,
             data.z,
