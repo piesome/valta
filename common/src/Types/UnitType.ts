@@ -1,12 +1,40 @@
 import {TypeManager} from "./TypeManager";
+import {Faction} from "../Models/Faction";
+import {calculateValue, unlocked} from "./Improvement";
 
 export class UnitType {
     constructor(
         public name: string,
-        public health: number,
-        public damage: number,
+        public baseHealth: number,
+        public baseDamage: number,
         public actions: string[]
     ) {}
+
+    getMaximumHealth(faction: Faction) {
+        return calculateValue(
+            faction,
+            {
+                unitType: this.name,
+                field: "health"
+            },
+            this.baseHealth
+        );
+    }
+
+    getDamage(faction: Faction) {
+        return calculateValue(
+            faction,
+            {
+                unitType: this.name,
+                field: "damage"
+            },
+            this.baseDamage
+        );
+    }
+
+    isUnlocked(faction: Faction) {
+        return unlocked(faction, {unitType: this.name});
+    }
 }
 
 export class UnitTypeManager extends TypeManager<UnitType> {

@@ -22,9 +22,9 @@
         "type": "multiplier",
         "target": {
           "unitType": "testunit",
-          "value": "damage"
+          "field": "damage"
         },
-        "amount": 1.5
+        "amount": 0.25
       }
     ]
   }

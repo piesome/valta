@@ -1,5 +1,7 @@
+import * as R from "ramda";
+
 import * as GS from "../GameState";
-import {FactionType, UpgradeType} from "../Types";
+import {FactionType, UpgradeType, Improvement, ImprovementTarget} from "../Types";
 import {Game} from "../Game";
 
 export class Faction {
@@ -17,6 +19,14 @@ export class Faction {
             data.canAct,
             data.unlockedUpgrades.map(x => game.types.upgrade.getType(x))
         );
+    }
+
+    improvements(): Improvement[] {
+        return R.flatten(R.map(x => x.improvements, this.upgrades));
+    }
+
+    improvementsFor(target: ImprovementTarget): Improvement[] {
+        return R.filter(x => R.equals(x.target, target), this.improvements());
     }
 
     public serialize(): GS.Faction {

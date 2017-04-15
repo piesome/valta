@@ -3,6 +3,7 @@ import {TerrainType, TerrainTypeManager} from "./TerrainType";
 import {UnitType, UnitTypeManager} from "./UnitType";
 import {UpgradeType, UpgradeTypeManager} from "./UpgradeType";
 
+export {Improvement, ImprovementTarget} from "./Improvement";
 export {
     FactionType,
     FactionTypeManager,

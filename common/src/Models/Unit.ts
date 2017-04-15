@@ -12,6 +12,14 @@ export class Unit {
         public currentHealth: number
     ) {}
 
+    get maximumHealth() {
+        return this.type.getMaximumHealth(this.faction);
+    }
+
+    get damage() {
+        return this.type.getDamage(this.faction);
+    }
+
     static deserialize(game: Game, data: GS.Unit): Unit {
         return new Unit(
             data.id,
