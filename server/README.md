@@ -2,14 +2,11 @@
 
 Websocket server
 
-## setup
+## development setup
 
-One time step. Must be repeated if `node_modules` folder is removed. Also run `yarn build` in common when you change it
+First setup `valta.common` and `valta.data`. Then in this directory
 
-    cd ../common
-    yarn build
-    yarn link
-    cd ../server
+    yarn link valta.data
     yarn link valta.common
 
 ## runnig

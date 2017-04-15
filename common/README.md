@@ -2,14 +2,8 @@
 
 Common data and models for server and client to share
 
-## building
+## development
 
-    yarn build
+In this directory
 
-## try serialization
-
-    yarn try
-
-## lint
-
-    yarn lint
+    yarn link valta.data

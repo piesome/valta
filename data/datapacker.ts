@@ -36,16 +36,16 @@ function walk(pathParts: string[]) {
     }
 
     try {
-        let data;
+        let dataToInsert;
         if (curPath.endsWith(".json")) {
             const raw = fs.readFileSync(curPath, "utf8");
-            data = JSON.parse(raw);
+            dataToInsert = JSON.parse(raw);
         } else {
             const raw = fs.readFileSync(curPath);
-            data = raw.toString("base64");
+            dataToInsert = raw.toString("base64");
         }
 
-        insertFile(pathParts, data);
+        insertFile(pathParts, dataToInsert);
     } catch (e) {
         console.error(e);
     }
@@ -61,5 +61,5 @@ exports.data = ${JSON.stringify(data.data)};
 }
 
 walk(["data"]);
-fs.writeFileSync("dist/data.js", commonjs());
-console.log("wrote dist/data.js");
+fs.writeFileSync("dist/index.js", commonjs());
+console.log("wrote dist/index.js");

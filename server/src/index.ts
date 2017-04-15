@@ -1,20 +1,20 @@
 import * as WS from "ws";
 import {v4 as uuid} from "uuid";
 
-import {Game} from "valta.common/dist/Game";
+import {Game} from "valta.common/src/Game";
 import {
     FactionTypeManager,
     UnitTypeManager,
     TerrainTypeManager
-} from "valta.common/dist/Types";
+} from "valta.common/src/Types";
 import {
     RPCPeer,
     RemoteRPCPeer,
     ListGames,
     CreateGame,
     GetGameState
-} from "valta.common/dist/RPC";
-import {TerrainGenerator} from "valta.common/dist/TerrainGenerator";
+} from "valta.common/src/RPC";
+import {TerrainGenerator} from "valta.common/src/TerrainGenerator";
 
 
 class RemotePeer extends RemoteRPCPeer {
