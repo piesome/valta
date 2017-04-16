@@ -1,4 +1,4 @@
-import {v4 as uuid} from "uuid";
+import * as EE from "events";
 
 import * as GS from "./GameState";
 import {Types} from "./Types";
@@ -7,7 +7,7 @@ import {
     TerrainSegment
 } from "./Models";
 
-export class Game {
+export class Game extends EE {
     public types: Types;
 
     private terrain: {[x: number]: {[y: number]: {[z: number]: TerrainSegment}}};
@@ -16,20 +16,15 @@ export class Game {
     constructor(
         types?: Types
     ) {
+        super();
+
         this.terrain = {};
         this.factions = [];
 
         this.types = types || new Types();
     }
 
-    public createFaction(factionType: string): Faction {
-        const faction = new Faction(
-            uuid(),
-            this.types.faction.getType(factionType),
-            false,
-            this.types.upgrade.automaticallyUnlocked()
-        );
-
+    public addFaction(faction: Faction): Faction {
         this.factions.push(faction);
 
         return faction;

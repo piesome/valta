@@ -2,61 +2,98 @@ import {v4 as uuid} from "uuid";
 
 import * as GS from "./GameState";
 
-export interface RPC<Params, Response> {
-    (client: string, params: Params): Response;
+export interface RPC<T, Params, Response> {
+    (client: T, params: Params): Response;
 }
 
-export namespace ListGames {
-    export const name = "ListGames";
+export namespace ListLobbies {
+    export const name = "ListLobbies";
     export interface Params {}
     export interface Response {
-        games: GS.ID[];
+        lobbies: GS.ID[];
     }
 }
 
-export namespace CreateGame {
-    export const name = "CreateGame";
+export namespace CreateLobby {
+    export const name = "CreateLobby";
     export interface Params {}
     export interface Response {
-        game: GS.ID;
+        lobby: GS.ID;
     }
 }
 
-export namespace JoinGame {
-    export const name = "JoinGame";
+export namespace JoinLobby {
+    export const name = "JoinLobby";
     export interface Params {
-        game: GS.ID;
+        lobby: GS.ID;
+    }
+    export interface Response {}
+}
+
+export namespace LeaveLobby {
+    export const name = "LeaveLobby";
+    export interface Params {}
+    export interface Response {}
+}
+
+export namespace SelectFaction {
+    export const name = "SelectFaction";
+    export interface Params {
         factionType: GS.FactionType;
     }
-    export interface Response {
-        faction: GS.ID;
-    }
+    export interface Response {}
+}
+
+export namespace StartGame {
+    export const name = "StartGame";
+    export interface Params {}
+    export interface Response {}
 }
 
 export namespace GetGameState {
     export const name = "GetGameState";
-    export interface Params {
-        game: GS.ID;
-    }
+    export interface Params {}
     export interface Response {
         gameState: GS.GameState;
     }
 }
 
-export interface RPCPeerCB {
-    (peer: RemoteRPCPeer, data: any): void;
+export namespace LobbyUpdate {
+    export const name = "LobbyUpdate";
+    export interface Params {
+        id: GS.ID;
+        name: string;
+        lobbyUsers: {
+            factionType: string
+        }[];
+        canBeStarted: boolean;
+    }
 }
 
-export abstract class RemoteRPCPeer {
+export namespace GameUpdate {
+    export const name = "GameUpdate";
+    export type Params = GS.GameState;
+}
+
+export namespace GameStarted {
+    export const name = "GameStarted";
+    export type Params = GS.Faction;
+}
+
+export interface RPCPeerCB<T> {
+    (peer: T, data: any): void;
+}
+
+export abstract class RemotePeer {
     constructor(
         public id: string,
     ) {}
 }
 
-export abstract class RPCPeer {
-    private localMethods: {[name: string]: RPC<any, any>};
-    private ongoingCalls: {[id: string]: RPCPeerCB};
-    private peers: {[id: string]: RemoteRPCPeer};
+export abstract class Peer<T extends RemotePeer> {
+    private localMethods: {[name: string]: RPC<T, any, any>};
+    private ongoingCalls: {[id: string]: RPCPeerCB<T>};
+    private peers: {[id: string]: T};
 
     constructor(
         private id: string
@@ -65,19 +102,28 @@ export abstract class RPCPeer {
         this.peers = {};
     }
 
-    addPeer(peer: RemoteRPCPeer) {
+    addPeer(peer: T) {
         this.peers[peer.id] = peer;
     }
 
-    removePeer(peer: RemoteRPCPeer) {
+    removePeer(peer: T) {
         delete this.peers[peer.id];
     }
 
-    register<Params, Response>(name: string, method: RPC<Params, Response>) {
+    register<Params, Response>(name: string, method: RPC<T, Params, Response>) {
         this.localMethods[name] = method;
     }
 
-    callPeer<Response>(peer: RemoteRPCPeer, method: string, params: any): Promise<Response> {
+    notifyPeer(peer: T, method: string, params: any) {
+        const message = {
+            method,
+            params,
+            id: uuid()
+        };
+        this.send(peer, message);
+    }
+
+    callPeer<Response>(peer: T, method: string, params: any): Promise<Response> {
         const id = uuid();
 
         const message = {
@@ -108,20 +154,21 @@ export abstract class RPCPeer {
         return promise;
     }
 
-    incomingCall(peer: RemoteRPCPeer, data: any) {
+    incomingCall(peer: T, data: any) {
         if (!(data.method in this.localMethods)) {
             return this.send(peer, {id: data.id, result: null, error: "no such method"});
         }
 
         try {
-            const ret = this.localMethods[data.method](peer.id, data.params);
+            const ret = this.localMethods[data.method](peer, data.params);
             this.send(peer, {id: data.id, result: ret});
         } catch (err) {
+            console.error(err);
             this.send(peer, {id: data.id, result: null, error: err.toString()});
         }
     }
 
-    incomingResponse(peer: RemoteRPCPeer, data: any) {
+    incomingResponse(peer: T, data: any) {
         if (!(data.id in this.ongoingCalls)) {
             return this.send(peer, {error: "no such call id"});
         }
@@ -129,7 +176,7 @@ export abstract class RPCPeer {
         this.ongoingCalls[data.id](peer, data);
     }
 
-    onMessage(peer: RemoteRPCPeer, data: any) {
+    onMessage(peer: T, data: any) {
         if (!data) {
             return this.send(peer, {error: "no data"});
         }
@@ -145,5 +192,5 @@ export abstract class RPCPeer {
         return this.send(peer, {error: "no't a call or a response"});
     }
 
-    abstract send(peer: RemoteRPCPeer, data: any): void;
+    abstract send(peer: T, data: any): void;
 }

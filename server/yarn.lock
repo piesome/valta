@@ -6,6 +6,10 @@
   version "7.0.12"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.12.tgz#ae5f67a19c15f752148004db07cbbb372e69efc9"
 
+"@types/ramda@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@types/ramda/-/ramda-0.0.6.tgz#576ae4a12af63f0dbb358c639af9422b720bb6df"
+
 "@types/uuid@^2.0.29":
   version "2.0.29"
   resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-2.0.29.tgz#939a198ab73567f811ab84f670d2be9c25addd41"
@@ -384,6 +388,10 @@ prepend-http@^1.0.1:
 pseudomap@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/pseudomap/-/pseudomap-1.0.2.tgz#f052a28da70e618917ef0a8ac34c1ae5a68286b3"
+
+ramda@^0.23.0:
+  version "0.23.0"
+  resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.23.0.tgz#ccd13fff73497a93974e3e86327bfd87bd6e8e2b"
 
 rc@^1.0.1, rc@^1.1.6:
   version "1.2.1"
