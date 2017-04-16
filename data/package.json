@@ -13,7 +13,7 @@
     "build:tsc": "tsc",
     "build:data": "ts-node datapacker.ts",
     "watch": "npm-run-all build watch:data",
-    "watch:data": "watch-run -p 'data/**' npm build:data"
+    "watch:data": "watch-run -p 'data/**' npm run build:data"
   },
   "dependencies": {
     "@types/node": "^7.0.12",
