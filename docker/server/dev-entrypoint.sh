@@ -6,7 +6,6 @@ cd data
 yarn
 yarn link
 npm run build
-npm run watch & # works better in docker
 cd ..
 
 cd common
