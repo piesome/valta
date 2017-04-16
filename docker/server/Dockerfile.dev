@@ -1,0 +1,12 @@
+FROM node:7.9.0
+
+EXPOSE 3001
+VOLUME /opt/valta
+WORKDIR /opt/valta
+
+VOLUME /opt/valta/data/node_modules
+VOLUME /opt/valta/data/dist
+VOLUME /opt/valta/common/node_modules
+VOLUME /opt/valta/server/node_modules
+
+ENTRYPOINT ["/opt/valta/docker/server/dev-entrypoint.sh"]

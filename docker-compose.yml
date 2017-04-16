@@ -1,0 +1,14 @@
+# docker compose as dev environment
+
+version: '3'
+services: 
+  valta.server:
+    build:
+      context: .
+      dockerfile: ./docker/server/Dockerfile.dev
+
+    volumes: 
+      - .:/opt/valta
+
+    ports:
+      - "3001:3001"
