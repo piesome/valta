@@ -5,7 +5,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "develop": "webpack-dev-server --port 3000 --content-base ."
   },
   "devDependencies": {
     "awesome-typescript-loader": "^3.1.2",
@@ -19,6 +20,7 @@
     "@types/uuid": "^2.0.29",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "webpack-dev-server": "^2.4.2"
   }
 }

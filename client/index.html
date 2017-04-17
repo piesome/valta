@@ -3,10 +3,75 @@
     <head>
         <meta charset="UTF-8" />
         <title>valta.client</title>
+
+        <style>
+            #load {
+                width: 100%;
+                height: 5px;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+
+            #load.hidden {
+                height: 0;
+                transition: height 0.25s;
+                transition-delay: 0.75s;
+            }
+
+            #load>.bar {
+                width: 0%;
+                height: 100%;
+                background-color: darkblue;
+                transition: width 0.5s;
+            }
+        </style>
+        <script>
+            let prevTimeout = null;
+            window.loadPercentage = function(percentage) {
+                const container = document.querySelector("#load");
+                const bar = document.querySelector("#load>.bar");
+
+                if (prevTimeout) {
+                    window.clearTimeout(prevTimeout);
+                }
+
+                if (percentage >= 1) {
+                    container.classList.add("hidden");
+                    prevTimeout = window.setTimeout(() => {
+                        bar.style.width = "0%";
+                        prevTimeout = null;
+                    }, 1000);
+                } else {
+                    container.classList.remove("hidden");
+                }
+
+                bar.style.width = (percentage * 100).toString() + "%";
+            }
+
+            window.onload = () => {
+                const xhr = new XMLHttpRequest();
+                xhr.open("GET", "/dist/bundle.js");
+                xhr.send();
+
+                xhr.addEventListener("progress", (ev) => {
+                    const percentComplete = (ev.loaded / ev.total) / 2;
+                    window.loadPercentage(percentComplete);
+                });
+
+                xhr.addEventListener("load", () => {
+                    const script = document.createElement("script");
+                    script.text = xhr.responseText;
+                    document.head.appendChild(script);
+                });
+            }
+        </script>
     </head>
     <body>
-        <div id="app"></div>
+        <div id="load">
+            <div class="bar"></div>
+        </div>
 
-        <script src="./dist/bundle.js"></script>
+        <div id="app"></div>
     </body>
 </html>
