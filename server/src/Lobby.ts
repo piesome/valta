@@ -5,13 +5,15 @@ import * as R from "ramda";
 
 import {Types} from "valta.common/src/Types";
 import {TerrainGenerator} from "valta.common/src/TerrainGenerator";
-import {Faction} from "valta.common/src/Models";
 
+import {Joinable} from "./Joinable";
 import {ServerGame} from "./ServerGame";
 import {RemotePeer} from "./RemotePeer";
 
 
-export class Lobby extends EE {
+export class Lobby extends EE implements Joinable {
+    public type = "lobby";
+
     public peers: RemotePeer[];
     public name: string;
     public id: string;
@@ -25,21 +27,17 @@ export class Lobby extends EE {
     }
 
     addPeer(peer: RemotePeer) {
-        peer.assertNotInLobby();
-
         this.peers.push(peer);
-
-        peer.lobby = this;
-
         this.emit("update");
     }
 
     removePeer(peer: RemotePeer) {
-        this.peers = R.filter(x => peer.id !== peer.id, this.peers);
-
-        peer.lobby = null;
-
+        this.peers = R.filter(x => x.id !== peer.id, this.peers);
         this.emit("update");
+
+        if (this.canBeRemoved()) {
+            this.emit("canBeRemoved");
+        }
     }
 
     canBeStarted() {
@@ -58,23 +56,7 @@ export class Lobby extends EE {
         const game = new ServerGame(types);
         (new TerrainGenerator(game, 3)).generate();
 
-        let canAct = true;
-
-        for (const peer of this.peers) {
-            const faction = new Faction(
-                uuid(),
-                types.faction.getType(peer.factionType),
-                canAct,
-                types.upgrade.automaticallyUnlocked()
-            );
-
-            game.clientsFaction(peer, faction);
-            canAct = false;
-
-            peer.lobby = null;
-        }
-
-        this.peers = [];
+        this.peers.map(x => x.join(game));
 
         return game;
     }
@@ -83,7 +65,7 @@ export class Lobby extends EE {
         return {
             id: this.id,
             name: this.name,
-            lobbyUsers: this.peers.map(x => x.lobbySerialize()),
+            peers: this.peers.map(x => x.lobbySerialize()),
             canBeStarted: this.canBeStarted()
         };
     }

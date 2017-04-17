@@ -48,13 +48,11 @@ export class GameManager {
 
     listLobbies(client: RemotePeer, params: RPC.ListLobbies.Params): RPC.ListLobbies.Response {
         return {
-            lobbies: Object.keys(this.lobbies)
+            lobbyIds: Object.keys(this.lobbies)
         };
     }
 
     createLobby(client: RemotePeer, params: RPC.CreateLobby.Params): RPC.CreateLobby.Response {
-        client.assertNotInLobby();
-
         const lobby = new Lobby();
         this.lobbies[lobby.id] = lobby;
 
@@ -63,49 +61,40 @@ export class GameManager {
             lobby.peers.map(x => this.peer.notifyPeer(x, RPC.LobbyUpdate.name, data));
         });
 
-        lobby.addPeer(client);
+        lobby.on("canBeRemoved", () => {
+            delete this.lobbies[lobby.id];
+        });
+
+        client.join(lobby);
 
         return {
-            lobby: lobby.id
+            id: lobby.id
         };
     }
 
     joinLobby(client: RemotePeer, params: RPC.JoinLobby.Params): RPC.JoinLobby.Response {
-        client.assertNotInLobby();
-        const lobby = this.getLobby(params.lobby);
-        lobby.addPeer(client);
+        const lobby = this.getLobby(params.id);
+        client.join(lobby);
 
-        return {
-            lobby: lobby.id
-        };
+        return {};
     }
 
     selectFaction(client: RemotePeer, params: RPC.SelectFaction.Params): RPC.SelectFaction.Response {
         // check that params.factionType is valid
         this.types.faction.getType(params.factionType);
-
-        client.assertLobby();
         client.factionType = params.factionType;
-        client.lobby.emit("update");
 
         return {};
     }
 
     leaveLobby(client: RemotePeer, params: RPC.LeaveLobby.Params): RPC.LeaveLobby.Response {
         client.assertLobby();
-        const lobby = client.lobby;
-
-        lobby.removePeer(client);
-
-        if (lobby.canBeRemoved()) {
-            delete this.lobbies[lobby.id];
-        }
+        client.leave();
 
         return {};
     }
 
     startGame(client: RemotePeer, params: RPC.StartGame.Params): RPC.StartGame.Response {
-        client.assertLobby();
         const lobby = client.lobby;
 
         if (!lobby.canBeStarted()) {
@@ -118,20 +107,16 @@ export class GameManager {
 
         game.on("update", () => {
             const data = game.serialize();
-            game.clients.map(x => this.peer.notifyPeer(x, RPC.GameUpdate.name, data));
+            game.peers.map(x => this.peer.notifyPeer(x, RPC.GameUpdate.name, data));
         });
 
-        game.clients.map(x => this.peer.notifyPeer(x, RPC.GameStarted.name, x.faction.serialize()));
+        game.peers.map(x => this.peer.notifyPeer(x, RPC.GameStarted.name, x.faction.serialize()));
 
         return {};
     }
 
     getGameState(client: RemotePeer, params: RPC.GetGameState.Params): RPC.GetGameState.Response {
-        client.assertGame();
-
-        return {
-            gameState: client.game.serialize()
-        };
+        return client.game.serialize();
     }
 
     register(peer: RPC.Peer<RemotePeer>) {

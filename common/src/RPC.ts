@@ -1,3 +1,5 @@
+import * as EE from "events";
+
 import {v4 as uuid} from "uuid";
 
 import * as GS from "./GameState";
@@ -10,7 +12,7 @@ export namespace ListLobbies {
     export const name = "ListLobbies";
     export interface Params {}
     export interface Response {
-        lobbies: GS.ID[];
+        lobbyIds: GS.ID[];
     }
 }
 
@@ -18,14 +20,14 @@ export namespace CreateLobby {
     export const name = "CreateLobby";
     export interface Params {}
     export interface Response {
-        lobby: GS.ID;
+        id: GS.ID;
     }
 }
 
 export namespace JoinLobby {
     export const name = "JoinLobby";
     export interface Params {
-        lobby: GS.ID;
+        id: GS.ID;
     }
     export interface Response {}
 }
@@ -53,9 +55,7 @@ export namespace StartGame {
 export namespace GetGameState {
     export const name = "GetGameState";
     export interface Params {}
-    export interface Response {
-        gameState: GS.GameState;
-    }
+    export type Response = GS.GameState;
 }
 
 /**
@@ -76,7 +76,7 @@ export namespace LobbyUpdate {
     export interface Params {
         id: GS.ID;
         name: string;
-        lobbyUsers: {
+        peers: {
             factionType: string
         }[];
         canBeStarted: boolean;
@@ -97,13 +97,15 @@ export interface RPCPeerCB<T> {
     (peer: T, data: any): void;
 }
 
-export abstract class RemotePeer {
+export abstract class RemotePeer extends EE {
     constructor(
         public id: string,
-    ) {}
+    ) {
+        super();
+    }
 }
 
-export abstract class Peer<T extends RemotePeer> {
+export abstract class Peer<T extends RemotePeer> extends EE {
     private localMethods: {[name: string]: RPC<T, any, any>};
     private ongoingCalls: {[id: string]: RPCPeerCB<T>};
     private peers: {[id: string]: T};
@@ -111,6 +113,7 @@ export abstract class Peer<T extends RemotePeer> {
     constructor(
         private id: string
     ) {
+        super();
         this.localMethods = {};
         this.peers = {};
     }

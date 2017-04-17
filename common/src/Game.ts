@@ -1,3 +1,4 @@
+import {v4 as uuid} from "uuid";
 import * as EE from "events";
 
 import * as GS from "./GameState";
@@ -22,6 +23,20 @@ export class Game extends EE {
         this.factions = [];
 
         this.types = types || new Types();
+    }
+
+    public createFaction(factionType: string): Faction {
+        const type = this.types.faction.getType(factionType);
+        const faction = new Faction(
+            uuid(),
+            type,
+            false,
+            this.types.upgrade.automaticallyUnlocked()
+        );
+
+        this.addFaction(faction);
+
+        return faction;
     }
 
     public addFaction(faction: Faction): Faction {
