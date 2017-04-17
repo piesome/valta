@@ -58,6 +58,19 @@ export namespace GetGameState {
     }
 }
 
+/**
+ * Todo automatically populated from above
+ */
+export const SERVER_METHODS = [
+    GetGameState.name,
+    StartGame.name,
+    SelectFaction.name,
+    LeaveLobby.name,
+    JoinLobby.name,
+    CreateLobby.name,
+    ListLobbies.name
+];
+
 export namespace LobbyUpdate {
     export const name = "LobbyUpdate";
     export interface Params {
