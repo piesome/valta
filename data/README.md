@@ -6,7 +6,7 @@ Game data
 
 In this directory
 
-    yarn
+    yarn install
     yarn link
 
     yarn watch

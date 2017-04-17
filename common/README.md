@@ -7,3 +7,4 @@ Common data and models for server and client to share
 In this directory
 
     yarn link valta.data
+    yarn install
