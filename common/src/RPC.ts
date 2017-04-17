@@ -77,6 +77,7 @@ export namespace LobbyUpdate {
         id: GS.ID;
         name: string;
         peers: {
+            id: GS.ID,
             factionType: string
         }[];
         canBeStarted: boolean;
@@ -90,7 +91,18 @@ export namespace GameUpdate {
 
 export namespace GameStarted {
     export const name = "GameStarted";
-    export type Params = GS.Faction;
+    export interface Params {
+        gameState: GS.GameState;
+        faction: GS.Faction;
+    }
+}
+
+export namespace AdjustIds {
+    export const name = "AdjustIds";
+    export interface Params {
+        youAre: GS.ID;
+        iAm: GS.ID;
+    }
 }
 
 export interface RPCPeerCB<T> {
@@ -111,11 +123,12 @@ export abstract class Peer<T extends RemotePeer> extends EE {
     private peers: {[id: string]: T};
 
     constructor(
-        private id: string
+        public id: string
     ) {
         super();
         this.localMethods = {};
         this.peers = {};
+        this.ongoingCalls = {};
     }
 
     addPeer(peer: T) {
@@ -133,8 +146,7 @@ export abstract class Peer<T extends RemotePeer> extends EE {
     notifyPeer(peer: T, method: string, params: any) {
         const message = {
             method,
-            params,
-            id: uuid()
+            params
         };
         this.send(peer, message);
     }
@@ -192,20 +204,33 @@ export abstract class Peer<T extends RemotePeer> extends EE {
         this.ongoingCalls[data.id](peer, data);
     }
 
+    incomingNotification(peer: T, data: any) {
+        this.emit(data.method, data.params);
+    }
+
     onMessage(peer: T, data: any) {
         if (!data) {
             return this.send(peer, {error: "no data"});
         }
 
         if (data.method !== undefined && data.params !== undefined) {
-            return this.incomingCall(peer, data);
+            if (data.id !== undefined) {
+                return this.incomingCall(peer, data);
+            } else {
+                return this.incomingNotification(peer, data);
+            }
         }
 
-        if (data.response !== undefined && data.id !== undefined) {
+        if (data.id !== undefined) {
             return this.incomingResponse(peer, data);
         }
 
-        return this.send(peer, {error: "no't a call or a response"});
+        if (data.error) {
+            console.error(data.error);
+            return;
+        }
+
+        return this.send(peer, {error: "not a call or a response"});
     }
 
     abstract send(peer: T, data: any): void;

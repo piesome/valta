@@ -76,6 +76,7 @@ export class RemotePeer extends RPC.RemotePeer {
 
     lobbySerialize() {
         return {
+            id: this.id,
             factionType: this.factionType
         };
     }

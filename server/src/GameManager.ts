@@ -106,11 +106,16 @@ export class GameManager {
         delete this.lobbies[lobby.id];
 
         game.on("update", () => {
-            const data = game.serialize();
-            game.peers.map(x => this.peer.notifyPeer(x, RPC.GameUpdate.name, data));
+            const gameState = game.serialize();
+            game.peers.map(x => this.peer.notifyPeer(x, RPC.GameUpdate.name, gameState));
         });
 
-        game.peers.map(x => this.peer.notifyPeer(x, RPC.GameStarted.name, x.faction.serialize()));
+        const gameState = game.serialize();
+
+        game.peers.map(x => this.peer.notifyPeer(x, RPC.GameStarted.name, {
+            faction: x.faction.serialize(),
+            gameState
+        }));
 
         return {};
     }
