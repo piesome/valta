@@ -1,10 +1,44 @@
-import * as EE from "events";
+import {EventEmitter} from "eventemitter3";
 
 import {v4 as uuid} from "uuid";
 
 import * as GS from "./GameState";
 
-export type RPC<T, Params, Response> = (client: T, params: Params) => Response;
+export type RPCFn<T, Params, Response> = (client: T, params: Params) => Response;
+
+/*
+export interface IRPC<Name extends string, Params, Response> {
+    name: Name;
+    call(peer: RemotePeer, params: Params): Response;
+}
+
+export interface IListLobbiesResponse {
+    lobbyIds: GS.ID[];
+}
+export type IListLobbies = IRPC<"ListLobbies", void, IListLobbiesResponse>;
+
+export interface ICreateLobbyResponse {
+    id: GS.ID;
+}
+export type ICreateLobby = IRPC<"CreateLobby", void, ICreateLobbyResponse>;
+
+export interface IJoinLobbyParams {
+    id: GS.ID;
+}
+export type IJoinLobby = IRPC<"JoinLobby", IJoinLobbyParams, void>;
+
+export type ILeaveLobby = IRPC<"LeaveLobby", void, void>;
+
+export interface ISelectFactionParams {
+    factionType: GS.FactionType;
+}
+export type ISelectFaction = IRPC<"SelectFaction", ISelectFactionParams, void>;
+
+export type IStartGame = IRPC<"StartGame", void, void>;
+
+export type IGetGameStateResponse = GS.IGameState;
+export type IGetGameState = IRPC<"GetGameState", void, IGetGameStateResponse>;
+*/
 
 export namespace ListLobbies {
     export const name = "ListLobbies";
@@ -105,7 +139,7 @@ export namespace AdjustIds {
 
 export type RPCPeerCB<T> = (peer: T, data: any) => void;
 
-export abstract class RemotePeer extends EE {
+export abstract class RemotePeer extends EventEmitter {
     constructor(
         public id: string,
     ) {
@@ -113,8 +147,8 @@ export abstract class RemotePeer extends EE {
     }
 }
 
-export abstract class Peer<T extends RemotePeer> extends EE {
-    private localMethods: {[name: string]: RPC<T, any, any>};
+export abstract class Peer<T extends RemotePeer> extends EventEmitter {
+    private localMethods: {[name: string]: RPCFn<T, any, any>};
     private ongoingCalls: {[id: string]: RPCPeerCB<T>};
     private peers: {[id: string]: T};
 
@@ -135,7 +169,7 @@ export abstract class Peer<T extends RemotePeer> extends EE {
         delete this.peers[peer.id];
     }
 
-    public register<Params, Response>(name: string, method: RPC<T, Params, Response>) {
+    public register<Params, Response>(name: string, method: RPCFn<T, Params, Response>) {
         this.localMethods[name] = method;
     }
 

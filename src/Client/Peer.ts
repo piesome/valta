@@ -4,7 +4,7 @@ import * as RPC from "../Common/RPC";
 
 import {RemotePeer} from "./RemotePeer";
 
-export class Peer extends RPC.Peer<RPC.RemotePeer> {
+export class Peer extends RPC.Peer<RemotePeer> {
     public server: RemotePeer;
 
     constructor() {

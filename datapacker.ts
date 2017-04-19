@@ -62,4 +62,6 @@ exports.data = ${JSON.stringify(data.data)};
 
 walk(["data"]);
 fs.writeFileSync("data.js", commonjs());
+
+// tslint:disable-next-line
 console.log("wrote data.js");
