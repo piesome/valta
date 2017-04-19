@@ -3,6 +3,12 @@
     <div><strong>Fantasy 4X strategy game</strong></div>
 </diV>
 
-## fast dev start
+## dev start
 
-    docker-compose up
+```sh
+yarn install
+yarn data
+yarn server
+# in another shell
+yarn client:dev
+```
