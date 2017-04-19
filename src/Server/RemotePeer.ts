@@ -3,17 +3,17 @@ import * as WS from "ws";
 import {Faction} from "../Common/Models";
 import * as RPC from "../Common/RPC";
 
-import {Joinable} from "./Joinable";
+import {IJoinable} from "./Joinable";
 import {Lobby} from "./Lobby";
 import {ServerGame} from "./ServerGame";
 
 export class RemotePeer extends RPC.RemotePeer {
     public ws: WS;
 
-    public joined: Joinable;
+    public joined: IJoinable;
 
     public faction: Faction;
-    private _factionType: string; // name of faction type in lobby
+    private selectedFactionType: string;
 
     constructor(id: string, ws: WS) {
         super(id);
@@ -43,17 +43,17 @@ export class RemotePeer extends RPC.RemotePeer {
     }
 
     get factionType() {
-        return this._factionType;
+        return this.selectedFactionType;
     }
 
     set factionType(val: string) {
         this.assertLobby();
 
-        this._factionType = val;
+        this.selectedFactionType = val;
         this.lobby.emit("update");
     }
 
-    public join(joinable: Joinable) {
+    public join(joinable: IJoinable) {
         if (this.joined) {
             this.leave();
         }

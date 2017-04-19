@@ -85,10 +85,22 @@ export class Game extends EE {
         const terrain: GS.ITerrainData = {};
 
         for (const xkey in this.terrain) {
+            if (!this.terrain.hasOwnProperty(xkey)) {
+                continue;
+            }
+
             terrain[xkey] = {};
             for (const ykey in this.terrain[xkey]) {
+                if (!this.terrain[xkey].hasOwnProperty(ykey)) {
+                    continue;
+                }
+
                 terrain[xkey][ykey] = {};
                 for (const zkey in this.terrain[xkey][ykey]) {
+                    if (!this.terrain[xkey][ykey].hasOwnProperty(zkey)) {
+                        continue;
+                    }
+
                     terrain[xkey][ykey][zkey] = this.terrain[xkey][ykey][zkey].serialize();
                 }
             }
@@ -101,8 +113,20 @@ export class Game extends EE {
         this.terrain = {};
 
         for (const xkey in data) {
+            if (!data.hasOwnProperty(xkey)) {
+                continue;
+            }
+
             for (const ykey in data[xkey]) {
+                if (!data[xkey].hasOwnProperty(ykey)) {
+                    continue;
+                }
+
                 for (const zkey in data[xkey][ykey]) {
+                    if (!data[xkey][ykey].hasOwnProperty(zkey)) {
+                        continue;
+                    }
+
                     const terrain = TerrainSegment.deserialize(this, data[xkey][ykey][zkey]);
                     this.addTerrain(terrain);
                 }

@@ -60,21 +60,21 @@ export class App extends React.Component<IAppProps, IAppState> {
             );
         }
         if (this.state.lobby) {
-            return <Lobby
+            return (<Lobby
                 factionTypes={this.props.types.faction.possible()}
                 lobby={this.state.lobby}
                 ourId={this.props.peer.id}
                 onLeave={() => this.leaveLobby()}
                 onSelectFaction={(f: string) => this.selectFaction(f)}
                 onStartGame={() => this.startGame()}
-            />;
+            />);
         }
         if (this.state.lobbyIds !== undefined) {
-            return <LobbyList
+            return (<LobbyList
                 lobbyIds={this.state.lobbyIds}
                 onJoinLobby={(id: string) => this.joinLobby(id)}
                 onCreateLobby={() => this.createLobby()}
-            />;
+            />);
         }
     }
 

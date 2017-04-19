@@ -4,9 +4,7 @@ import {v4 as uuid} from "uuid";
 
 import * as GS from "./GameState";
 
-export interface RPC<T, Params, Response> {
-    (client: T, params: Params): Response;
-}
+export type RPC<T, Params, Response> = (client: T, params: Params) => Response;
 
 export namespace ListLobbies {
     export const name = "ListLobbies";
@@ -105,9 +103,7 @@ export namespace AdjustIds {
     }
 }
 
-export interface RPCPeerCB<T> {
-    (peer: T, data: any): void;
-}
+export type RPCPeerCB<T> = (peer: T, data: any) => void;
 
 export abstract class RemotePeer extends EE {
     constructor(
@@ -123,7 +119,7 @@ export abstract class Peer<T extends RemotePeer> extends EE {
     private peers: {[id: string]: T};
 
     constructor(
-        public id: string
+        public id: string,
     ) {
         super();
         this.localMethods = {};
@@ -131,19 +127,19 @@ export abstract class Peer<T extends RemotePeer> extends EE {
         this.ongoingCalls = {};
     }
 
-    addPeer(peer: T) {
+    public addPeer(peer: T) {
         this.peers[peer.id] = peer;
     }
 
-    removePeer(peer: T) {
+    public removePeer(peer: T) {
         delete this.peers[peer.id];
     }
 
-    register<Params, Response>(name: string, method: RPC<T, Params, Response>) {
+    public register<Params, Response>(name: string, method: RPC<T, Params, Response>) {
         this.localMethods[name] = method;
     }
 
-    notifyPeer(peer: T, method: string, params: any) {
+    public notifyPeer(peer: T, method: string, params: any) {
         const message = {
             method,
             params,
@@ -151,7 +147,7 @@ export abstract class Peer<T extends RemotePeer> extends EE {
         this.send(peer, message);
     }
 
-    callPeer<Response>(peer: T, method: string, params: any): Promise<Response> {
+    public callPeer<Response>(peer: T, method: string, params: any): Promise<Response> {
         const id = uuid();
 
         const message = {
@@ -182,7 +178,7 @@ export abstract class Peer<T extends RemotePeer> extends EE {
         return promise;
     }
 
-    incomingCall(peer: T, data: any) {
+    public incomingCall(peer: T, data: any) {
         if (!(data.method in this.localMethods)) {
             return this.send(peer, {id: data.id, result: null, error: "no such method"});
         }
@@ -196,7 +192,7 @@ export abstract class Peer<T extends RemotePeer> extends EE {
         }
     }
 
-    incomingResponse(peer: T, data: any) {
+    public incomingResponse(peer: T, data: any) {
         if (!(data.id in this.ongoingCalls)) {
             return this.send(peer, {error: "no such call id"});
         }
@@ -204,11 +200,11 @@ export abstract class Peer<T extends RemotePeer> extends EE {
         this.ongoingCalls[data.id](peer, data);
     }
 
-    incomingNotification(peer: T, data: any) {
+    public incomingNotification(peer: T, data: any) {
         this.emit(data.method, data.params);
     }
 
-    onMessage(peer: T, data: any) {
+    public onMessage(peer: T, data: any) {
         if (!data) {
             return this.send(peer, {error: "no data"});
         }
@@ -233,5 +229,5 @@ export abstract class Peer<T extends RemotePeer> extends EE {
         return this.send(peer, {error: "not a call or a response"});
     }
 
-    abstract send(peer: T, data: any): void;
+    public abstract send(peer: T, data: any): void;
 }

@@ -1,31 +1,35 @@
-import {FactionType, FactionTypeManager} from "./FactionType";
-import {TerrainType, TerrainTypeManager} from "./TerrainType";
-import {UnitType, UnitTypeManager} from "./UnitType";
-import {UpgradeType, UpgradeTypeManager} from "./UpgradeType";
-
 export {Improvement, ImprovementTarget} from "./Improvement";
+
+export {FactionType} from "./FactionType";
+export {TerrainType} from "./TerrainType";
+export {UnitType} from "./UnitType";
+export {UpgradeType} from "./UpgradeType";
+
+export {TypeManager} from "./TypeManager";
+
+import {FactionTypes} from "./FactionTypes";
+import {TerrainTypes} from "./TerrainTypes";
+import {UnitTypes} from "./UnitTypes";
+import {UpgradeTypes} from "./UpgradeTypes";
+
 export {
-    FactionType,
-    FactionTypeManager,
-    TerrainType,
-    TerrainTypeManager,
-    UnitType,
-    UnitTypeManager,
-    UpgradeType,
-    UpgradeTypeManager,
+    FactionTypes,
+    TerrainTypes,
+    UnitTypes,
+    UpgradeTypes,
 };
 
 export class Types {
-    public faction: FactionTypeManager;
-    public terrain: TerrainTypeManager;
-    public unit: UnitTypeManager;
-    public upgrade: UpgradeTypeManager;
+    public faction: FactionTypes;
+    public terrain: TerrainTypes;
+    public unit: UnitTypes;
+    public upgrade: UpgradeTypes;
 
     constructor() {
-        this.faction = new FactionTypeManager();
-        this.terrain =  new TerrainTypeManager();
-        this.unit = new UnitTypeManager();
-        this.upgrade = new UpgradeTypeManager();
+        this.faction = new FactionTypes();
+        this.terrain =  new TerrainTypes();
+        this.unit = new UnitTypes();
+        this.upgrade = new UpgradeTypes();
     }
 
     public async load() {

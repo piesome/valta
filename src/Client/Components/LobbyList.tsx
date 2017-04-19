@@ -7,6 +7,10 @@ export interface ILobbyListProps {
 }
 
 export class LobbyList extends React.Component<ILobbyListProps, undefined> {
+    constructor(props: ILobbyListProps) {
+        super(props);
+    }
+
     public render() {
         const lobbies = this.props.lobbyIds.map((x) => {
             return (

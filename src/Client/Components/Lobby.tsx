@@ -20,6 +20,14 @@ export interface ILobbyProps {
 }
 
 export class Lobby extends React.Component<ILobbyProps, undefined> {
+    constructor(props: ILobbyProps) {
+        super(props);
+
+        this.handleSelectFaction = this.handleSelectFaction.bind(this);
+        this.handleStartGame = this.handleStartGame.bind(this);
+        this.handleLeave = this.handleLeave.bind(this);
+    }
+
     public render() {
         const lobby = this.props.lobby;
 
@@ -33,12 +41,12 @@ export class Lobby extends React.Component<ILobbyProps, undefined> {
             <div>
                 <strong>Lobby {this.props.lobby.id}</strong>
 
-                <button onClick={() => this.props.onLeave()}>Leave</button>
+                <button onClick={this.handleLeave}>Leave</button>
 
                 <br />
 
-                <select defaultValue="un" onChange={(e) => this.handleSelectFaction(e)}>
-                    <option value="un" disabled>Select your faction</option>
+                <select defaultValue="un" onChange={this.handleSelectFaction}>
+                    <option value="un" disabled={true}>Select your faction</option>
                     {this.props.factionTypes.map((x) => <option key={x}>{x}</option>)}
                 </select>
 
@@ -48,12 +56,20 @@ export class Lobby extends React.Component<ILobbyProps, undefined> {
                     {peers}
                 </ul>
 
-                {lobby.canBeStarted ? <button onClick={() => this.props.onStartGame()}>Start game</button> : null}
+                {lobby.canBeStarted ? <button onClick={this.handleStartGame}>Start game</button> : null}
             </div>
         );
     }
 
     private handleSelectFaction(event: any) {
         this.props.onSelectFaction(event.target.value);
+    }
+
+    private handleStartGame() {
+        this.props.onStartGame();
+    }
+
+    private handleLeave() {
+        this.props.onLeave();
     }
 }

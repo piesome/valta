@@ -1,6 +1,6 @@
 import {RemotePeer} from "./RemotePeer";
 
-export interface Joinable {
+export interface IJoinable {
     type: string;
     peers: RemotePeer[];
 

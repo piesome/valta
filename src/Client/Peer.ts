@@ -24,7 +24,9 @@ export class Peer extends RPC.Peer<RPC.RemotePeer> {
             try {
                 const json = JSON.parse(data.data);
                 this.onMessage(this.server, json);
-            } catch (e) {}
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         this.on(RPC.AdjustIds.name, (data: RPC.AdjustIds.Params) => {
