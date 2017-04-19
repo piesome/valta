@@ -19,7 +19,6 @@ export abstract class TypeManager<T> {
 
     public async load(): Promise<void> {
         try {
-            console.log(`TypeManager: loading ${this.typeName}`);
             const rawTypes = data[this.typeName]["types.json"];
             for (const raw of rawTypes) {
                 this.types[raw.name] = this.transformRaw(raw);

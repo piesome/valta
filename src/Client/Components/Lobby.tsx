@@ -24,8 +24,6 @@ export class Lobby extends React.Component<ILobbyProps, undefined> {
         super(props);
 
         this.handleSelectFaction = this.handleSelectFaction.bind(this);
-        this.handleStartGame = this.handleStartGame.bind(this);
-        this.handleLeave = this.handleLeave.bind(this);
     }
 
     public render() {
@@ -41,7 +39,7 @@ export class Lobby extends React.Component<ILobbyProps, undefined> {
             <div>
                 <strong>Lobby {this.props.lobby.id}</strong>
 
-                <button onClick={this.handleLeave}>Leave</button>
+                <button onClick={this.props.onLeave}>Leave</button>
 
                 <br />
 
@@ -56,7 +54,7 @@ export class Lobby extends React.Component<ILobbyProps, undefined> {
                     {peers}
                 </ul>
 
-                {lobby.canBeStarted ? <button onClick={this.handleStartGame}>Start game</button> : null}
+                {lobby.canBeStarted ? <button onClick={this.props.onStartGame}>Start game</button> : null}
             </div>
         );
     }
@@ -65,11 +63,4 @@ export class Lobby extends React.Component<ILobbyProps, undefined> {
         this.props.onSelectFaction(event.target.value);
     }
 
-    private handleStartGame() {
-        this.props.onStartGame();
-    }
-
-    private handleLeave() {
-        this.props.onLeave();
-    }
 }

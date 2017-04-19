@@ -6,9 +6,7 @@ const gameManager = new GameManager();
 gameManager.register(server);
 
 gameManager.load()
-    .then(() => {
-        console.log("GameManager: loaded");
-    }, (err) => {
+    .catch((err) => {
         console.error(err);
         process.exit(1);
     });

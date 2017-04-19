@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import {LobbyListItem} from "./LobbyListItem";
+
 export interface ILobbyListProps {
     lobbyIds: string[];
     onJoinLobby: (id: string) => void;
@@ -14,16 +16,17 @@ export class LobbyList extends React.Component<ILobbyListProps, undefined> {
     public render() {
         const lobbies = this.props.lobbyIds.map((x) => {
             return (
-                <li key={x} onClick={() => this.props.onJoinLobby(x)}>
-                    {x}
-                </li>
+                <LobbyListItem
+                    id={x}
+                    onJoinLobby={this.props.onJoinLobby}
+                />
             );
         });
         return (
             <div>
                 <strong>Lobbies</strong>
 
-                <button onClick={() => this.props.onCreateLobby()}>Create</button>
+                <button onClick={this.props.onCreateLobby}>Create</button>
 
                 <ul>
                     {lobbies}

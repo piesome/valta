@@ -30,6 +30,13 @@ export interface IAppState {
 export class App extends React.Component<IAppProps, IAppState> {
     constructor(props: IAppProps) {
         super(props);
+
+        // big thanks to react for making our code so nice....
+        this.createLobby = this.createLobby.bind(this);
+        this.joinLobby = this.joinLobby.bind(this);
+        this.leaveLobby = this.leaveLobby.bind(this);
+        this.selectFaction = this.selectFaction.bind(this);
+        this.startGame = this.startGame.bind(this);
     }
 
     public componentWillMount() {
@@ -60,21 +67,25 @@ export class App extends React.Component<IAppProps, IAppState> {
             );
         }
         if (this.state.lobby) {
-            return (<Lobby
-                factionTypes={this.props.types.faction.possible()}
-                lobby={this.state.lobby}
-                ourId={this.props.peer.id}
-                onLeave={() => this.leaveLobby()}
-                onSelectFaction={(f: string) => this.selectFaction(f)}
-                onStartGame={() => this.startGame()}
-            />);
+            return (
+                <Lobby
+                    factionTypes={this.props.types.faction.possible()}
+                    lobby={this.state.lobby}
+                    ourId={this.props.peer.id}
+                    onLeave={this.leaveLobby}
+                    onSelectFaction={this.selectFaction}
+                    onStartGame={this.startGame}
+                />
+            );
         }
         if (this.state.lobbyIds !== undefined) {
-            return (<LobbyList
-                lobbyIds={this.state.lobbyIds}
-                onJoinLobby={(id: string) => this.joinLobby(id)}
-                onCreateLobby={() => this.createLobby()}
-            />);
+            return (
+                <LobbyList
+                    lobbyIds={this.state.lobbyIds}
+                    onJoinLobby={this.joinLobby}
+                    onCreateLobby={this.createLobby}
+                />
+            );
         }
     }
 
