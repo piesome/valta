@@ -15,15 +15,40 @@ export class RemotePeer extends RPC.RemotePeer {
     public faction: Faction;
     private selectedFactionType: string;
 
-    constructor(id: string, ws: WS) {
-        super(id);
+    constructor(ws: WS) {
+        super();
         this.ws = ws;
 
         this.ws.on("close", () => {
             if (this.joined) {
                 this.leave();
             }
+            this.emit("close");
         });
+
+        this.ws.on("open", () => {
+            this.emit("open");
+        });
+
+        this.ws.on("message", (data) => {
+            this.onMessage(data);
+        });
+    }
+
+    public lobbyUpdate(params: RPC.ClientMethods.ILobbyUpdateParams) {
+        return this.call(RPC.ClientMethods.LobbyUpdate, params);
+    }
+
+    public gameUpdate(params: RPC.ClientMethods.IGameUpdateParams) {
+        return this.call(RPC.ClientMethods.GameUpdate, params);
+    }
+
+    public gameStarted(params: RPC.ClientMethods.IGameStartedParams) {
+        return this.call(RPC.ClientMethods.GameStarted, params);
+    }
+
+    public adjustIds(params: RPC.ClientMethods.IAdjustIdsParams) {
+        return this.call<RPC.ClientMethods.IAdjustIdsParams, void>(RPC.ClientMethods.AdjustIds, params);
     }
 
     get lobby() {
@@ -78,5 +103,9 @@ export class RemotePeer extends RPC.RemotePeer {
             factionType: this.factionType,
             id: this.id,
         };
+    }
+
+    protected send(data: string) {
+        this.ws.send(data);
     }
 }

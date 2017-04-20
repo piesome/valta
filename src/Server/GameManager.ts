@@ -1,9 +1,31 @@
+import "reflect-metadata";
+
 import {Game} from "Common/Game";
 import * as RPC from "Common/RPC";
 import {Types} from "Common/Types";
 
 import {Lobby} from "./Lobby";
 import {RemotePeer} from "./RemotePeer";
+
+const RPC_METADATA_KEY = "rpc";
+
+interface IRPC {
+    method: string;
+    fn: (client: RemotePeer, data: any) => any;
+}
+
+function rpc(method: string) {
+    return (target: any, propertyName: string, descriptor: any) => {
+        const rpcs: IRPC[] = Reflect.getMetadata(RPC_METADATA_KEY, target) || [];
+        rpcs.push({
+            method,
+            fn: target[propertyName],
+        });
+        Reflect.defineMetadata(RPC_METADATA_KEY, rpcs, target);
+
+        return descriptor;
+    };
+}
 
 export class GameManager {
     private lobbies: {[id: string]: Lobby};
@@ -29,44 +51,10 @@ export class GameManager {
     public register(peer: RPC.Peer<RemotePeer>) {
         this.peer = peer;
 
-        // lobby
-
-        peer.register<RPC.ListLobbies.Params, RPC.ListLobbies.Response>(
-            RPC.ListLobbies.name,
-            (client, data) => this.listLobbies(client, data),
-        );
-
-        peer.register<RPC.CreateLobby.Params, RPC.CreateLobby.Response>(
-            RPC.CreateLobby.name,
-            (client, data) => this.createLobby(client, data),
-        );
-
-        peer.register<RPC.JoinLobby.Params, RPC.JoinLobby.Response>(
-            RPC.JoinLobby.name,
-            (client, data) => this.joinLobby(client, data),
-        );
-
-        peer.register<RPC.SelectFaction.Params, RPC.SelectFaction.Response>(
-            RPC.SelectFaction.name,
-            (client, data) => this.selectFaction(client, data),
-        );
-
-        peer.register<RPC.LeaveLobby.Params, RPC.LeaveLobby.Response>(
-            RPC.LeaveLobby.name,
-            (client, data) => this.leaveLobby(client, data),
-        );
-
-        // game
-
-        peer.register<RPC.StartGame.Params, RPC.StartGame.Response>(
-            RPC.StartGame.name,
-            (client, data) => this.startGame(client, data),
-        );
-
-        peer.register<RPC.GetGameState.Params, RPC.GetGameState.Response>(
-            RPC.GetGameState.name,
-            (client, data) => this.getGameState(client, data),
-        );
+        const rpcs: IRPC[] = Reflect.getMetadata(RPC_METADATA_KEY, this) || [];
+        for (const rpc of rpcs) {
+            peer.register(rpc.method, rpc.fn.bind(this));
+        }
     }
 
     private getGame(gameid: string): Game {
@@ -88,19 +76,27 @@ export class GameManager {
         return lobby;
     }
 
-    private listLobbies(client: RemotePeer, params: RPC.ListLobbies.Params): RPC.ListLobbies.Response {
+    @rpc(RPC.ServerMethods.ListLobbies)
+    private listLobbies(
+        client: RemotePeer,
+        params: RPC.ServerMethods.IListLobbiesParams,
+    ): RPC.ServerMethods.IListLobbiesResponse {
         return {
             lobbyIds: Object.keys(this.lobbies),
         };
     }
 
-    private createLobby(client: RemotePeer, params: RPC.CreateLobby.Params): RPC.CreateLobby.Response {
+    @rpc(RPC.ServerMethods.CreateLobby)
+    private createLobby(
+        client: RemotePeer,
+        params: RPC.ServerMethods.ICreateLobbyParams,
+    ): RPC.ServerMethods.ICreateLobbyResponse {
         const lobby = new Lobby();
         this.lobbies[lobby.id] = lobby;
 
         lobby.on("update", () => {
             const data = lobby.serialize();
-            lobby.peers.map((x) => this.peer.notifyPeer(x, RPC.LobbyUpdate.name, data));
+            lobby.peers.map((peer) => peer.lobbyUpdate(data));
         });
 
         lobby.on("canBeRemoved", () => {
@@ -114,29 +110,38 @@ export class GameManager {
         };
     }
 
-    private joinLobby(client: RemotePeer, params: RPC.JoinLobby.Params): RPC.JoinLobby.Response {
+    @rpc(RPC.ServerMethods.JoinLobby)
+    private joinLobby(
+        client: RemotePeer,
+        params: RPC.ServerMethods.IJoinLobbyParams,
+    ): RPC.ServerMethods.IJoinLobbyResponse {
         const lobby = this.getLobby(params.id);
         client.join(lobby);
-
-        return {};
     }
 
-    private selectFaction(client: RemotePeer, params: RPC.SelectFaction.Params): RPC.SelectFaction.Response {
+    @rpc(RPC.ServerMethods.SelectFaction)
+    private selectFaction(
+        client: RemotePeer, params: RPC.ServerMethods.ISelectFactionParams,
+    ): RPC.ServerMethods.ISelectFactionResponse {
         // check that params.factionType is valid
         this.types.faction.getType(params.factionType);
         client.factionType = params.factionType;
-
-        return {};
     }
 
-    private leaveLobby(client: RemotePeer, params: RPC.LeaveLobby.Params): RPC.LeaveLobby.Response {
+    @rpc(RPC.ServerMethods.LeaveLobby)
+    private leaveLobby(
+        client: RemotePeer,
+        params: RPC.ServerMethods.ILeaveLobbyParams,
+    ): RPC.ServerMethods.ILeaveLobbyResponse {
         client.assertLobby();
         client.leave();
-
-        return {};
     }
 
-    private startGame(client: RemotePeer, params: RPC.StartGame.Params): RPC.StartGame.Response {
+    @rpc(RPC.ServerMethods.StartGame)
+    private startGame(
+        client: RemotePeer,
+        params: RPC.ServerMethods.IStartGameParams,
+    ): RPC.ServerMethods.IStartGameResponse {
         const lobby = client.lobby;
 
         if (!lobby.canBeStarted()) {
@@ -149,20 +154,22 @@ export class GameManager {
 
         game.on("update", () => {
             const gameState = game.serialize();
-            game.peers.map((x) => this.peer.notifyPeer(x, RPC.GameUpdate.name, gameState));
+            game.peers.map((peer) => peer.gameUpdate(gameState));
         });
 
         const gameState = game.serialize();
 
-        game.peers.map((x) => this.peer.notifyPeer(x, RPC.GameStarted.name, {
-            faction: x.faction.serialize(),
+        game.peers.map((peer) => peer.gameStarted({
+            faction: peer.faction.serialize(),
             gameState,
         }));
-
-        return {};
     }
 
-    private getGameState(client: RemotePeer, params: RPC.GetGameState.Params): RPC.GetGameState.Response {
+    @rpc(RPC.ServerMethods.GetGameState)
+    private getGameState(
+        client: RemotePeer,
+        params: RPC.ServerMethods.IGetGameStateParams,
+    ): RPC.ServerMethods.IGetGameStateResponse {
         return client.game.serialize();
     }
 }

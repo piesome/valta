@@ -43,11 +43,11 @@ export class App extends React.Component<IAppProps, IAppState> {
         this.setState({lobbyIds: []});
         this.updateLobbies();
 
-        this.props.peer.on(RPC.LobbyUpdate.name, (data: RPC.LobbyUpdate.Params) => {
+        this.props.peer.on(RPC.ClientMethods.LobbyUpdate, (data: RPC.ClientMethods.ILobbyUpdateParams) => {
             this.setState({lobby: data});
         });
 
-        this.props.peer.on(RPC.GameStarted.name, (data: RPC.GameStarted.Params) => {
+        this.props.peer.on(RPC.ClientMethods.GameStarted, (data: RPC.ClientMethods.IGameStartedParams) => {
             this.setState({
                 game: new Game(this.props.types),
             });
@@ -55,7 +55,7 @@ export class App extends React.Component<IAppProps, IAppState> {
             this.state.game.deserialize(data.gameState);
         });
 
-        this.props.peer.on(RPC.GameUpdate.name, (data: RPC.GameUpdate.Params) => {
+        this.props.peer.on(RPC.ClientMethods.GameUpdate, (data: RPC.ClientMethods.IGameUpdateParams) => {
             this.state.game.deserialize(data);
         });
     }
@@ -90,18 +90,14 @@ export class App extends React.Component<IAppProps, IAppState> {
     }
 
     private async updateLobbies() {
-        const peer = this.props.peer;
-
-        const data = await peer.callPeer<RPC.ListLobbies.Response>(peer.server, RPC.ListLobbies.name, {});
+        const data = await this.props.peer.server.updateLobbies();
         this.setState({
             lobbyIds: data.lobbyIds,
         });
     }
 
     private async createLobby() {
-        const peer = this.props.peer;
-
-        const data = await peer.callPeer<RPC.CreateLobby.Response>(peer.server, RPC.CreateLobby.name, {});
+        const data = await this.props.peer.server.createLobby();
 
         this.setState({
             lobby: {
@@ -111,9 +107,7 @@ export class App extends React.Component<IAppProps, IAppState> {
     }
 
     private async leaveLobby() {
-        const peer = this.props.peer;
-
-        await peer.callPeer<RPC.LeaveLobby.Response>(peer.server, RPC.LeaveLobby.name, {});
+        await this.props.peer.server.leaveLobby();
 
         this.setState({
             lobby: null,
@@ -121,9 +115,7 @@ export class App extends React.Component<IAppProps, IAppState> {
     }
 
     private async joinLobby(id: string) {
-        const peer = this.props.peer;
-
-        await peer.callPeer<RPC.JoinLobby.Response>(peer.server, RPC.JoinLobby.name, {id});
+        await this.props.peer.server.joinLobby({id});
 
         this.setState({
             lobby: {
@@ -135,7 +127,7 @@ export class App extends React.Component<IAppProps, IAppState> {
     private async startGame() {
         const peer = this.props.peer;
 
-        await peer.callPeer<RPC.StartGame.Response>(peer.server, RPC.StartGame.name, {});
+        await this.props.peer.server.startGame();
 
         this.setState({lobby: null});
     }
@@ -143,8 +135,6 @@ export class App extends React.Component<IAppProps, IAppState> {
     private selectFaction(factionType: string) {
         const peer = this.props.peer;
 
-        peer.callPeer<RPC.SelectFaction.Response>(peer.server, RPC.SelectFaction.name, {
-            factionType,
-        });
+        this.props.peer.server.selectFaction({factionType});
     }
 }

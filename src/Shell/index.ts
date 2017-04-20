@@ -11,7 +11,7 @@ import * as RPC from "Common/RPC";
 const ws = new WS(process.argv[2] || "ws://localhost:3001");
 
 function completer(line: string) {
-    const possible = RPC.SERVER_METHODS;
+    const possible = RPC.ServerMethods.SERVER_METHODS;
     const hits = possible.filter((x) => x.indexOf(line) === 0);
 
     return [hits.length ? hits : possible, line];
