@@ -1,10 +1,9 @@
 import {EventEmitter} from "eventemitter3";
-
 import * as R from "ramda";
 import {v4 as uuid} from "uuid";
 
-import {TerrainGenerator} from "../Common/TerrainGenerator";
-import {Types} from "../Common/Types";
+import {TerrainGenerator} from "Common/TerrainGenerator";
+import {Types} from "Common/Types";
 
 import {IJoinable} from "./Joinable";
 import {RemotePeer} from "./RemotePeer";

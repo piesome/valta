@@ -1,4 +1,4 @@
-import * as RPC from "../Common/RPC";
+import * as RPC from "Common/RPC";
 
 export class RemotePeer extends RPC.RemotePeer {
     public ws: WebSocket;

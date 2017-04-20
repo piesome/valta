@@ -1,7 +1,7 @@
 import * as React from "react"; // tslint:disable-line
 import * as ReactDOM from "react-dom";
 
-import {Types} from "../Common/Types";
+import {Types} from "Common/Types";
 
 import {App} from "./Components/App";
 import {Peer} from "./Peer";

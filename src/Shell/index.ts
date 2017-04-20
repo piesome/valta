@@ -6,7 +6,7 @@ import * as yaml from "js-yaml";
 import {v4 as uuid} from "uuid";
 import * as WS from "ws";
 
-import * as RPC from "../Common/RPC";
+import * as RPC from "Common/RPC";
 
 const ws = new WS(process.argv[2] || "ws://localhost:3001");
 

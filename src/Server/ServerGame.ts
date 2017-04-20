@@ -1,7 +1,7 @@
 import * as R from "ramda";
 
-import {Game} from "../Common/Game";
-import {Types} from "../Common/Types";
+import {Game} from "Common/Game";
+import {Types} from "Common/Types";
 
 import {IJoinable} from "./Joinable";
 import {RemotePeer} from "./RemotePeer";

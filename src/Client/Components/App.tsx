@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import {Game} from "../../Common/Game";
-import * as RPC from "../../Common/RPC";
-import {Types} from "../../Common/Types";
+import {Game} from "Common/Game";
+import * as RPC from "Common/RPC";
+import {Types} from "Common/Types";
 
 import {Peer} from "../Peer";
 import {Lobby} from "./Lobby";

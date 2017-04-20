@@ -12,7 +12,14 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "outDir": "dist",
-    "jsx": "react"
+    "jsx": "react",
+    "baseUrl": ".",
+    "paths": {
+      "Common/*": ["src/Common/*"],
+      "Server/*": ["src/Server/*"],
+      "Shell/*": ["src/Shell/*"],
+      "Client/*": ["src/Client/*"]
+    }
   },
   "exclude": [
     "node_modules",

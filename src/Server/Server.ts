@@ -1,7 +1,8 @@
 import {v4 as uuid} from "uuid";
 import * as WS from "ws";
 
-import * as RPC from "../Common/RPC";
+import * as RPC from "Common/RPC";
+
 import {RemotePeer} from "./RemotePeer";
 
 export class Server extends RPC.Peer<RemotePeer> {

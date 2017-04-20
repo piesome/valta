@@ -1,6 +1,6 @@
-import {Game} from "../Common/Game";
-import * as RPC from "../Common/RPC";
-import {Types} from "../Common/Types";
+import {Game} from "Common/Game";
+import * as RPC from "Common/RPC";
+import {Types} from "Common/Types";
 
 import {Lobby} from "./Lobby";
 import {RemotePeer} from "./RemotePeer";

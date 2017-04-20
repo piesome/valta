@@ -1,7 +1,7 @@
 import * as WS from "ws";
 
-import {Faction} from "../Common/Models";
-import * as RPC from "../Common/RPC";
+import {Faction} from "Common/Models";
+import * as RPC from "Common/RPC";
 
 import {IJoinable} from "./Joinable";
 import {Lobby} from "./Lobby";

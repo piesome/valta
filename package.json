@@ -8,8 +8,8 @@
   "scripts": {
     "lint": "tslint --project ./tsconfig.json --type-check 'src/**/*.ts?(x)'",
     "data": "ts-node datapacker.ts",
-    "shell": "ts-node src/Shell/index.ts",
-    "server": "ts-node src/Server/index.ts",
+    "shell": "ts-node -r tsconfig-paths/register src/Shell/index.ts",
+    "server": "ts-node -r tsconfig-paths/register src/Server/index.ts",
     "client": "webpack",
     "client:dev": "webpack-dev-server --port 3000 --content-base ."
   },
@@ -35,6 +35,7 @@
     "reflect-metadata": "^0.1.10",
     "source-map-loader": "^0.2.1",
     "ts-node": "^3.0.2",
+    "tsconfig-paths": "^2.1.2",
     "tslint": "4",
     "tslint-react": "^2.6.0",
     "typescript": "2.2",
