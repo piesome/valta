@@ -5,8 +5,8 @@ import {v4 as uuid} from "uuid";
 import {TerrainGenerator} from "Common/TerrainGenerator";
 import {Types} from "Common/Types";
 
+import {RemotePeer} from "../RemotePeer";
 import {IJoinable} from "./Joinable";
-import {RemotePeer} from "./RemotePeer";
 import {ServerGame} from "./ServerGame";
 
 export class Lobby extends EventEmitter implements IJoinable {

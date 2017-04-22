@@ -3,8 +3,8 @@ import * as R from "ramda";
 import {Game} from "Common/Game";
 import {Types} from "Common/Types";
 
+import {RemotePeer} from "../RemotePeer";
 import {IJoinable} from "./Joinable";
-import {RemotePeer} from "./RemotePeer";
 
 export class ServerGame extends Game implements IJoinable {
     public type = "game";

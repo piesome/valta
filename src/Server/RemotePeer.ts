@@ -3,9 +3,9 @@ import * as WS from "ws";
 import {Faction} from "Common/Models";
 import * as RPC from "Common/RPC";
 
-import {IJoinable} from "./Joinable";
-import {Lobby} from "./Lobby";
-import {ServerGame} from "./ServerGame";
+import {IJoinable} from "./Models/Joinable";
+import {Lobby} from "./Models/Lobby";
+import {ServerGame} from "./Models/ServerGame";
 
 export class RemotePeer extends RPC.RemotePeer {
     public ws: WS;

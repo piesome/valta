@@ -1,4 +1,4 @@
-import {RemotePeer} from "./RemotePeer";
+import {RemotePeer} from "../RemotePeer";
 
 export interface IJoinable {
     type: string;

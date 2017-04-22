@@ -1,12 +1,17 @@
-import {GameManager} from "./GameManager";
+import "reflect-metadata";
+
+import {GameRPCHandler, LobbyRPCHandler} from "./RPC";
 import {Server} from "./Server";
 
-const server = new Server();
-const gameManager = new GameManager();
-gameManager.register(server);
+const start = async () => {
+    const server = new Server();
+    server.load();
 
-gameManager.load()
-    .catch((err) => {
-        console.error(err);
-        process.exit(1);
-    });
+    server.addRPCHandler(new LobbyRPCHandler());
+    server.addRPCHandler(new GameRPCHandler());
+};
+
+start().catch((e) => {
+    console.error(e);
+    process.exit(1);
+});
