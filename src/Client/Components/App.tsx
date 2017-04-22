@@ -51,8 +51,6 @@ export class App extends React.Component<IAppProps, IAppState> {
             this.setState({
                 game: new Game(this.props.types),
             });
-
-            this.state.game.deserialize(data.gameState);
         });
 
         this.props.peer.on(RPC.ClientMethods.GameUpdate, (data: RPC.ClientMethods.IGameUpdateParams) => {

@@ -46,19 +46,6 @@ export class Lobby extends EventEmitter implements IJoinable {
         return this.peers.length === 0;
     }
 
-    /**
-     * Probably doesn't belong here
-     * @param types
-     */
-    public start(types: Types): ServerGame {
-        const game = new ServerGame(types);
-        (new TerrainGenerator(game, 3)).generate();
-
-        this.peers.map((x) => x.join(game));
-
-        return game;
-    }
-
     public serialize() {
         return {
             canBeStarted: this.canBeStarted(),

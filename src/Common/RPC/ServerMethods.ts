@@ -1,5 +1,7 @@
 import * as GS from "../GameState";
 
+// lobbies
+
 export const ListLobbies = "ListLobbies";
 export type IListLobbiesParams = void;
 export interface IListLobbiesResponse {
@@ -28,6 +30,8 @@ export interface ISelectFactionParams {
 }
 export type ISelectFactionResponse = void;
 
+// game
+
 export const StartGame = "StartGame";
 export type IStartGameParams = void;
 export type IStartGameResponse = void;
@@ -35,6 +39,16 @@ export type IStartGameResponse = void;
 export const GetGameState = "GetGameState";
 export type IGetGameStateParams = void;
 export type IGetGameStateResponse = GS.IGameState;
+
+export const JoinGame = "JoinGame";
+export interface IJoinGameParams {
+    id: GS.ID;
+}
+export type IJoinGameResponse = void;
+
+export const EndTurn = "EndTurn";
+export type IEndTurnParams = void;
+export type IEndTurnResponse = void;
 
 /**
  * Todo automatically populated from above
@@ -47,4 +61,6 @@ export const SERVER_METHODS = [
     JoinLobby,
     CreateLobby,
     ListLobbies,
+    JoinGame,
+    EndTurn,
 ];

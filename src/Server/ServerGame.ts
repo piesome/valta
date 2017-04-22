@@ -17,9 +17,21 @@ export class ServerGame extends Game implements IJoinable {
     }
 
     public addPeer(peer: RemotePeer) {
+        const readyFaction = this.getFactionByPeerId(peer.id);
+        if (readyFaction) {
+            // client returning
+            peer.faction = readyFaction;
+        } else {
+            // client joining for first time
+            if (this.tick !== 0) {
+                throw new Error("New peer can't join in the middle of the game");
+            }
+
+            const faction = this.createFaction(peer.id, peer.factionType);
+            peer.faction = faction;
+        }
+
         this.peers.push(peer);
-        const faction = this.createFaction(peer.factionType);
-        peer.faction = faction;
     }
 
     public removePeer(peer: RemotePeer) {

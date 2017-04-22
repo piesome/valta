@@ -13,6 +13,7 @@ export interface ITerrainData {
 }
 
 export interface IGameState {
+    tick: number;
     terrain: ITerrainData;
     factions: IFaction[];
 }
@@ -25,6 +26,8 @@ export interface IFaction {
     factionType: FactionType;
     unlockedUpgrades: UpgradeName[];
     canAct: boolean;
+    peerId: ID;
+    order: number;
 }
 
 export type UpgradeName = string;

@@ -92,6 +92,13 @@ export class RemotePeer extends RPC.RemotePeer {
         this.joined = null;
     }
 
+    public endTurn() {
+        if (this.game && !this.faction.canAct) {
+            throw new Error("Can't end turn when it's not your turn");
+        }
+        this.game.endTurn();
+    }
+
     public assertLobby() {
         if (!this.lobby) {
             throw new Error("Client hasn't joined a lobby");

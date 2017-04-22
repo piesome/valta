@@ -16,7 +16,6 @@ export type IGameUpdateParams = GS.IGameState;
 
 export const GameStarted = "GameStarted";
 export interface IGameStartedParams {
-    gameState: GS.IGameState;
     faction: GS.IFaction;
 }
 

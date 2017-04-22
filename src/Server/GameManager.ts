@@ -1,11 +1,14 @@
+import * as R from "ramda";
 import "reflect-metadata";
 
 import {Game} from "Common/Game";
 import * as RPC from "Common/RPC";
+import {TerrainGenerator} from "Common/TerrainGenerator";
 import {Types} from "Common/Types";
 
 import {Lobby} from "./Lobby";
 import {RemotePeer} from "./RemotePeer";
+import {ServerGame} from "./ServerGame";
 
 const RPC_METADATA_KEY = "rpc";
 
@@ -29,7 +32,7 @@ function rpc(method: string) {
 
 export class GameManager {
     private lobbies: {[id: string]: Lobby};
-    private games: {[id: string]: Game};
+    private games: {[id: string]: ServerGame};
     private types: Types;
     private peer: RPC.Peer<RemotePeer>;
 
@@ -57,7 +60,7 @@ export class GameManager {
         }
     }
 
-    private getGame(gameid: string): Game {
+    private getGame(gameid: string): ServerGame {
         const game = this.games[gameid];
 
         if (!game) {
@@ -148,21 +151,24 @@ export class GameManager {
             throw new Error("Not all players have selected their faction yet");
         }
 
-        const game = lobby.start(this.types);
+        const game = new ServerGame(this.types);
+        (new TerrainGenerator(game, 3)).generate();
 
-        delete this.lobbies[lobby.id];
+        R.map((x) => x.join(game), lobby.peers);
 
         game.on("update", () => {
             const gameState = game.serialize();
             game.peers.map((peer) => peer.gameUpdate(gameState));
         });
 
-        const gameState = game.serialize();
+        game.endTurn();
 
-        game.peers.map((peer) => peer.gameStarted({
-            faction: peer.faction.serialize(),
-            gameState,
-        }));
+        delete this.lobbies[lobby.id];
+
+        const gameState = game.serialize();
+        R.map((x) => x.gameStarted({
+            faction: x.faction.serialize(),
+        }), game.peers);
     }
 
     @rpc(RPC.ServerMethods.GetGameState)
@@ -171,5 +177,22 @@ export class GameManager {
         params: RPC.ServerMethods.IGetGameStateParams,
     ): RPC.ServerMethods.IGetGameStateResponse {
         return client.game.serialize();
+    }
+
+    @rpc(RPC.ServerMethods.JoinGame)
+    private joinGame(
+        client: RemotePeer,
+        params: RPC.ServerMethods.IJoinGameParams,
+    ): RPC.ServerMethods.IJoinGameResponse {
+        const game = this.getGame(params.id);
+        client.join(game);
+    }
+
+    @rpc(RPC.ServerMethods.EndTurn)
+    private endTurn(
+        client: RemotePeer,
+        params: RPC.ServerMethods.IEndTurnParams,
+    ): RPC.ServerMethods.IEndTurnResponse {
+        client.endTurn();
     }
 }

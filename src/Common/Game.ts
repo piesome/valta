@@ -1,4 +1,5 @@
 import * as EE from "events";
+import * as R from "ramda";
 import {v4 as uuid} from "uuid";
 
 import * as GS from "./GameState";
@@ -11,35 +12,49 @@ import {Types} from "./Types";
 export class Game extends EE {
     public types: Types;
 
-    private terrain: {[x: number]: {[y: number]: {[z: number]: TerrainSegment}}};
-    private factions: Faction[];
+    protected tick: number;
+    protected terrain: {[x: number]: {[y: number]: {[z: number]: TerrainSegment}}};
+    protected factions: Faction[];
 
     constructor(
         types?: Types,
     ) {
         super();
 
+        this.tick = 0;
         this.terrain = {};
         this.factions = [];
 
         this.types = types || new Types();
     }
 
-    public createFaction(factionType: string): Faction {
+    public endTurn() {
+        const orderedFactions = R.sortBy((faction) => faction.order, this.factions);
+        const currentTurn = R.find((faction) => faction.canAct, orderedFactions);
+
+        R.map((faction) => faction.canAct = false, this.factions);
+
+        if (!currentTurn || currentTurn.order === orderedFactions.length - 1) {
+            this.getFaction(orderedFactions[0].id).canAct = true;
+        } else {
+            this.getFaction(orderedFactions[currentTurn.order + 1].id).canAct = true;
+        }
+
+        this.tick += 1;
+        this.emit("update");
+    }
+
+    public createFaction(peerId: GS.ID, factionType: GS.FactionType): Faction {
         const type = this.types.faction.getType(factionType);
         const faction = new Faction(
             uuid(),
             type,
             false,
             this.types.upgrade.automaticallyUnlocked(),
+            peerId,
+            this.factions.length,
         );
 
-        this.addFaction(faction);
-
-        return faction;
-    }
-
-    public addFaction(faction: Faction): Faction {
         this.factions.push(faction);
 
         return faction;
@@ -47,6 +62,10 @@ export class Game extends EE {
 
     public getFaction(id: GS.ID) {
         return this.factions.filter((x) => x.id === id)[0];
+    }
+
+    public getFactionByPeerId(peerId: GS.ID) {
+        return this.factions.filter((x) => x.peerId === peerId)[0];
     }
 
     public addTerrain(terrain: TerrainSegment) {
@@ -70,6 +89,7 @@ export class Game extends EE {
     }
 
     public deserialize(data: GS.IGameState) {
+        this.tick = data.tick;
         this.factions = data.factions.map((x) => Faction.deserialize(this, x));
         this.deserializeTerrain(data.terrain);
     }
@@ -78,6 +98,7 @@ export class Game extends EE {
         return {
             factions: this.factions.map((x) => x.serialize()),
             terrain: this.serializeTerrain(),
+            tick: this.tick,
         };
     }
 
