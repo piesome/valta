@@ -8,7 +8,11 @@
 ```sh
 yarn install
 yarn data
-yarn server
-# in another shell
+./node_modules/.bin/knex migrate:latest --env index-server-development
+./node_modules/.bin/knex migrate:latest --env game-server-development
+
+# each in different shell
+yarn index-server
+yarn game-server
 yarn client:dev
 ```

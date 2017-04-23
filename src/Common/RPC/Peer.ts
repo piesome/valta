@@ -10,8 +10,8 @@ export const RESERVED_METHOD_NAMES = ["call", "open", "close"];
 export abstract class Peer<T extends RemotePeer> extends EventEmitter {
     public id: string;
 
+    protected peers: {[id: string]: T};
     private methods: {[name: string]: RPCFn<T, any, any>};
-    private peers: {[id: string]: T};
 
     constructor() {
         super();
@@ -58,6 +58,17 @@ export abstract class Peer<T extends RemotePeer> extends EventEmitter {
 
         try {
             const ret = this.methods[data.method](peer, data.params);
+
+            if (ret && typeof ret.then === "function") {
+                const prom = ret as Promise<any>;
+                return prom.then((promRet) => {
+                    peer.respond(data.id, promRet);
+                }, (err) => {
+                    console.error(err);
+                    peer.error(data.id, err.toString());
+                });
+            }
+
             peer.respond(data.id, ret);
         } catch (err) {
             console.error(err);

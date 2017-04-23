@@ -4,26 +4,22 @@ import {Game} from "Common/Game";
 import * as RPC from "Common/RPC";
 import {Types} from "Common/Types";
 
-import {Peer} from "../Peer";
+import {Client} from "../Client";
+import {GameList} from "./GameList";
 import {Lobby} from "./Lobby";
-import {LobbyList} from "./LobbyList";
 
 export interface IAppProps {
-    peer: Peer;
+    client: Client;
     types: Types;
 }
 
 export interface IAppState {
-    lobbyIds: string[];
-    lobby: {
+    games: Array<{
         id: string;
-        name?: string;
-        canBeStarted?: boolean;
-        peers?: Array<{
-            id: string,
-            factionType: string,
-        }>
-    };
+        name: string;
+        factionCount: number;
+        status: string;
+    }>;
     game: Game;
 }
 
@@ -32,28 +28,22 @@ export class App extends React.Component<IAppProps, IAppState> {
         super(props);
 
         // big thanks to react for making our code so nice....
-        this.createLobby = this.createLobby.bind(this);
-        this.joinLobby = this.joinLobby.bind(this);
-        this.leaveLobby = this.leaveLobby.bind(this);
         this.selectFaction = this.selectFaction.bind(this);
         this.startGame = this.startGame.bind(this);
+
+        this.createGame = this.createGame.bind(this);
+        this.joinGame = this.joinGame.bind(this);
     }
 
     public componentWillMount() {
-        this.setState({lobbyIds: []});
-        this.updateLobbies();
+        this.setState({games: []});
+        this.updateGames();
 
-        this.props.peer.on(RPC.ClientMethods.LobbyUpdate, (data: RPC.ClientMethods.ILobbyUpdateParams) => {
-            this.setState({lobby: data});
-        });
+        this.props.client.on(RPC.ClientMethods.GameUpdate, (data: RPC.ClientMethods.IGameUpdateParams) => {
+            if (!this.state.game) {
+                this.setState({game: new Game(this.props.types)});
+            }
 
-        this.props.peer.on(RPC.ClientMethods.GameStarted, (data: RPC.ClientMethods.IGameStartedParams) => {
-            this.setState({
-                game: new Game(this.props.types),
-            });
-        });
-
-        this.props.peer.on(RPC.ClientMethods.GameUpdate, (data: RPC.ClientMethods.IGameUpdateParams) => {
             this.state.game.deserialize(data);
         });
     }
@@ -64,75 +54,43 @@ export class App extends React.Component<IAppProps, IAppState> {
                 <strong>TODO: game</strong>
             );
         }
-        if (this.state.lobby) {
+        if (!this.state.game) {
             return (
-                <Lobby
-                    factionTypes={this.props.types.faction.possible()}
-                    lobby={this.state.lobby}
-                    ourId={this.props.peer.id}
-                    onLeave={this.leaveLobby}
-                    onSelectFaction={this.selectFaction}
-                    onStartGame={this.startGame}
-                />
-            );
-        }
-        if (this.state.lobbyIds !== undefined) {
-            return (
-                <LobbyList
-                    lobbyIds={this.state.lobbyIds}
-                    onJoinLobby={this.joinLobby}
-                    onCreateLobby={this.createLobby}
+                <GameList
+                    games={this.state.games}
+                    createGame={this.createGame}
+                    joinGame={this.joinGame}
                 />
             );
         }
     }
 
-    private async updateLobbies() {
-        const data = await this.props.peer.server.updateLobbies();
+    private async updateGames() {
+        const data = await this.props.client.indexServer.listGames();
         this.setState({
-            lobbyIds: data.lobbyIds,
+            games: data.games,
         });
     }
 
-    private async createLobby() {
-        const data = await this.props.peer.server.createLobby();
-
-        this.setState({
-            lobby: {
-                id: data.id,
-            },
-        });
+    private async createGame() {
+        const data = await this.props.client.indexServer.createGame();
+        await this.props.client.connectToGame(data.url);
     }
 
-    private async leaveLobby() {
-        await this.props.peer.server.leaveLobby();
-
-        this.setState({
-            lobby: null,
-        });
-    }
-
-    private async joinLobby(id: string) {
-        await this.props.peer.server.joinLobby({id});
-
-        this.setState({
-            lobby: {
-                id,
-            },
-        });
+    private async joinGame(id: string) {
+        const data = await this.props.client.indexServer.joinGame(id);
+        await this.props.client.connectToGame(data.url);
     }
 
     private async startGame() {
-        const peer = this.props.peer;
+        const peer = this.props.client;
 
-        await this.props.peer.server.startGame();
-
-        this.setState({lobby: null});
+        await this.props.client.gameServer.startGame();
     }
 
     private selectFaction(factionType: string) {
-        const peer = this.props.peer;
+        const peer = this.props.client;
 
-        this.props.peer.server.selectFaction({factionType});
+        this.props.client.gameServer.selectFaction({factionType});
     }
 }

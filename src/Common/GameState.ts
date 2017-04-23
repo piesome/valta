@@ -12,7 +12,13 @@ export interface ITerrainData {
     };
 }
 
-export interface IGameState {
+export type GameStatus = "lobby" | "started" | "ended";
+
+export interface IGame {
+    id: ID;
+    name: string;
+    status: GameStatus;
+
     tick: number;
     terrain: ITerrainData;
     factions: IFaction[];
@@ -26,7 +32,6 @@ export interface IFaction {
     factionType: FactionType;
     unlockedUpgrades: UpgradeName[];
     canAct: boolean;
-    peerId: ID;
     order: number;
 }
 

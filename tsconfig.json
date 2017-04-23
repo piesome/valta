@@ -16,7 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "Common/*": ["src/Common/*"],
-      "Server/*": ["src/Server/*"],
+      "GameServer/*": ["src/GameServer/*"],
       "Shell/*": ["src/Shell/*"],
       "Client/*": ["src/Client/*"]
     }

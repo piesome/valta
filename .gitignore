@@ -39,3 +39,4 @@ jspm_packages
 dist
 ts-node-*
 data.js
+*.sqlite3

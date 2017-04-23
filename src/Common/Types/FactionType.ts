@@ -4,4 +4,8 @@ export class FactionType {
     constructor(name: string) {
         this.name = name;
     }
+
+    get isReal() {
+        return this.name !== "undecided";
+    }
 }

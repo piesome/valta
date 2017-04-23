@@ -11,7 +11,6 @@ export class Faction {
             game.types.faction.getType(data.factionType),
             data.canAct,
             data.unlockedUpgrades.map((x) => game.types.upgrade.getType(x)),
-            data.peerId,
             data.order,
         );
     }
@@ -21,7 +20,6 @@ export class Faction {
         public type: FactionType,
         public canAct: boolean,
         public upgrades: UpgradeType[],
-        public peerId: GS.ID,
         public order: number,
     ) {}
 
@@ -39,7 +37,6 @@ export class Faction {
             factionType: this.type.name,
             id: this.id,
             order: this.order,
-            peerId: this.peerId,
             unlockedUpgrades: this.upgrades.map((x) => x.name),
         };
     }

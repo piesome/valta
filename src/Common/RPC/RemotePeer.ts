@@ -20,10 +20,10 @@ export abstract class RemotePeer extends EventEmitter {
 
     private ongoingCalls: {[id: string]: (response: IResponse) => void};
 
-    constructor() {
+    constructor(id?: string) {
         super();
 
-        this.id = uuid();
+        this.id = id || uuid();
         this.ongoingCalls = {};
     }
 
