@@ -12,8 +12,8 @@ export class GameServer extends RPC.RemotePeer {
             this.onMessage(event.data);
         };
 
-        this.ws.onclose = () => {
-            this.emit("close");
+        this.ws.onclose = (ev: CloseEvent) => {
+            this.emit("close", new Error(ev.reason));
         };
 
         this.ws.onopen = () => {

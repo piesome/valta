@@ -53,7 +53,7 @@ export abstract class Peer<T extends RemotePeer> extends EventEmitter {
                 return peer.respond(data.id, null);
             }
 
-            return peer.error(data.id, "no such method");
+            return peer.error(data.id, `no such method ${data.method}`);
         }
 
         try {

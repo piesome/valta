@@ -25,8 +25,11 @@ export class Client extends RPC.Peer<GameServer | IndexServer> {
         this.addPeer(this.gameServer);
 
         return new Promise<void>((accept, reject) => {
-            this.gameServer.on("open", () => {
+            this.on(RPC.ClientMethods.Hi, (d) => {
                 accept();
+            });
+            this.gameServer.on("close", (reason) => {
+                reject(reason);
             });
         });
     }

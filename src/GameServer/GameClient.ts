@@ -52,8 +52,8 @@ export class GameClient extends RPC.RemotePeer {
         return this.call(RPC.ClientMethods.GameUpdate, params);
     }
 
-    public adjustIds(params: RPC.ClientMethods.IAdjustIdsParams) {
-        return this.call<RPC.ClientMethods.IAdjustIdsParams, void>(RPC.ClientMethods.AdjustIds, params);
+    public hi() {
+        return this.callNoParams(RPC.ClientMethods.Hi);
     }
 
     public endTurn() {

@@ -50,30 +50,38 @@ export class GameServer extends RPC.Peer<GameClient> {
     }
 
     private onConnection(ws: WS) {
-        let payload: any;
         try {
             const parsed = url.parse(ws.upgradeReq.url, true);
             const token = parsed.query.token;
 
-            payload = jwt.verify(token, this.index.authenticatedSecret, {
+            const payload = jwt.verify(token, this.index.authenticatedSecret, {
                 algorithms: ["HS512"],
                 audience: this.index.authenticatedId,
             });
+
+            const peer = new GameClient(payload.peer.id, ws);
+            this.addPeer(peer);
+
+            this.log(`New peer ${peer.id}`);
+
+            if (!this.games[payload.game.id]) {
+                this.createGame(payload.game.id);
+            }
+
+            const game = this.getGame(payload.game.id);
+
+            if (game.status !== "lobby") {
+                // This will throw if the peer doesn't belong in the game
+                game.getFaction(peer.id);
+            }
+
+            peer.hi();
+
+            peer.game = game;
         } catch (e) {
             this.log(e);
-            return ws.close();
+            return ws.close(3000, e.toString());
         }
-
-        const peer = new GameClient(payload.peer.id, ws);
-        this.addPeer(peer);
-
-        this.log(`New peer ${peer.id}`);
-
-        if (!this.games[payload.game.id]) {
-            this.createGame(payload.game.id);
-        }
-
-        peer.game = this.getGame(payload.game.id);
     }
 
     private createGame(gameId: string) {
