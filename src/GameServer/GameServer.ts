@@ -78,6 +78,7 @@ export class GameServer extends RPC.Peer<GameClient> {
 
     private createGame(gameId: string) {
         const game = this.games[gameId] = new ServerGame(gameId, this.types);
+        game.name = "unnamed";
 
         this.log(`Game ${game.id} created`);
 

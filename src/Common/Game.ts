@@ -17,9 +17,9 @@ export class Game extends EventEmitter {
     public name: string;
     public status: GS.GameStatus;
 
-    protected tick: number;
-    protected terrain: {[x: number]: {[y: number]: {[z: number]: TerrainSegment}}};
-    protected factions: Faction[];
+    public factions: Faction[];
+    public tick: number;
+    public terrain: {[x: number]: {[y: number]: {[z: number]: TerrainSegment}}};
 
     constructor(
         types?: Types,

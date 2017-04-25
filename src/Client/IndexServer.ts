@@ -48,6 +48,7 @@ export class IndexServer extends RPC.RemotePeer {
             const configData = JSON.parse(config);
             try {
                 await this.authenticateWith(configData.id, configData.secret);
+                this.emit("id", configData.id);
                 return;
             } catch (err) {
                 console.error(err);
@@ -56,6 +57,7 @@ export class IndexServer extends RPC.RemotePeer {
 
         const registered = await this.register();
 
+        this.emit("id", registered.id);
         window.localStorage.setItem("config", JSON.stringify(registered));
     }
 

@@ -4,6 +4,6 @@
     "tslint-react"
   ],
   "rules": {
-    
+    "no-var-requires": false
   }
 }

@@ -14,16 +14,15 @@ export class Client extends RPC.Peer<GameServer | IndexServer> {
     }
 
     public connectToGame(url: string): Promise<void> {
+        if (this.gameServer) {
+            this.gameServer.close();
+        }
+
         this.gameServer = new GameServer(
             new WebSocket(url),
         );
 
         this.addPeer(this.gameServer);
-
-        this.register<RPC.ClientMethods.IAdjustIdsParams, void>(RPC.ClientMethods.AdjustIds, (client, params) => {
-            this.id = params.youAre;
-            this.gameServer.id = params.iAm;
-        });
 
         return new Promise<void>((accept, reject) => {
             this.gameServer.on("open", () => {
@@ -38,6 +37,10 @@ export class Client extends RPC.Peer<GameServer | IndexServer> {
         );
 
         this.addPeer(this.indexServer);
+
+        this.indexServer.on("id", (id: string) => {
+            this.id = id;
+        });
 
         return new Promise<void>((accept, reject) => {
             this.indexServer.on("open", () => {

@@ -31,6 +31,7 @@ export class ServerGame extends Game {
             const readyFaction = this.getFaction(peer.id);
             peer.faction = readyFaction;
             this.peers.push(peer);
+            peer.gameUpdate(this.serialize());
         } catch (e) {
             this.assertLobby();
 
@@ -43,6 +44,11 @@ export class ServerGame extends Game {
 
     public removePeer(peer: GameClient) {
         this.peers = R.filter((x) => x.id !== peer.id, this.peers);
+
+        if (this.status !== "lobby") {
+            return;
+        }
+
         this.removeFaction(peer.id);
 
         if (this.canBeRemoved()) {
