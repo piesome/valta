@@ -3,6 +3,7 @@ import * as url from "url";
 import * as debug from "debug";
 import * as jwt from "jsonwebtoken";
 import * as Knex from "knex";
+import * as R from "ramda";
 import {v4 as uuid} from "uuid";
 import * as WS from "ws";
 
@@ -46,7 +47,9 @@ export class GameServer extends RPC.Peer<GameClient> {
 
         this.wss.on("connection", (x) => this.onConnection(x));
 
-        return await this.types.load();
+        await this.types.load();
+
+        await this.loadGames();
     }
 
     private onConnection(ws: WS) {
@@ -84,21 +87,71 @@ export class GameServer extends RPC.Peer<GameClient> {
         }
     }
 
+    private watchGame(game: ServerGame) {
+        game.on("canBeRemoved", () => {
+            if (this.games[game.id]) {
+                this.removeGame(game.id);
+            }
+        });
+
+        game.on("update", async () => {
+            this.index.setGameStatus(game.serializeShort());
+            if (game.status !== "lobby") {
+                const serialized = JSON.stringify(game.serialize());
+
+                const changed = await this.db
+                    .table("game")
+                    .update({
+                        data: serialized,
+                    })
+                    .where("id", game.id);
+
+                if (changed === 1) {
+                    this.log(`Game ${game.id} updated`);
+                    return;
+                }
+
+                await this.db
+                    .table("game")
+                    .insert({
+                        data: serialized,
+                        id: game.id,
+                    });
+                this.log(`Game ${game.id} inserted`);
+            }
+        });
+    }
+
     private createGame(gameId: string) {
         const game = this.games[gameId] = new ServerGame(gameId, this.types);
         game.name = "unnamed";
 
         this.log(`Game ${game.id} created`);
 
-        game.on("canBeRemoved", () => {
-            if (this.games[gameId]) {
-                this.removeGame(gameId);
-            }
-        });
+        this.watchGame(game);
+    }
 
-        game.on("update", () => {
-            this.index.setGameStatus(game.serializeShort());
-        });
+    private async loadGames() {
+        const games = await this.db
+            .table("game")
+            .select();
+
+        return Promise.all(R.map((game: any) => this.loadGame(game.id, JSON.parse(game.data)), games));
+    }
+
+    private async loadGame(id: string, data: any) {
+        if (!data) {
+            return;
+        }
+
+        const game = this.games[id] = new ServerGame(id, this.types);
+        game.deserialize(data);
+
+        this.log(`Game ${game.id} loaded`);
+
+        this.watchGame(game);
+
+        this.index.setGameStatus(game.serializeShort());
     }
 
     private removeGame(gameId: string) {
