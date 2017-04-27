@@ -27,7 +27,7 @@ export class Faction {
         return R.flatten(R.map((x) => x.effects, this.upgrades));
     }
 
-    public improvementsFor(target: EffectTarget): Effect[] {
+    public effectsFor(target: EffectTarget): Effect[] {
         return R.filter((x) => R.equals(x.target, target), this.effects());
     }
 

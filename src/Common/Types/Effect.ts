@@ -11,11 +11,11 @@ export interface Effect {
 }
 
 export interface EffectsFor {
-    improvementsFor(target: EffectTarget): Effect[];
+    effectsFor(target: EffectTarget): Effect[];
 }
 
 export function calculateValue(faction: EffectsFor, target: EffectTarget, baseValue: number): number {
-    const effects = faction.improvementsFor(target);
+    const effects = faction.effectsFor(target);
     let constant = 0;
     let multiplier = 1;
 
@@ -32,7 +32,7 @@ export function calculateValue(faction: EffectsFor, target: EffectTarget, baseVa
 }
 
 export function unlocked(faction: EffectsFor, target: EffectTarget): boolean {
-    const effects = faction.improvementsFor(target);
+    const effects = faction.effectsFor(target);
 
     for (const improvement of effects) {
         if (improvement.type === "unlock") {
