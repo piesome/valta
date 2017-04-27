@@ -2,7 +2,7 @@ import * as R from "ramda";
 
 import {Game} from "../Game";
 import * as GS from "../GameState";
-import {FactionType, Improvement, ImprovementTarget, UpgradeType} from "../Types";
+import {Effect, EffectTarget, FactionType, UpgradeType} from "../Types";
 
 export class Faction {
     public static deserialize(game: Game, data: GS.IFaction): Faction {
@@ -23,12 +23,12 @@ export class Faction {
         public order: number,
     ) {}
 
-    public improvements(): Improvement[] {
-        return R.flatten(R.map((x) => x.improvements, this.upgrades));
+    public effects(): Effect[] {
+        return R.flatten(R.map((x) => x.effects, this.upgrades));
     }
 
-    public improvementsFor(target: ImprovementTarget): Improvement[] {
-        return R.filter((x) => R.equals(x.target, target), this.improvements());
+    public improvementsFor(target: EffectTarget): Effect[] {
+        return R.filter((x) => R.equals(x.target, target), this.effects());
     }
 
     public serialize(): GS.IFaction {

@@ -3,7 +3,7 @@
     "name": "base",
     "dependsOn": null,
     "automaticallyUnlocked": true,
-    "improvements": [
+    "effects": [
       {
         "name": "Unlock testuint",
         "type": "unlock",
@@ -16,7 +16,7 @@
   {
     "name": "enhanced-something",
     "dependsOn": ["base"],
-    "improvements": [
+    "effects": [
       {
         "name": "Increase testunit damage",
         "type": "multiplier",

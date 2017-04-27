@@ -1,6 +1,6 @@
 import {TypeManager, UnitType} from ".";
 import {Faction} from "../Models/Faction";
-import {calculateValue, unlocked} from "./Improvement";
+import {calculateValue, unlocked} from "./Effect";
 
 export class UnitTypes extends TypeManager<UnitType> {
     constructor() {

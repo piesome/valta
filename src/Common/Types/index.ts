@@ -1,4 +1,4 @@
-export {Improvement, ImprovementTarget} from "./Improvement";
+export {Effect, EffectTarget} from "./Effect";
 
 export {FactionType} from "./FactionType";
 export {TerrainType} from "./TerrainType";
