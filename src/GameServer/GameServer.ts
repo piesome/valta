@@ -144,10 +144,21 @@ export class GameServer extends RPC.Peer<GameClient> {
             return;
         }
 
-        const game = this.games[id] = new ServerGame(id, this.types);
-        game.deserialize(data);
+        const game = new ServerGame(id, this.types);
+        try {
+            game.deserialize(data);
+        } catch (err) {
+            this.log(`Game ${game.id} failed to load. ${err}. Dropping from database`);
+            this.db
+                .table("game")
+                .del()
+                .where("id", game.id);
+            return;
+        }
 
         this.log(`Game ${game.id} loaded`);
+
+        this.games[id] = game;
 
         this.watchGame(game);
 
