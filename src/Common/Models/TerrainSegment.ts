@@ -1,10 +1,11 @@
 import {Game} from "../Game";
 import * as GS from "../GameState";
 import {TerrainType} from "../Types";
+import {IHex} from "../Util";
 
 import {Unit} from "./Unit";
 
-export class TerrainSegment {
+export class TerrainSegment implements IHex {
     public static deserialize(game: Game, data: GS.ITerrainSegment): TerrainSegment {
         return new TerrainSegment(
             data.id,

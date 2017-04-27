@@ -70,7 +70,6 @@ export class Game extends EventEmitter {
 
         (new TerrainGenerator(this, 3)).generate();
         this.status = "started";
-        this.emit("started");
         this.endTurn();
     }
 

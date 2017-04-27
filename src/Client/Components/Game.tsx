@@ -5,6 +5,7 @@ import * as RPC from "Common/RPC";
 import {Types} from "Common/Types";
 
 import {Client} from "../Client";
+import {ClientGame} from "../ClientGame";
 import {GameInLobby} from "./GameInLobby";
 import {GameInProgress} from "./GameInProgress";
 
@@ -15,7 +16,7 @@ export interface IGameProps {
 }
 
 export interface IGameState {
-    game: Game;
+    game: ClientGame;
 }
 
 export class GameComponent extends React.Component<IGameProps, IGameState> {
@@ -24,7 +25,7 @@ export class GameComponent extends React.Component<IGameProps, IGameState> {
     }
 
     public componentWillMount() {
-        this.setState({game: new Game(this.props.types)});
+        this.setState({game: new ClientGame(this.props.types)});
 
         this.props.client.on(RPC.ClientMethods.GameUpdate, (data: RPC.ClientMethods.IGameUpdateParams) => {
             this.state.game.deserialize(data);
