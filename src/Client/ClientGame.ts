@@ -2,7 +2,6 @@ import {Game} from "Common/Game";
 import {TerrainSegment} from "Common/Models";
 import {IHex, IPoint} from "Common/Util";
 
-
 function hexToPoint(hex: IHex, size: number): IPoint {
     return {
         x: size * 3 / 2 * hex.x,
