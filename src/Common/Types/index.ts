@@ -1,5 +1,6 @@
-export {Effect, EffectTarget} from "./Effect";
+export {IEffect, IEffectTarget} from "./Effect";
 
+export {CombatModifierType} from "./CombatModifierType";
 export {FactionType} from "./FactionType";
 export {TerrainType} from "./TerrainType";
 export {UnitType} from "./UnitType";
@@ -7,6 +8,7 @@ export {UpgradeType} from "./UpgradeType";
 
 export {TypeManager} from "./TypeManager";
 
+import {CombatModifierTypes} from "./CombatModifierTypes";
 import {FactionTypes} from "./FactionTypes";
 import {TerrainTypes} from "./TerrainTypes";
 import {UnitTypes} from "./UnitTypes";

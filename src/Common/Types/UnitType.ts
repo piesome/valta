@@ -1,3 +1,4 @@
+import {CombatModifierType} from ".";
 import {Faction} from "../Models/Faction";
 import {calculateValue, unlocked} from "./Effect";
 
@@ -7,6 +8,8 @@ export class UnitType {
         public baseHealth: number,
         public baseDamage: number,
         public actions: string[],
+        public type: string,
+        public modifiers?: CombatModifierType[],
     ) {}
 
     public getMaximumHealth(faction: Faction) {

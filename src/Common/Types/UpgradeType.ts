@@ -1,10 +1,10 @@
-import {Effect} from "./Effect";
+import {IEffect} from "./Effect";
 
 export class UpgradeType {
     constructor(
         public name: string,
         public dependsOn: string[],
         public automaticallyUnlocked: boolean,
-        public effects: Effect[],
+        public effects: IEffect[],
     ) {}
 }

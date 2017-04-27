@@ -1,6 +1,6 @@
 import * as R from "ramda";
 
-import {Effect, TypeManager, UpgradeType} from ".";
+import {IEffect, TypeManager, UpgradeType} from ".";
 
 export class UpgradeTypes extends TypeManager<UpgradeType> {
     constructor() {
@@ -17,7 +17,7 @@ export class UpgradeTypes extends TypeManager<UpgradeType> {
             data.name,
             data.dependsOn,
             data.automaticallyUnlocked,
-            data.effects.map((x: any) => x as Effect),
+            data.effects.map((x: any) => x as IEffect),
         );
     }
 }

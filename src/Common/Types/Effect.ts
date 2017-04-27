@@ -1,37 +1,36 @@
-export interface EffectTarget {
+export interface IEffectTarget {
     unitType?: string;
     field?: string;
 }
 
-export interface Effect {
+export interface IEffect {
     name: string;
     type: string;
-    target: EffectTarget;
+    target: IEffectTarget;
     amount: number;
 }
 
-export interface EffectsFor {
-    effectsFor(target: EffectTarget): Effect[];
+export interface IEffectsFor {
+    effectsFor(target: IEffectTarget): IEffect[];
 }
 
-export function calculateValue(faction: EffectsFor, target: EffectTarget, baseValue: number): number {
+export function calculateValue(faction: IEffectsFor, target: IEffectTarget, baseValue: number): number {
     const effects = faction.effectsFor(target);
     let constant = 0;
     let multiplier = 1;
 
-    for (const improvement of effects) {
-        if (improvement.type === "multiplier") {
-            multiplier += improvement.amount;
+    for (const effect of effects) {
+        if (effect.type === "multiplier") {
+            multiplier += effect.amount;
         }
-        if (improvement.type === "constant") {
-            constant += improvement.amount;
+        if (effect.type === "constant") {
+            constant += effect.amount;
         }
     }
-
     return (baseValue + constant) * multiplier;
 }
 
-export function unlocked(faction: EffectsFor, target: EffectTarget): boolean {
+export function unlocked(faction: IEffectsFor, target: IEffectTarget): boolean {
     const effects = faction.effectsFor(target);
 
     for (const improvement of effects) {

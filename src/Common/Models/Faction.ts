@@ -2,7 +2,7 @@ import * as R from "ramda";
 
 import {Game} from "../Game";
 import * as GS from "../GameState";
-import {Effect, EffectTarget, FactionType, UpgradeType} from "../Types";
+import {FactionType, IEffect, IEffectTarget, UpgradeType} from "../Types";
 
 export class Faction {
     public static deserialize(game: Game, data: GS.IFaction): Faction {
@@ -23,11 +23,11 @@ export class Faction {
         public order: number,
     ) {}
 
-    public effects(): Effect[] {
+    public effects(): IEffect[] {
         return R.flatten(R.map((x) => x.effects, this.upgrades));
     }
 
-    public effectsFor(target: EffectTarget): Effect[] {
+    public effectsFor(target: IEffectTarget): IEffect[] {
         return R.filter((x) => R.equals(x.target, target), this.effects());
     }
 

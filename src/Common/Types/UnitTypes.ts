@@ -14,6 +14,8 @@ export class UnitTypes extends TypeManager<UnitType> {
             data.heath,
             data.damage,
             data.actions,
+            data.type,
+            data.modifiers,
         );
     }
 }
