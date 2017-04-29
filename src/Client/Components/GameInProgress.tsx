@@ -10,6 +10,7 @@ import {Point} from "Common/Util";
 import {Camera, ICameraEvent} from "../Camera";
 import {Client} from "../Client";
 import {ClientGame} from "../ClientGame";
+import {IGameTime} from "../GameTime";
 import {Controls} from "./Controls";
 
 const style = require("./GameInProgress.scss");
@@ -68,7 +69,12 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
         this.draw();
     }
 
-    private draw() {
+    private draw(total = 0, previous = 0) {
+        const time: IGameTime = {
+            delta: previous - total,
+            total,
+        };
+
         this.ctx.save();
         this.ctx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
         this.ctx.restore();
@@ -76,14 +82,14 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
         this.ctx.save();
         this.camera.applyToCtx(this.ctx);
 
-        this.props.game.draw(this.ctx);
+        this.props.game.draw(time, this.ctx);
 
         if (this.hover) {
-            this.props.game.drawHover(this.ctx, this.hover);
+            this.props.game.drawHover(time, this.ctx, this.hover);
         }
 
         this.ctx.restore();
 
-        this.animationHandle = window.requestAnimationFrame(() => this.draw());
+        this.animationHandle = window.requestAnimationFrame((timeNow) => this.draw(timeNow, time.total));
     }
 }

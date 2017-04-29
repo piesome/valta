@@ -2,12 +2,14 @@ import {Game} from "Common/Game";
 import {TerrainSegment} from "Common/Models";
 import {Hex, Point} from "Common/Util";
 
+import {IGameTime} from "./GameTime";
+
 export class ClientGame extends Game {
-    public draw(ctx: CanvasRenderingContext2D) {
+    public draw(time: IGameTime, ctx: CanvasRenderingContext2D) {
         this.drawTerrain(ctx);
     }
 
-    public drawHover(ctx: CanvasRenderingContext2D, hoverPoint: Point) {
+    public drawHover(time: IGameTime, ctx: CanvasRenderingContext2D, hoverPoint: Point) {
         const hex = hoverPoint.toHex().round();
 
         const middlePoint = hex.toPoint();
@@ -19,7 +21,11 @@ export class ClientGame extends Game {
         ctx.closePath();
 
         ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([16, 16]);
+        ctx.lineDashOffset = Math.floor(time.total / 16);
         ctx.stroke();
+        ctx.setLineDash([]);
     }
 
     private drawTerrain(ctx: CanvasRenderingContext2D) {
@@ -48,6 +54,7 @@ export class ClientGame extends Game {
         ctx.closePath();
 
         ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 1;
         ctx.stroke();
 
         ctx.fillStyle = terrain.type.debugColor;
