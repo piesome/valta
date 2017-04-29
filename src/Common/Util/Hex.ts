@@ -57,6 +57,14 @@ export class Hex {
     public round(): Hex {
         return this.toCube().round().toHex();
     }
+
+    public distanceTo(other: Hex): number {
+        return (
+            Math.abs(this.q - other.q)
+            + Math.abs(this.q + this.r - other.q - other.r)
+            + Math.abs(this.r - other.r)
+        ) / 2;
+    }
 }
 
 export const AXIAL_DIRECTIONS = [

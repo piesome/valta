@@ -81,6 +81,8 @@ export class Camera extends EventEmitter {
             this.clickY = this.panY - event.offsetY;
             this.clickOffsetX = event.offsetX;
             this.clickOffsetY = event.offsetY;
+
+            event.preventDefault();
         }, true);
 
         canvasElement.addEventListener("mousemove", (event) => {
@@ -116,6 +118,11 @@ export class Camera extends EventEmitter {
         canvasElement.addEventListener("mouseleave", (event) => {
             this.inPan = false;
             this.inClick = false;
+        }, true);
+
+        canvasElement.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+            return false;
         }, true);
     }
 
