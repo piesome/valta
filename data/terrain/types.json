@@ -2,7 +2,7 @@
   {
     "name": "plains",
     "movementPenalty": 0,
-    "debugColor": "#00ff00"
+    "debugColor": "#85cc00"
   },
   {
     "name": "impassable",
