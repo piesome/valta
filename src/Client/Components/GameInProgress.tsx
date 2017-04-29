@@ -40,8 +40,13 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
 
     public render() {
         return (
-            <div className={style.container}>
-                <canvas ref={this.bindCanvasElement}/>
+            <div className={style.game}>
+                <Controls>
+                    <button>Quit</button>
+                </Controls>
+                <div className={style.canvasContainer}>
+                    <canvas ref={this.bindCanvasElement}/>
+                </div>
             </div>
         );
     }
@@ -49,8 +54,8 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
     private bindCanvasElement(canvasElement: HTMLCanvasElement) {
         this.canvasElement = canvasElement;
 
-        this.canvasElement.width = window.innerWidth;
-        this.canvasElement.height = window.innerHeight - 20; // fix
+        this.canvasElement.width = (this.canvasElement.parentNode as HTMLDivElement).clientWidth;
+        this.canvasElement.height = (this.canvasElement.parentNode as HTMLDivElement).clientHeight;
         this.camera.bindTo(this.canvasElement);
 
         this.ctx = this.canvasElement.getContext("2d");

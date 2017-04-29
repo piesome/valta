@@ -1,3 +1,10 @@
-.container {
+.game {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.canvasContainer {
     overflow: hidden;
+    flex: 1;
 }

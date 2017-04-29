@@ -58,6 +58,8 @@ export class Camera {
             this.panX += mouseX - (mouseX * (this.zoomLevel / zoomNow));
             this.panY += mouseY - (mouseY * (this.zoomLevel / zoomNow));
 
+            event.preventDefault();
+
         }, true);
 
         canvasElement.addEventListener("mousedown", (event) => {
