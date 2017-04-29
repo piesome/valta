@@ -1,6 +1,6 @@
 import {Game} from "Common/Game";
 import {TerrainSegment} from "Common/Models";
-import {Hex, Point} from "Common/Util";
+import {getHSL, Hex, Point} from "Common/Util";
 
 import {IGameTime} from "./GameTime";
 
@@ -60,8 +60,19 @@ export class ClientGame extends Game {
         ctx.fillStyle = terrain.type.debugColor;
         ctx.fill();
 
+        const fact = terrain.units[0] ? terrain.units[0].faction : null;
+
+        if (fact) {
+            ctx.fillStyle = getHSL(fact.order);
+
+            ctx.beginPath();
+            ctx.arc(middlePoint.x, middlePoint.y - 16, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        }
+
         ctx.fillStyle = "#000000";
         ctx.textAlign = "center";
-        ctx.fillText(terrain.units.map((unit) => unit.type.name).join(" "), middlePoint.x, middlePoint.y);
+        ctx.fillText(terrain.units.map((unit) => unit.type.name).join("\n"), middlePoint.x, middlePoint.y);
     }
 }
