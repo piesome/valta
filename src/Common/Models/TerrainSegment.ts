@@ -26,6 +26,10 @@ export class TerrainSegment extends Hex {
         super(q, r);
     }
 
+    public addUnit(unit: Unit) {
+        this.units.push(unit);
+    }
+
     public serialize(): GS.ITerrainSegment {
         return {
             city: null,

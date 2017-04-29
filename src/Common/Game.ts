@@ -6,9 +6,11 @@ import * as GS from "./GameState";
 import {
     Faction,
     TerrainSegment,
+    Unit,
 } from "./Models";
 import {TerrainGenerator} from "./TerrainGenerator";
 import {Types} from "./Types";
+import {Hex} from "./Util";
 
 export class Game extends EventEmitter {
     public types: Types;
@@ -68,7 +70,15 @@ export class Game extends EventEmitter {
             throw new Error("Game can't be started");
         }
 
-        (new TerrainGenerator(this, 10)).generate();
+        const startingPoints = (new TerrainGenerator(this, 10)).generate();
+        for (const fact of this.factions) {
+            const startingPoint = startingPoints[fact.order]; // TODO: fix order
+
+            const unitType = this.types.unit.getType("testunit");
+            const unit = new Unit(uuid(), unitType, fact, unitType.getMaximumHealth(fact));
+
+            this.addUnit(startingPoint, unit);
+        }
         this.status = "started";
         this.endTurn();
     }
@@ -137,6 +147,17 @@ export class Game extends EventEmitter {
         this.factions = R.filter((x: Faction) => x.id !== faction.id, this.factions);
 
         this.checkCanBeStarted();
+    }
+
+    public addUnit(hex: Hex, unit: Unit) {
+        if (!this.terrain[hex.r] || !this.terrain[hex.r][hex.q]) {
+            throw new Error("Can't add unit into void");
+        }
+
+        const terrain = this.terrain[hex.r][hex.q];
+        // TODO: terrain unit limit etc
+
+        terrain.addUnit(unit);
     }
 
     public addTerrain(terrain: TerrainSegment) {

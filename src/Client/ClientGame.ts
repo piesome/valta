@@ -53,6 +53,8 @@ export class ClientGame extends Game {
         ctx.fillStyle = terrain.type.debugColor;
         ctx.fill();
 
+        ctx.fillStyle = "#000000";
+        ctx.textAlign = "center";
         ctx.fillText(terrain.units.map((unit) => unit.type.name).join(" "), middlePoint.x, middlePoint.y);
     }
 }

@@ -34,7 +34,7 @@ export class Unit {
             currentHealth: this.currentHealth,
             faction: this.faction.id,
             id: this.id,
-            unitType: null,
+            unitType: this.type.name,
         };
     }
 }
