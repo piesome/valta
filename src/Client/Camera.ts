@@ -1,4 +1,12 @@
+import {EventEmitter} from "eventemitter3";
 import * as R from "ramda";
+
+import {Point} from "Common/Util";
+
+export interface ICameraEvent {
+    button: number;
+    point: Point;
+}
 
 export interface ICameraOptions {
     panButton?: number;
@@ -17,7 +25,7 @@ const defaultOptions: ICameraOptions = {
 
     zoomMax: 5,
     zoomMin: 0.35,
-    zoomSpeed: 7,
+    zoomSpeed: 0.3,
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -28,7 +36,7 @@ function dist(x1: number, y1: number, x2: number, y2: number) {
     return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 }
 
-export class Camera {
+export class Camera extends EventEmitter {
     private options: ICameraOptions;
 
     private zoomLevel: number = 1;
@@ -42,12 +50,14 @@ export class Camera {
     private clickOffsetY: number;
 
     constructor(options: ICameraOptions = {}) {
+        super();
+
         this.options = R.merge(defaultOptions, options);
     }
 
     public bindTo(canvasElement: HTMLCanvasElement) {
         canvasElement.addEventListener("wheel", (event) => {
-            const delta = Math.exp((-event.deltaY / 120) * 5);
+            const delta = Math.exp((event.deltaY > 0 ? -1 : 1) * this.options.zoomSpeed);
             const zoomNow = this.zoomLevel;
 
             this.zoomLevel = clamp(this.zoomLevel * delta, this.options.zoomMin, this.options.zoomMax);
@@ -80,6 +90,7 @@ export class Camera {
 
                     this.inPan = true;
                 } else {
+                    this.emitHover(event);
                     return;
                 }
             }
@@ -89,6 +100,11 @@ export class Camera {
         }, true);
 
         canvasElement.addEventListener("mouseup", (event) => {
+            if (!this.inPan) {
+                this.emitSelect(event);
+                return;
+            }
+
             if (event.button !== this.options.panButton) {
                 return;
             }
@@ -105,5 +121,24 @@ export class Camera {
 
     public applyToCtx(ctx: CanvasRenderingContext2D) {
         ctx.setTransform(this.zoomLevel, 0, 0, this.zoomLevel, this.panX, this.panY);
+    }
+
+    private createEvent(event: MouseEvent): ICameraEvent {
+        return {
+            button: event.button,
+            point: new Point(
+                (event.offsetX - this.panX) / this.zoomLevel,
+                (event.offsetY - this.panY) / this.zoomLevel,
+            ),
+        };
+    }
+
+    private emitSelect(event: MouseEvent) {
+        this.emit("select", this.createEvent(event));
+        this.inClick = false;
+    }
+
+    private emitHover(event: MouseEvent) {
+        this.emit("hover", this.createEvent(event));
     }
 }

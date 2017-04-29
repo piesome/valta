@@ -5,8 +5,9 @@ import {Game} from "Common/Game";
 import {Faction} from "Common/Models";
 import * as RPC from "Common/RPC";
 import {Types} from "Common/Types";
+import {Point} from "Common/Util";
 
-import {Camera} from "../Camera";
+import {Camera, ICameraEvent} from "../Camera";
 import {Client} from "../Client";
 import {ClientGame} from "../ClientGame";
 import {Controls} from "./Controls";
@@ -25,6 +26,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
     private ctx: CanvasRenderingContext2D;
     private animationHandle: number;
     private camera: Camera;
+    private hover: Point;
 
     constructor(props: IGameInProgressProps) {
         super(props);
@@ -58,6 +60,10 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
         this.canvasElement.height = (this.canvasElement.parentNode as HTMLDivElement).clientHeight;
         this.camera.bindTo(this.canvasElement);
 
+        this.camera.on("hover", (args: ICameraEvent) => {
+            this.hover = args.point;
+        });
+
         this.ctx = this.canvasElement.getContext("2d");
         this.draw();
     }
@@ -71,6 +77,11 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
         this.camera.applyToCtx(this.ctx);
 
         this.props.game.draw(this.ctx);
+
+        if (this.hover) {
+            this.props.game.drawHover(this.ctx, this.hover);
+        }
+
         this.ctx.restore();
 
         this.animationHandle = window.requestAnimationFrame(() => this.draw());

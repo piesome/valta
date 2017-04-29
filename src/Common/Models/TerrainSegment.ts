@@ -1,18 +1,17 @@
 import {Game} from "../Game";
 import * as GS from "../GameState";
 import {TerrainType} from "../Types";
-import {IHex} from "../Util";
+import {Hex} from "../Util";
 
 import {Unit} from "./Unit";
 
-export class TerrainSegment implements IHex {
+export class TerrainSegment extends Hex {
     public static deserialize(game: Game, data: GS.ITerrainSegment): TerrainSegment {
         return new TerrainSegment(
             data.id,
             game.types.terrain.getType(data.terrainType),
-            data.x,
-            data.y,
-            data.z,
+            data.q,
+            data.r,
             data.units.map((x) => Unit.deserialize(game, x)),
         );
     }
@@ -20,14 +19,11 @@ export class TerrainSegment implements IHex {
     constructor(
         public id: GS.ID,
         public type: TerrainType,
-        public x: number,
-        public y: number,
-        public z: number,
+        q: number,
+        r: number,
         public units: Unit[],
     ) {
-        if (x + y + z !== 0) {
-            throw new Error("TerrainSegment x + y + z should equal 0");
-        }
+        super(q, r);
     }
 
     public serialize(): GS.ITerrainSegment {
@@ -35,11 +31,10 @@ export class TerrainSegment implements IHex {
             city: null,
             id: this.id,
             naturalResources: {},
+            q: this.q,
+            r: this.r,
             terrainType: this.type.name,
             units: this.units.map((x) => x.serialize()),
-            x: this.x,
-            y: this.y,
-            z: this.z,
         };
     }
 }

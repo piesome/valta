@@ -5,10 +5,8 @@
 export type ID = string;
 
 export interface ITerrainData {
-    [x: number]: {
-        [y: number]: {
-            [z: number]: ITerrainSegment;
-        };
+    [r: number]: {
+        [q: number]: ITerrainSegment;
     };
 }
 
@@ -42,10 +40,8 @@ export type TerrainType = string;
 export interface ITerrainSegment {
     id: ID;
 
-    // x - y - z = 0
-    x: number;
-    y: number;
-    z: number;
+    q: number;
+    r: number;
 
     terrainType: TerrainType;
 

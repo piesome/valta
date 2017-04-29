@@ -19,7 +19,7 @@ export class Game extends EventEmitter {
 
     public factions: Faction[];
     public tick: number;
-    public terrain: {[x: number]: {[y: number]: {[z: number]: TerrainSegment}}};
+    public terrain: {[r: number]: {[q: number]: TerrainSegment}};
 
     constructor(
         types?: Types,
@@ -68,7 +68,7 @@ export class Game extends EventEmitter {
             throw new Error("Game can't be started");
         }
 
-        (new TerrainGenerator(this, 3)).generate();
+        (new TerrainGenerator(this, 10)).generate();
         this.status = "started";
         this.endTurn();
     }
@@ -140,15 +140,11 @@ export class Game extends EventEmitter {
     }
 
     public addTerrain(terrain: TerrainSegment) {
-        if (!this.terrain[terrain.x]) {
-            this.terrain[terrain.x] = {};
+        if (!this.terrain[terrain.r]) {
+            this.terrain[terrain.r] = {};
         }
 
-        if (!this.terrain[terrain.x][terrain.y]) {
-            this.terrain[terrain.x][terrain.y] = {};
-        }
-
-        this.terrain[terrain.x][terrain.y][terrain.z] = terrain;
+        this.terrain[terrain.r][terrain.q] = terrain;
     }
 
     public async load() {
@@ -191,25 +187,18 @@ export class Game extends EventEmitter {
     private serializeTerrain(): GS.ITerrainData {
         const terrain: GS.ITerrainData = {};
 
-        for (const xkey in this.terrain) {
-            if (!this.terrain.hasOwnProperty(xkey)) {
+        for (const row in this.terrain) {
+            if (!this.terrain.hasOwnProperty(row)) {
                 continue;
             }
 
-            terrain[xkey] = {};
-            for (const ykey in this.terrain[xkey]) {
-                if (!this.terrain[xkey].hasOwnProperty(ykey)) {
+            terrain[row] = {};
+            for (const column in this.terrain[row]) {
+                if (!this.terrain[row].hasOwnProperty(column)) {
                     continue;
                 }
 
-                terrain[xkey][ykey] = {};
-                for (const zkey in this.terrain[xkey][ykey]) {
-                    if (!this.terrain[xkey][ykey].hasOwnProperty(zkey)) {
-                        continue;
-                    }
-
-                    terrain[xkey][ykey][zkey] = this.terrain[xkey][ykey][zkey].serialize();
-                }
+                terrain[row][column] = this.terrain[row][column].serialize();
             }
         }
 
@@ -219,26 +208,19 @@ export class Game extends EventEmitter {
     private deserializeTerrain(data: GS.ITerrainData) {
         this.terrain = {};
 
-        for (const xkey in data) {
-            if (!data.hasOwnProperty(xkey)) {
+        for (const row in data) {
+            if (!data.hasOwnProperty(row)) {
                 continue;
             }
 
-            for (const ykey in data[xkey]) {
-                if (!data[xkey].hasOwnProperty(ykey)) {
+            for (const column in data[row]) {
+                if (!data[row].hasOwnProperty(column)) {
                     continue;
                 }
 
-                for (const zkey in data[xkey][ykey]) {
-                    if (!data[xkey][ykey].hasOwnProperty(zkey)) {
-                        continue;
-                    }
-
-                    const terrain = TerrainSegment.deserialize(this, data[xkey][ykey][zkey]);
-                    this.addTerrain(terrain);
-                }
+                const terrain = TerrainSegment.deserialize(this, data[row][column]);
+                this.addTerrain(terrain);
             }
         }
     }
-
 }

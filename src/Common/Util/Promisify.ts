@@ -13,14 +13,3 @@ export function promisify<T>(fn: Fn<T>, params: any[]): Promise<T> {
         fn(...params);
     });
 }
-
-export interface IHex {
-    x: number;
-    y: number;
-    z: number;
-}
-
-export interface IPoint {
-    x: number;
-    y: number;
-}

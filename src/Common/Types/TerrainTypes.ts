@@ -10,6 +10,7 @@ export class TerrainTypes extends TypeManager<TerrainType> {
         return new TerrainType(
             data.name,
             data.movementPenalty,
+            data.debugColor,
         );
     }
 }

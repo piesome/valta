@@ -19,7 +19,6 @@ export class TerrainGenerator {
                     uuid(),
                     this.game.types.terrain.getType("plains"),
                     dx,
-                    dy,
                     dz,
                     [],
                 );
