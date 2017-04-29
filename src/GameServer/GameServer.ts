@@ -149,10 +149,11 @@ export class GameServer extends RPC.Peer<GameClient> {
             game.deserialize(data);
         } catch (err) {
             this.log(`Game ${game.id} failed to load. ${err}. Dropping from database`);
-            this.db
+            await this.db
                 .table("game")
-                .del()
-                .where("id", game.id);
+                .where("id", game.id)
+                .del();
+
             return;
         }
 

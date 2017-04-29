@@ -13,6 +13,7 @@ export class UnitTypes extends TypeManager<UnitType> {
             data.name,
             data.heath,
             data.damage,
+            data.energy,
             data.actions,
             data.type,
             data.modifiers,

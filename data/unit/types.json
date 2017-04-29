@@ -3,6 +3,7 @@
     "name": "testunit",
     "health": 10,
     "damage": 5,
+    "energy": 2,
     "actions": [
       "moveOnLand",
       "meleeAttack"

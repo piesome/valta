@@ -7,6 +7,7 @@ export class UnitType {
         public name: string,
         public baseHealth: number,
         public baseDamage: number,
+        public baseEnergy: number,
         public actions: string[],
         public type: string,
         public modifiers?: CombatModifierType[],
@@ -31,6 +32,17 @@ export class UnitType {
                 unitType: this.name,
             },
             this.baseDamage,
+        );
+    }
+
+    public getMaximumEnergy(faction: Faction) {
+        return calculateValue(
+            faction,
+            {
+                field: "energy",
+                unitType: this.name,
+            },
+            this.baseEnergy,
         );
     }
 

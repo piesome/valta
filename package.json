@@ -10,6 +10,7 @@
     "data": "ts-node datapacker.ts",
     "shell": "ts-node -r tsconfig-paths/register src/Shell/index.ts",
     "game-server": "DEBUG=valta:* NODE_ENV=game-server-development INDEX_URL=ws://localhost:30321 ts-node -r tsconfig-paths/register src/GameServer/index.ts",
+    "game-server:dev": "nodemon --watch 'src/**/*.ts' -e ts --exec 'yarn game-server'",
     "index-server": "DEBUG=valta:* NODE_ENV=index-server-development ts-node -r tsconfig-paths/register src/IndexServer/index.ts",
     "client": "webpack",
     "client:dev": "webpack-dev-server --port 3000 --content-base ."
@@ -37,6 +38,7 @@
     "jsonwebtoken": "^7.3.0",
     "knex": "^0.12.9",
     "node-sass": "^4.5.2",
+    "nodemon": "1.10",
     "npm-run-all": "^4.0.2",
     "ramda": "^0.23.0",
     "react": "^15.5.4",

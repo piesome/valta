@@ -8,6 +8,7 @@ import {Types} from "Common/Types";
 
 import {Client} from "../Client";
 import {Controls} from "./Controls";
+import {FactionCube} from "./FactionCube";
 
 export interface IGameInLobbyProps {
     client: Client;
@@ -41,6 +42,7 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
             return (
                 <tr key={fact.id}>
                     <td>{isUs ? "me" : null}</td>
+                    <td><FactionCube order={fact.order} /></td>
                     <td>{fact.id}</td>
                     <td>{isUs ? factionTypeSelection(fact) : fact.type.name}</td>
                 </tr>
@@ -58,6 +60,7 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
                 <table>
                     <thead>
                         <tr>
+                            <th />
                             <th />
                             <th>id</th>
                             <th>faction type</th>

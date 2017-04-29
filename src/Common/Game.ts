@@ -74,9 +74,7 @@ export class Game extends EventEmitter {
         for (const fact of this.factions) {
             const startingPoint = startingPoints[fact.order]; // TODO: fix order
 
-            const unitType = this.types.unit.getType("testunit");
-            const unit = new Unit(uuid(), unitType, fact, unitType.getMaximumHealth(fact));
-
+            const unit = this.createUnit(fact, "testunit");
             this.addUnit(startingPoint, unit);
         }
         this.status = "started";
@@ -145,8 +143,19 @@ export class Game extends EventEmitter {
         const faction = this.getFaction(id);
 
         this.factions = R.filter((x: Faction) => x.id !== faction.id, this.factions);
+        this.factions.map((fact, ind) => fact.order = ind);
 
         this.checkCanBeStarted();
+    }
+
+    public createUnit(faction: Faction, unitType: string) {
+        const type = this.types.unit.getType("testunit");
+        if (!type.isUnlocked(faction)) {
+            throw new Error(`Unit type ${unitType} not unlocked`);
+        }
+
+        const unit = new Unit(uuid(), type, faction, type.getMaximumHealth(faction));
+        return unit;
     }
 
     public addUnit(hex: Hex, unit: Unit) {

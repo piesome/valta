@@ -74,6 +74,7 @@ export interface IUnit {
 
     faction: ID;
     currentHealth: number;
+    currentEnergy: number;
     unitType: UnitType;
 }
 
