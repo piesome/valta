@@ -6,6 +6,7 @@ import {Faction} from "Common/Models";
 import * as RPC from "Common/RPC";
 import {Types} from "Common/Types";
 
+import {Camera} from "../Camera";
 import {Client} from "../Client";
 import {ClientGame} from "../ClientGame";
 import {Controls} from "./Controls";
@@ -23,18 +24,12 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
     private canvasElement: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
     private animationHandle: number;
-    private scale: number;
-    private offsetX: number;
-    private offsetY: number;
-    private clickX: number;
-    private clickY: number;
-    private isPanning: boolean;
+    private camera: Camera;
 
     constructor(props: IGameInProgressProps) {
         super(props);
 
-        this.scale = 1;
-        this.isPanning = false;
+        this.camera = new Camera();
 
         this.bindCanvasElement = this.bindCanvasElement.bind(this);
     }
@@ -51,27 +46,12 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
         );
     }
 
-    private modifyScale(delta: number) {
-        let scale = this.scale + delta;
-        if (scale < 0.35) {
-            scale = 0.35;
-        } else if (scale > 5) {
-            scale = 5;
-        }
-        this.scale = scale;
-    }
-
     private bindCanvasElement(canvasElement: HTMLCanvasElement) {
         this.canvasElement = canvasElement;
 
         this.canvasElement.width = window.innerWidth;
         this.canvasElement.height = window.innerHeight - 20; // fix
-        this.offsetX = this.canvasElement.width / 2;
-        this.offsetY = this.canvasElement.height / 2;
-
-        this.canvasElement.addEventListener("wheel", (event) => {
-            this.modifyScale(-event.deltaY / 10);
-        }, true);
+        this.camera.bindTo(this.canvasElement);
 
         this.ctx = this.canvasElement.getContext("2d");
         this.draw();
@@ -83,8 +63,8 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
         this.ctx.restore();
 
         this.ctx.save();
-        this.ctx.translate(this.offsetX, this.offsetY);
-        this.ctx.scale(this.scale, this.scale);
+        this.camera.applyToCtx(this.ctx);
+
         this.props.game.draw(this.ctx);
         this.ctx.restore();
 
