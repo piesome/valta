@@ -1,14 +1,15 @@
 import * as React from "react";
 
+import {getHSL} from "Common/Util";
+
 export interface IFactionCubeParams {
     order: number;
 }
 
 export class FactionCube extends React.Component<IFactionCubeParams, object> {
     public render() {
-        const hue = Math.floor(360 * ((this.props.order * 0.618033988749895) % 1));
         const style = {
-            background: `hsl(${hue}, 100%, 75%)`,
+            background: getHSL(this.props.order),
             border: "thin solid black",
             borderRadius: "4px",
             display: "inline-block",
