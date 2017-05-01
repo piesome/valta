@@ -209,17 +209,17 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
                 const actor = this.state.selectedUnit;
                 const target = terrain;
                 try {
-                    this.state.inAction.do(
-                        this.props.game.getFaction(this.props.client.id),
-                        actor,
-                        target,
-                    );
-
                     await this.props.client.gameServer.action(this.state.inAction.serialize(actor, target));
                 } catch (err) {
                     console.error(err);
                     return;
                 }
+
+                this.setState({
+                    inAction: null,
+                });
+
+                return;
             }
 
             this.setState({

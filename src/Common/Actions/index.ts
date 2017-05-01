@@ -24,6 +24,8 @@ export class ActionManager {
         const target = action.deserializeTarget(data.target);
 
         action.do(faction, actor, target);
+
+        this.game.emit("update");
     }
 
     private addAction(action: Action<any, any>) {
