@@ -63,7 +63,7 @@ export class GameServer extends RPC.Peer<GameClient> {
             });
 
             if (payload.peer.id in this.peers) {
-                return ws.close(3000, "Game already open in this browser");
+                this.peers[payload.peer.id].ws.close();
             }
 
             const peer = new GameClient(payload.peer.id, ws);
