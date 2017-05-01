@@ -5,7 +5,7 @@
     "damage": 5,
     "energy": 2,
     "actions": [
-      "move"
+      "move", "attack"
     ],
     "type": "unit"
   }

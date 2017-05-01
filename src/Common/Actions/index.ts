@@ -1,17 +1,19 @@
 import {Game} from "../Game";
 import {Faction} from "../Models";
 import {Action} from "./Action";
+import {Attack} from "./Attack";
 import {Move} from "./Move";
 
-export {Action, Move};
+export {Action, Attack, Move};
 
 export class ActionManager {
-    private possibleActions: {[name: string]: Action<any, any>};
+    private possibleActions: {[name: string]: Action<any>};
 
     constructor(private game: Game) {
         this.possibleActions = {};
 
         this.addAction(new Move("move", game));
+        this.addAction(new Attack("attack", game));
     }
 
     public getAction(name: string) {
@@ -28,7 +30,7 @@ export class ActionManager {
         this.game.emit("update");
     }
 
-    private addAction(action: Action<any, any>) {
+    private addAction(action: Action<any>) {
         this.possibleActions[action.name] = action;
     }
 }

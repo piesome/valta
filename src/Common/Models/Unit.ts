@@ -1,3 +1,5 @@
+import {EventEmitter} from "eventemitter3";
+
 import {Game} from "../Game";
 import * as GS from "../GameState";
 import {UnitType} from "../Types";
@@ -5,7 +7,7 @@ import {UnitType} from "../Types";
 import {Faction} from "./Faction";
 import {TerrainSegment} from "./TerrainSegment";
 
-export class Unit {
+export class Unit extends EventEmitter {
     public static deserialize(game: Game, data: GS.IUnit): Unit {
         return new Unit(
             data.id,
@@ -28,6 +30,8 @@ export class Unit {
         currentHealth?: number,
         currentEnergy?: number,
     ) {
+        super();
+
         if ((typeof currentHealth) === "undefined") {
             this.currentHealth = this.maximumHealth;
         } else {
@@ -51,10 +55,16 @@ export class Unit {
         }
 
         if (this.terrain) {
-            terrain.removeUnit(this);
+            this.terrain.removeUnit(this);
         }
         terrain.addUnit(this);
         this.terrain = terrain;
+    }
+
+    public onRemove() {
+        if (this.terrain) {
+            this.terrain.removeUnit(this);
+        }
     }
 
     public resetEnergy() {
@@ -75,6 +85,9 @@ export class Unit {
 
     public takeDamage(damage: number) {
         this.currentHealth = (damage >= this.currentHealth ? 0 : this.currentHealth - damage);
+        if (this.currentHealth <= 0) {
+            this.emit("dead");
+        }
     }
 
     public serialize(): GS.IUnit {

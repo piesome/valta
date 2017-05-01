@@ -44,6 +44,13 @@ export class TerrainSegment extends Hex {
         this.units = this.units.filter((un) => un.id !== unit.id);
     }
 
+    /**
+     * @todo Don't target civilians, something fancy with cities
+     */
+    public getDefendingUnits(): Unit[] {
+        return this.units;
+    }
+
     public serialize(): GS.ITerrainSegment {
         return {
             city: null,

@@ -168,8 +168,16 @@ export class Game extends EventEmitter {
         }
 
         const unit = new Unit(uuid(), type, faction, null);
-        this.units[unit.id] = unit;
+        this.addUnit(unit);
         return unit;
+    }
+
+    public battleUnits(attacker: Unit, defenders: Unit[]) {
+        for (const def of defenders) {
+            // TODO: more advanced calculations?
+            def.takeDamage(attacker.damage);
+            attacker.takeDamage(def.damage);
+        }
     }
 
     public moveUnitTo(unit: Unit, terrain: TerrainSegment) {
@@ -248,6 +256,20 @@ export class Game extends EventEmitter {
         this.terrain[terrain.r][terrain.q] = terrain;
     }
 
+    public addUnit(unit: Unit) {
+        this.units[unit.id] = unit;
+
+        unit.on("dead", () => {
+            this.removeUnit(unit);
+        });
+    }
+
+    public removeUnit(unit: Unit) {
+        unit.onRemove();
+        unit.removeAllListeners();
+        delete this.units[unit.id];
+    }
+
     public async load() {
         try {
             await this.types.load();
@@ -311,7 +333,7 @@ export class Game extends EventEmitter {
             }
 
             const unit = Unit.deserialize(this, data[id]);
-            this.units[unit.id] = unit;
+            this.addUnit(unit);
         }
     }
 

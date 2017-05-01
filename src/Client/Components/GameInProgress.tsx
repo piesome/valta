@@ -26,7 +26,7 @@ export interface IGameInProgressProps {
 
 export interface IGameInProgressState {
     selectedUnit: Unit;
-    inAction: Action<any, any>;
+    inAction: Action<any>;
 }
 
 export class GameInProgress extends React.Component<IGameInProgressProps, IGameInProgressState> {

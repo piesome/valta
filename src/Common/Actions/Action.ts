@@ -1,18 +1,22 @@
 import {Game} from "../Game";
-import {Faction} from "../Models";
+import {Faction, TerrainSegment} from "../Models";
 
+/**
+ * IActorable = unit for now, in future city too
+ */
 export interface IActorable {
     currentEnergy: number;
     faction: Faction;
+    id: string;
 }
 
-export abstract class Action<Actor extends IActorable, Target> {
+export abstract class Action<Actor extends IActorable> {
     constructor(
         public name: string,
         protected game: Game,
     ) {}
 
-    public do(faction: Faction, actor: Actor, target: Target) {
+    public do(faction: Faction, actor: Actor, target: TerrainSegment) {
         if (actor.faction.id !== faction.id) {
             throw new Error("Can't act on other factions actors");
         }
@@ -30,11 +34,11 @@ export abstract class Action<Actor extends IActorable, Target> {
         actor.currentEnergy -= energyConsumption;
     }
 
-    public abstract enact(actor: Actor, target: Target): void;
-    public abstract energyConsumption(actor: Actor, target: Target): number;
+    public abstract enact(actor: Actor, target: TerrainSegment): void;
+    public abstract energyConsumption(actor: Actor, target: TerrainSegment): number;
     public abstract range(actor: Actor): number;
 
-    public serialize(actor: Actor, target: Target) {
+    public serialize(actor: Actor, target: TerrainSegment) {
         return {
             action: this.name,
             actor: this.serializeActor(actor),
@@ -42,9 +46,17 @@ export abstract class Action<Actor extends IActorable, Target> {
         };
     }
 
-    public abstract serializeActor(actor: Actor): any;
-    public abstract serializeTarget(target: Target): any;
+    public serializeActor(actor: Actor) {
+        return actor.id;
+    }
+
+    public serializeTarget(target: TerrainSegment) {
+        return target.id;
+    }
 
     public abstract deserializeActor(data: any): Actor;
-    public abstract deserializeTarget(data: any): Target;
+
+    public deserializeTarget(data: any) {
+        return this.game.getTerrain(data);
+    }
 }
