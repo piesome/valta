@@ -228,6 +228,13 @@ export class Game extends EventEmitter {
         this.terrain[terrain.r][terrain.q] = terrain;
     }
 
+    public getTerrainSegment(r: number, q: number): TerrainSegment|null {
+        if(this.terrain[r] && this.terrain[r][q]) {
+            return this.terrain[r][q];
+        }
+        return null;
+    }
+
     public addUnit(unit: Unit) {
         this.units[unit.id] = unit;
 

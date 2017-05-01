@@ -65,6 +65,22 @@ export class Hex {
             + Math.abs(this.r - other.r)
         ) / 2;
     }
+
+    public sum(other: Hex): Hex {
+        if(!other)
+            return this;
+        return new Hex(
+            this.q + other.q,
+            this.r + other.r,
+        );
+    }
+
+    public diff(other: Hex): Hex {
+        return new Hex(
+            this.q - other.q,
+            this.r - other.r,
+        );
+    }
 }
 
 export const AXIAL_DIRECTIONS = [
