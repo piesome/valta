@@ -15,19 +15,31 @@ export class Unit {
         );
     }
 
+    public currentHealth: number;
+    public currentEnergy: number;
+
     constructor(
         public id: GS.ID,
         public type: UnitType,
         public faction: Faction,
-        public currentHealth?: number,
-        public currentEnergy?: number,
+        currentHealth?: number,
+        currentEnergy?: number,
     ) {
-        if (currentHealth === undefined) {
+        if ((typeof currentHealth) === "undefined") {
             this.currentHealth = this.maximumHealth;
+        } else {
+            this.currentHealth = currentHealth;
         }
-        if (currentEnergy === undefined) {
+
+        if ((typeof currentEnergy) === "undefined") {
             this.currentEnergy = this.maximumEnergy;
+        } else {
+            this.currentEnergy = currentEnergy;
         }
+    }
+
+    public resetEnergy() {
+        this.currentEnergy = this.maximumEnergy;
     }
 
     public get maximumHealth() {

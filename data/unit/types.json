@@ -5,8 +5,7 @@
     "damage": 5,
     "energy": 2,
     "actions": [
-      "moveOnLand",
-      "meleeAttack"
+      "move"
     ],
     "type": "unit"
   }

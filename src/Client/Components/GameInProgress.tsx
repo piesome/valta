@@ -1,6 +1,7 @@
 import * as R from "ramda";
 import * as React from "react";
 
+import {Action} from "Common/Actions";
 import {Game} from "Common/Game";
 import {Faction, Unit} from "Common/Models";
 import * as RPC from "Common/RPC";
@@ -25,6 +26,7 @@ export interface IGameInProgressProps {
 
 export interface IGameInProgressState {
     selectedUnit: Unit;
+    inAction: Action<any, any>;
 }
 
 export class GameInProgress extends React.Component<IGameInProgressProps, IGameInProgressState> {
@@ -40,6 +42,8 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         this.camera = new Camera();
 
         this.bindCanvasElement = this.bindCanvasElement.bind(this);
+        this.endTurn = this.endTurn.bind(this);
+        this.cancelAction = this.cancelAction.bind(this);
     }
 
     public componentWillUnmount() {
@@ -50,12 +54,12 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
     public render() {
         return (
             <div className={style.game}>
-                <Controls>
-                    <button>Quit</button>
-                </Controls>
+                <Controls />
                 <div className={style.container}>
                     <div className={style.sidebar}>
+                        {this.renderInfo()}
                         {this.renderSelectedUnit()}
+                        {this.renderAction()}
                     </div>
                     <div className={style.canvas}>
                         <canvas ref={this.bindCanvasElement}/>
@@ -65,6 +69,44 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         );
     }
 
+    private renderInfo() {
+        const faction = this.props.game.getFaction(this.props.client.id);
+
+        return (
+            <div className={style.snippet}>
+                <table className={style.info}>
+                    <tbody>
+                        <tr>
+                            <td>Tick</td>
+                            <td>{this.props.game.tick}</td>
+                        </tr>
+                        <tr>
+                            <td>Faction</td>
+                            <td><FactionCube order={faction.order} /></td>
+                        </tr>
+                        <tr>
+                            <td>Can act</td>
+                            <td>{faction.canAct ? "yes" : "no"}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div>
+                    {faction.canAct ? <button onClick={this.endTurn}>End turn</button> : null}
+                </div>
+            </div>
+        );
+    }
+
+    private endTurn() {
+        this.props.client.gameServer.endTurn();
+    }
+
+    private selectAction(act: string) {
+        return () => {
+            this.setState({inAction: this.props.game.actionManager.getAction(act)});
+        };
+    }
+
     private renderSelectedUnit() {
         if (!this.state || !this.state.selectedUnit) {
             return null;
@@ -72,8 +114,12 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
 
         const unit = this.state.selectedUnit;
         const ours = unit.faction.id === this.props.client.id;
-        const possibleActions = unit.type.actions.map((act) => <button key={act}>{act}</button>);
-        const actions = ours ? <div>{possibleActions}</div> : null;
+        const possibleActions = unit.type.actions.map((act) => {
+            return (
+                <button key={act} onClick={this.selectAction(act)}>{act}</button>
+            );
+        });
+        const actions = ours && unit.faction.canAct && unit.currentEnergy > 0 ? <div>{possibleActions}</div> : null;
 
         return (
             <div className={style.snippet}>
@@ -99,6 +145,36 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         );
     }
 
+    private renderAction() {
+        if (!this.state || !this.state.inAction) {
+            return null;
+        }
+
+        return (
+            <div className={style.snippet}>
+                <table className={style.info}>
+                    <tbody>
+                        <tr>
+                            <td>action</td>
+                            <td>{this.state.inAction.name}</td>
+                        </tr>
+                        <tr>
+                            <td>range</td>
+                            <td>{this.state.inAction.range(this.state.selectedUnit)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button onClick={this.cancelAction}>Cancel</button>
+            </div>
+        );
+    }
+
+    private cancelAction() {
+        this.setState({
+            inAction: null,
+        });
+    }
+
     private bindCanvasElement(canvasElement: HTMLCanvasElement) {
         this.canvasElement = canvasElement;
         this.recalculateSize();
@@ -119,7 +195,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
             this.hover = event.hex;
         });
 
-        this.camera.on("select", (event: ICameraEvent) => {
+        this.camera.on("select", async (event: ICameraEvent) => {
             const hex = event.hex;
 
             if (!(hex.r in this.props.game.terrain && hex.q in this.props.game.terrain[hex.r])) {
@@ -128,9 +204,43 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
 
             const terrain = this.props.game.terrain[hex.r][hex.q];
 
+            // TODO: fix generic
+            if (this.state && this.state.inAction && this.state.selectedUnit) {
+                const actor = this.state.selectedUnit;
+                const target = terrain;
+                try {
+                    this.state.inAction.do(
+                        this.props.game.getFaction(this.props.client.id),
+                        actor,
+                        target,
+                    );
+
+                    await this.props.client.gameServer.action(this.state.inAction.serialize(actor, target));
+                } catch (err) {
+                    console.error(err);
+                    return;
+                }
+            }
+
             this.setState({
+                inAction: null,
                 selectedUnit: terrain.units[0] || null,
             });
+        });
+
+        this.props.game.on("deserialized", () => {
+            if (!this.state) {
+                return;
+            }
+
+            if (this.state.selectedUnit) {
+                const id = this.state.selectedUnit.id;
+                try {
+                    this.setState({selectedUnit: this.props.game.getUnit(id)});
+                } catch (err) {
+                    this.setState({selectedUnit: null});
+                }
+            }
         });
     }
 

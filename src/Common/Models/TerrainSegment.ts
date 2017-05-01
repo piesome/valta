@@ -26,8 +26,20 @@ export class TerrainSegment extends Hex {
         super(q, r);
     }
 
+    public canUnitBeAdded(unit: Unit) {
+        if (this.units.length === 0) {
+            return true;
+        }
+        // TODO: fix inf stack of same faction
+        return this.units[0].faction.id === unit.faction.id;
+    }
+
     public addUnit(unit: Unit) {
         this.units.push(unit);
+    }
+
+    public removeUnit(unit: Unit) {
+        this.units = this.units.filter((un) => un.id !== unit.id);
     }
 
     public serialize(): GS.ITerrainSegment {

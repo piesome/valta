@@ -29,6 +29,17 @@ export class GameServer extends RPC.RemotePeer {
         return this.call<RPC.GameServerMethods.ISelectFactionParams, null>(RPC.GameServerMethods.SelectFaction, params);
     }
 
+    public action(params: RPC.GameServerMethods.IActionParams) {
+        return this.call<RPC.GameServerMethods.IActionParams, RPC.GameServerMethods.IActionResponse>(
+            RPC.GameServerMethods.Action,
+            params,
+        );
+    }
+
+    public endTurn() {
+        return this.callNoParams<void>(RPC.GameServerMethods.EndTurn);
+    }
+
     public close() {
         this.ws.close();
     }
