@@ -1,5 +1,5 @@
 import {Game} from "Common/Game";
-import {TerrainSegment} from "Common/Models";
+import {City, TerrainSegment, Unit} from "Common/Models";
 import {getHSL, Hex, Point} from "Common/Util";
 
 import {IGameTime} from "./GameTime";
@@ -58,19 +58,56 @@ export class ClientGame extends Game {
         ctx.fillStyle = terrain.type.debugColor;
         ctx.fill();
 
-        const fact = terrain.units[0] ? terrain.units[0].faction : null;
+        middlePoint.y -= 10;
 
-        if (fact) {
-            ctx.fillStyle = getHSL(fact.order);
-
-            ctx.beginPath();
-            ctx.arc(middlePoint.x, middlePoint.y - 16, 6, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
+        if (terrain.city) {
+            this.drawCity(middlePoint, terrain.city, ctx);
+            middlePoint.y += 10;
         }
+
+        for (const unit of terrain.units) {
+            this.drawUnit(middlePoint, unit, ctx);
+            middlePoint.y += 10;
+        }
+    }
+
+    private drawCity(middlePoint: Point, city: City, ctx: CanvasRenderingContext2D) {
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "#333";
+        ctx.fillStyle = getHSL(city.faction.order);
+
+        const displayedName = city.name.length > 10 ? city.name.substr(0, 10) : city.name;
+        const width = ctx.measureText(displayedName).width;
+
+        ctx.beginPath();
+        ctx.rect(middlePoint.x - (width / 2) - 1, middlePoint.y - 10, width + 2, 12);
+        ctx.fill();
+        ctx.stroke();
 
         ctx.fillStyle = "#000000";
         ctx.textAlign = "center";
-        ctx.fillText(terrain.units.map((unit) => unit.type.name).join("\n"), middlePoint.x, middlePoint.y);
+
+        ctx.fillText(displayedName, middlePoint.x, middlePoint.y);
+    }
+
+    private drawUnit(middlePoint: Point, unit: Unit, ctx: CanvasRenderingContext2D) {
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "#333";
+        ctx.fillStyle = getHSL(unit.faction.order);
+
+        const displayedName = unit.type.name.length > 10 ? unit.type.name.substr(0, 10) : unit.type.name;
+        const width = ctx.measureText(displayedName).width;
+
+        ctx.beginPath();
+        ctx.arc(middlePoint.x - (width / 2) + 4, middlePoint.y - 2, 6, Math.PI / 2, Math.PI * 3 / 2);
+        ctx.arc(middlePoint.x + (width / 2) - 4, middlePoint.y - 2, 6, Math.PI * 3 / 2, Math.PI / 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#000000";
+        ctx.textAlign = "center";
+
+        ctx.fillText(displayedName, middlePoint.x, middlePoint.y);
     }
 }

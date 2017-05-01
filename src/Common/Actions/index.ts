@@ -2,6 +2,7 @@ import {Game} from "../Game";
 import {Faction} from "../Models";
 import {Action} from "./Action";
 import {Attack} from "./Attack";
+import {Cityize} from "./Cityize";
 import {Move} from "./Move";
 
 export {Action, Attack, Move};
@@ -14,6 +15,7 @@ export class ActionManager {
 
         this.addAction(new Move("move", game));
         this.addAction(new Attack("attack", game));
+        this.addAction(new Cityize("cityize", game));
     }
 
     public getAction(name: string) {

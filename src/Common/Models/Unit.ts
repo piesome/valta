@@ -61,10 +61,11 @@ export class Unit extends EventEmitter {
         this.terrain = terrain;
     }
 
-    public onRemove() {
+    public kill() {
         if (this.terrain) {
             this.terrain.removeUnit(this);
         }
+        this.emit("dead");
     }
 
     public resetEnergy() {
@@ -86,7 +87,7 @@ export class Unit extends EventEmitter {
     public takeDamage(damage: number) {
         this.currentHealth = (damage >= this.currentHealth ? 0 : this.currentHealth - damage);
         if (this.currentHealth <= 0) {
-            this.emit("dead");
+            this.kill();
         }
     }
 

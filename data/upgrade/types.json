@@ -5,10 +5,17 @@
     "automaticallyUnlocked": true,
     "effects": [
       {
-        "name": "Unlock testuint",
+        "name": "Unlock wagon",
         "type": "unlock",
         "target": {
-          "unitType": "testunit"
+          "unitType": "wagon"
+        }
+      },
+      {
+        "name": "Unlock scout",
+        "type": "unlock",
+        "target": {
+          "unitType": "scout"
         }
       }
     ]

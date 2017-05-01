@@ -2,7 +2,7 @@ import {Game} from "../Game";
 import * as GS from "../GameState";
 import {TerrainType} from "../Types";
 import {Hex} from "../Util";
-
+import {City} from "./City";
 import {Unit} from "./Unit";
 
 export class TerrainSegment extends Hex {
@@ -16,6 +16,7 @@ export class TerrainSegment extends Hex {
     }
 
     public units: Unit[];
+    public city: City;
 
     constructor(
         public id: GS.ID,
@@ -53,7 +54,6 @@ export class TerrainSegment extends Hex {
 
     public serialize(): GS.ITerrainSegment {
         return {
-            city: null,
             id: this.id,
             naturalResources: {},
             q: this.q,

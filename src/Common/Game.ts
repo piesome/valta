@@ -5,6 +5,7 @@ import {v4 as uuid} from "uuid";
 import {ActionManager} from "./Actions";
 import * as GS from "./GameState";
 import {
+    City,
     Faction,
     TerrainSegment,
     Unit,
@@ -25,6 +26,7 @@ export class Game extends EventEmitter {
     public tick: number;
     public terrain: {[r: number]: {[q: number]: TerrainSegment}};
     public units: {[id: string]: Unit};
+    public cities: {[id: string]: City};
 
     private terrainById: {[id: string]: TerrainSegment};
 
@@ -82,7 +84,7 @@ export class Game extends EventEmitter {
         for (const fact of this.factions) {
             const startingPoint = startingPoints[fact.order]; // TODO: fix order
             const terr = this.terrain[startingPoint.r][startingPoint.q];
-            const unit = this.createUnit("testunit", fact);
+            const unit = this.createUnit("wagon", fact);
             unit.moveTo(terr);
         }
         this.status = "started";
@@ -162,7 +164,7 @@ export class Game extends EventEmitter {
     }
 
     public createUnit(unitType: string, faction: Faction) {
-        const type = this.types.unit.getType("testunit");
+        const type = this.types.unit.getType(unitType);
         if (!type.isUnlocked(faction)) {
             throw new Error(`Unit type ${unitType} not unlocked`);
         }
@@ -182,6 +184,13 @@ export class Game extends EventEmitter {
 
     public moveUnitTo(unit: Unit, terrain: TerrainSegment) {
         unit.moveTo(terrain);
+    }
+
+    public createCity(faction: Faction, terrain: TerrainSegment) {
+        const id = uuid();
+        const city = new City(id, id, faction, terrain, 100, 0);
+        this.addCity(city);
+        return city;
     }
 
     public factionsUnits(faction: Faction) {
@@ -204,48 +213,6 @@ export class Game extends EventEmitter {
         return ret;
     }
 
-    public allTerrain(): TerrainSegment[] {
-        const terrains: TerrainSegment[] = [];
-
-        for (const row in this.terrain) {
-            if (!this.terrain.hasOwnProperty(row)) {
-                continue;
-            }
-            for (const column in this.terrain[row]) {
-                if (!this.terrain[row].hasOwnProperty(column)) {
-                    continue;
-                }
-
-                terrains.push(this.terrain[row][column]);
-            }
-        }
-
-        return terrains;
-    }
-
-    public findUnitsTerrain(unit: Unit): TerrainSegment {
-        // TODO: fix this fast
-
-        for (const row in this.terrain) {
-            if (!this.terrain.hasOwnProperty(row)) {
-                continue;
-            }
-            for (const column in this.terrain[row]) {
-                if (!this.terrain[row].hasOwnProperty(column)) {
-                    continue;
-                }
-
-                for (const iter of this.terrain[row][column].units) {
-                    if (iter.id === unit.id) {
-                        return this.terrain[row][column];
-                    }
-                }
-            }
-        }
-
-        throw new Error(`Couldn't find unit ${unit.id}`);
-    }
-
     public addTerrain(terrain: TerrainSegment) {
         this.terrainById[terrain.id] = terrain;
 
@@ -265,9 +232,21 @@ export class Game extends EventEmitter {
     }
 
     public removeUnit(unit: Unit) {
-        unit.onRemove();
         unit.removeAllListeners();
         delete this.units[unit.id];
+    }
+
+    public addCity(city: City) {
+        this.cities[city.id] = city;
+
+        city.on("dead", () => {
+            this.removeCity(city);
+        });
+    }
+
+    public removeCity(city: City) {
+        city.removeAllListeners();
+        delete this.cities[city.id];
     }
 
     public async load() {
@@ -286,12 +265,14 @@ export class Game extends EventEmitter {
         this.factions = data.factions.map((x) => Faction.deserialize(this, x));
         this.deserializeTerrain(data.terrain);
         this.deserializeUnits(data.units);
+        this.deserializeCities(data.cities);
 
         this.emit("deserialized");
     }
 
     public serialize(): GS.IGame {
         return {
+            cities: this.serializeCities(),
             factions: this.factions.map((x) => x.serialize()),
             id: this.id,
             name: this.name,
@@ -309,6 +290,33 @@ export class Game extends EventEmitter {
             name: this.name,
             status: this.status,
         };
+    }
+
+    private serializeCities(): GS.ICities {
+        const data: GS.ICities = {};
+
+        for (const id in this.cities) {
+            if (!this.cities.hasOwnProperty(id)) {
+                continue;
+            }
+
+            data[id] = this.cities[id].serialize();
+        }
+
+        return data;
+    }
+
+    private deserializeCities(data: GS.ICities) {
+        this.cities = {};
+
+        for (const id in data) {
+            if (!data.hasOwnProperty(id)) {
+                continue;
+            }
+
+            const city = City.deserialize(this, data[id]);
+            this.addCity(city);
+        }
     }
 
     private serializeUnits(): GS.IUnits {

@@ -14,6 +14,10 @@ export interface IUnits {
     [id: string]: IUnit;
 }
 
+export interface ICities {
+    [id: string]: ICity;
+}
+
 export type GameStatus = "lobby" | "started" | "ended";
 
 export interface IGame {
@@ -25,6 +29,7 @@ export interface IGame {
     terrain: ITerrainData;
     factions: IFaction[];
     units: IUnits;
+    cities: ICities;
 }
 
 export type FactionType = string;
@@ -49,16 +54,19 @@ export interface ITerrainSegment {
     r: number;
 
     terrainType: TerrainType;
-
-    city: ICity;
-
     naturalResources: IResources;
 }
 
 export interface ICity {
     id: ID;
+    name: string;
 
+    terrain: ID;
     faction: ID;
+
+    currentHealth: number;
+    currentEnergy: number;
+
     productionQueue: IProductionQueueItem[];
     buildings: IBuilding[];
 }
