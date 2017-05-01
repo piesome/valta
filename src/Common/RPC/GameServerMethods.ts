@@ -18,6 +18,14 @@ export const EndTurn = "EndTurn";
 export type IEndTurnParams = void;
 export type IEndTurnResponse = void;
 
+export const Action = "Action";
+export interface IActionParams {
+    action: string;
+    actor: any;
+    target: any;
+}
+export type IActionResponse = void;
+
 /**
  * Todo automatically populated from above
  */
@@ -26,4 +34,5 @@ export const SERVER_METHODS = [
     StartGame,
     GetGameState,
     EndTurn,
+    Action,
 ];

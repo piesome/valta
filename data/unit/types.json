@@ -1,12 +1,21 @@
 [
   {
-    "name": "testunit",
+    "name": "scout",
     "health": 10,
-    "damage": 5,
+    "damage": 2,
+    "energy": 3,
+    "actions": [
+      "move", "attack"
+    ],
+    "type": "unit"
+  },
+  {
+    "name": "wagon",
+    "health": 10,
+    "damage": 0,
     "energy": 2,
     "actions": [
-      "moveOnLand",
-      "meleeAttack"
+      "move", "cityize"
     ],
     "type": "unit"
   }

@@ -216,4 +216,12 @@ export class GameServer extends RPC.Peer<GameClient> {
     ): RPC.GameServerMethods.IEndTurnResponse {
         client.endTurn();
     }
+
+    @registerRPC(RPC.GameServerMethods.Action)
+    private doAction(
+        client: GameClient,
+        params: RPC.GameServerMethods.IActionParams,
+    ): RPC.GameServerMethods.IActionResponse {
+        client.game.actionManager.deserialize(client.faction, params);
+    }
 }

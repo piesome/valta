@@ -2,8 +2,10 @@ import {EventEmitter} from "eventemitter3";
 import * as R from "ramda";
 import {v4 as uuid} from "uuid";
 
+import {ActionManager} from "./Actions";
 import * as GS from "./GameState";
 import {
+    City,
     Faction,
     TerrainSegment,
     Unit,
@@ -14,6 +16,7 @@ import {Hex} from "./Util";
 
 export class Game extends EventEmitter {
     public types: Types;
+    public actionManager: ActionManager;
 
     public id: GS.ID;
     public name: string;
@@ -22,6 +25,10 @@ export class Game extends EventEmitter {
     public factions: Faction[];
     public tick: number;
     public terrain: {[r: number]: {[q: number]: TerrainSegment}};
+    public units: {[id: string]: Unit};
+    public cities: {[id: string]: City};
+
+    private terrainById: {[id: string]: TerrainSegment};
 
     constructor(
         types?: Types,
@@ -35,8 +42,11 @@ export class Game extends EventEmitter {
         this.tick = 0;
         this.terrain = {};
         this.factions = [];
+        this.units = {};
+        this.terrainById = {};
 
         this.types = types || new Types();
+        this.actionManager = new ActionManager(this);
     }
 
     public assertLobby() {
@@ -73,9 +83,13 @@ export class Game extends EventEmitter {
         const startingPoints = (new TerrainGenerator(this, 10)).generate();
         for (const fact of this.factions) {
             const startingPoint = startingPoints[fact.order]; // TODO: fix order
+            const terr = this.terrain[startingPoint.r][startingPoint.q];
 
-            const unit = this.createUnit(fact, "testunit");
-            this.addUnit(startingPoint, unit);
+            const wagon = this.createUnit("wagon", fact);
+            wagon.moveTo(terr);
+
+            const scout = this.createUnit("scout", fact);
+            scout.moveTo(terr);
         }
         this.status = "started";
         this.endTurn();
@@ -89,11 +103,16 @@ export class Game extends EventEmitter {
 
         R.map((faction) => faction.canAct = false, this.factions);
 
+        let newFaction: Faction;
+
         if (!currentTurn || currentTurn.order === orderedFactions.length - 1) {
-            this.getFaction(orderedFactions[0].id).canAct = true;
+            newFaction = this.getFaction(orderedFactions[0].id);
         } else {
-            this.getFaction(orderedFactions[currentTurn.order + 1].id).canAct = true;
+            newFaction = this.getFaction(orderedFactions[currentTurn.order + 1].id);
         }
+
+        newFaction.canAct = true;
+        this.factionsUnits(newFaction).map((unit) => unit.resetEnergy());
 
         this.tick += 1;
         this.emit("update");
@@ -148,33 +167,90 @@ export class Game extends EventEmitter {
         this.checkCanBeStarted();
     }
 
-    public createUnit(faction: Faction, unitType: string) {
-        const type = this.types.unit.getType("testunit");
+    public createUnit(unitType: string, faction: Faction) {
+        const type = this.types.unit.getType(unitType);
         if (!type.isUnlocked(faction)) {
             throw new Error(`Unit type ${unitType} not unlocked`);
         }
 
-        const unit = new Unit(uuid(), type, faction, type.getMaximumHealth(faction));
+        const unit = new Unit(uuid(), type, faction, null);
+        this.addUnit(unit);
         return unit;
     }
 
-    public addUnit(hex: Hex, unit: Unit) {
-        if (!this.terrain[hex.r] || !this.terrain[hex.r][hex.q]) {
-            throw new Error("Can't add unit into void");
+    public battleUnits(attacker: Unit, defenders: Unit[]) {
+        for (const def of defenders) {
+            // TODO: more advanced calculations?
+            def.takeDamage(attacker.damage);
+            attacker.takeDamage(def.damage);
         }
+    }
 
-        const terrain = this.terrain[hex.r][hex.q];
-        // TODO: terrain unit limit etc
+    public moveUnitTo(unit: Unit, terrain: TerrainSegment) {
+        unit.moveTo(terrain);
+    }
 
-        terrain.addUnit(unit);
+    public createCity(faction: Faction, terrain: TerrainSegment) {
+        const id = uuid();
+        const city = new City(id, id, faction, terrain, 100, 0);
+        this.addCity(city);
+        return city;
+    }
+
+    public factionsUnits(faction: Faction) {
+        return R.filter((unit) => unit.faction.id === faction.id, R.values(this.units));
+    }
+
+    public getUnit(id: GS.ID) {
+        const ret = this.units[id];
+        if (!ret) {
+            throw new Error(`No unit with id ${id}`);
+        }
+        return ret;
+    }
+
+    public getTerrain(id: GS.ID) {
+        const ret = this.terrainById[id];
+        if (!ret) {
+            throw new Error(`No terrain with id ${id}`);
+        }
+        return ret;
     }
 
     public addTerrain(terrain: TerrainSegment) {
+        this.terrainById[terrain.id] = terrain;
+
         if (!this.terrain[terrain.r]) {
             this.terrain[terrain.r] = {};
         }
 
         this.terrain[terrain.r][terrain.q] = terrain;
+    }
+
+    public addUnit(unit: Unit) {
+        this.units[unit.id] = unit;
+
+        unit.on("dead", () => {
+            this.removeUnit(unit);
+        });
+    }
+
+    public removeUnit(unit: Unit) {
+        unit.removeAllListeners();
+        delete this.units[unit.id];
+    }
+
+    public addCity(city: City) {
+        this.cities[city.id] = city;
+
+        city.on("dead", () => {
+            this.removeCity(city);
+        });
+    }
+
+    public removeCity(city: City) {
+        city.removeAllListeners();
+        delete this.cities[city.id];
     }
 
     public async load() {
@@ -192,16 +268,22 @@ export class Game extends EventEmitter {
         this.tick = data.tick;
         this.factions = data.factions.map((x) => Faction.deserialize(this, x));
         this.deserializeTerrain(data.terrain);
+        this.deserializeUnits(data.units);
+        this.deserializeCities(data.cities);
+
+        this.emit("deserialized");
     }
 
     public serialize(): GS.IGame {
         return {
+            cities: this.serializeCities(),
             factions: this.factions.map((x) => x.serialize()),
             id: this.id,
             name: this.name,
             status: this.status,
             terrain: this.serializeTerrain(),
             tick: this.tick,
+            units: this.serializeUnits(),
         };
     }
 
@@ -212,6 +294,59 @@ export class Game extends EventEmitter {
             name: this.name,
             status: this.status,
         };
+    }
+
+    private serializeCities(): GS.ICities {
+        const data: GS.ICities = {};
+
+        for (const id in this.cities) {
+            if (!this.cities.hasOwnProperty(id)) {
+                continue;
+            }
+
+            data[id] = this.cities[id].serialize();
+        }
+
+        return data;
+    }
+
+    private deserializeCities(data: GS.ICities) {
+        this.cities = {};
+
+        for (const id in data) {
+            if (!data.hasOwnProperty(id)) {
+                continue;
+            }
+
+            const city = City.deserialize(this, data[id]);
+            this.addCity(city);
+        }
+    }
+
+    private serializeUnits(): GS.IUnits {
+        const data: GS.IUnits = {};
+        for (const id in this.units) {
+            if (!this.units.hasOwnProperty(id)) {
+                continue;
+            }
+
+            data[id] = this.units[id].serialize();
+        }
+
+        return data;
+    }
+
+    private deserializeUnits(data: GS.IUnits) {
+        this.units = {};
+
+        for (const id in data) {
+            if (!data.hasOwnProperty(id)) {
+                continue;
+            }
+
+            const unit = Unit.deserialize(this, data[id]);
+            this.addUnit(unit);
+        }
     }
 
     private serializeTerrain(): GS.ITerrainData {
@@ -237,6 +372,7 @@ export class Game extends EventEmitter {
 
     private deserializeTerrain(data: GS.ITerrainData) {
         this.terrain = {};
+        this.terrainById = {};
 
         for (const row in data) {
             if (!data.hasOwnProperty(row)) {

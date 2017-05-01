@@ -2,7 +2,7 @@ import {Game} from "../Game";
 import * as GS from "../GameState";
 import {TerrainType} from "../Types";
 import {Hex} from "../Util";
-
+import {City} from "./City";
 import {Unit} from "./Unit";
 
 export class TerrainSegment extends Hex {
@@ -12,33 +12,53 @@ export class TerrainSegment extends Hex {
             game.types.terrain.getType(data.terrainType),
             data.q,
             data.r,
-            data.units.map((x) => Unit.deserialize(game, x)),
         );
     }
+
+    public units: Unit[];
+    public city: City;
 
     constructor(
         public id: GS.ID,
         public type: TerrainType,
         q: number,
         r: number,
-        public units: Unit[],
     ) {
         super(q, r);
+
+        this.units = [];
+    }
+
+    public canUnitBeAdded(unit: Unit) {
+        if (this.units.length === 0) {
+            return true;
+        }
+        // TODO: fix inf stack of same faction
+        return this.units[0].faction.id === unit.faction.id;
     }
 
     public addUnit(unit: Unit) {
         this.units.push(unit);
     }
 
+    public removeUnit(unit: Unit) {
+        this.units = this.units.filter((un) => un.id !== unit.id);
+    }
+
+    /**
+     * @todo Don't target civilians, something fancy with cities
+     */
+    public getDefendingUnits(): Unit[] {
+        return this.units;
+    }
+
     public serialize(): GS.ITerrainSegment {
         return {
-            city: null,
             id: this.id,
             naturalResources: {},
             q: this.q,
             r: this.r,
             terrainType: this.type.name,
-            units: this.units.map((x) => x.serialize()),
         };
     }
 }
