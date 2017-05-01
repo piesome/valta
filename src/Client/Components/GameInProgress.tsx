@@ -71,6 +71,9 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         }
 
         const unit = this.state.selectedUnit;
+        const ours = unit.faction.id === this.props.client.id;
+        const possibleActions = unit.type.actions.map((act) => <button key={act}>{act}</button>);
+        const actions = ours ? <div>{possibleActions}</div> : null;
 
         return (
             <div className={style.snippet}>
@@ -91,6 +94,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
                         </tr>
                     </tbody>
                 </table>
+                {actions}
             </div>
         );
     }
