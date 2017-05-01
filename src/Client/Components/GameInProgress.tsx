@@ -56,17 +56,33 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
 
     private bindCanvasElement(canvasElement: HTMLCanvasElement) {
         this.canvasElement = canvasElement;
-
-        this.canvasElement.width = (this.canvasElement.parentNode as HTMLDivElement).clientWidth;
-        this.canvasElement.height = (this.canvasElement.parentNode as HTMLDivElement).clientHeight;
-        this.camera.bindTo(this.canvasElement);
-
-        this.camera.on("hover", (args: ICameraEvent) => {
-            this.hover = args.point;
-        });
+        this.recalculateSize();
+        this.bindEvents();
 
         this.ctx = this.canvasElement.getContext("2d");
         this.draw();
+    }
+
+    private bindEvents() {
+        this.camera.bindTo(this.canvasElement);
+        this.camera.on("hover", (args: ICameraEvent) => {
+            this.hover = args.point;
+        });
+        window.addEventListener("resize", (event) => {
+            this.recalculateSize();
+        });
+    }
+
+    /**
+     * @todo dom event unbinds
+     */
+    private unbindEvents() {
+        this.camera.removeAllListeners();
+    }
+
+    private recalculateSize() {
+        this.canvasElement.width = (this.canvasElement.parentNode as HTMLDivElement).clientWidth;
+        this.canvasElement.height = (this.canvasElement.parentNode as HTMLDivElement).clientHeight;
     }
 
     private draw(total = 0, previous = 0) {
