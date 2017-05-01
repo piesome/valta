@@ -243,7 +243,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
             const selectables = R.filter(R.identity, R.append(terrain.city, terrain.units));
 
             if (selectables.length === 0) {
-                this.setState({
+                return this.setState({
                     selectedCity: null,
                     selectedUnit: null,
                 });
