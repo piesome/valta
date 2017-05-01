@@ -21,7 +21,6 @@ export class TerrainGenerator {
                     this.game.types.terrain.getType("plains"),
                     dx,
                     dz,
-                    [],
                 );
 
                 this.game.addTerrain(terrain);

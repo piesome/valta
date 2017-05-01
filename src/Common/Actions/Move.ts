@@ -8,13 +8,11 @@ export class Move extends Action<Unit, TerrainSegment> {
     }
 
     public energyConsumption(unit: Unit, terrain: TerrainSegment) {
-        // todo fix units
-        const currentTerrain = this.game.findUnitsTerrain(unit);
-        return currentTerrain.distanceTo(terrain);
+        return unit.terrain.distanceTo(terrain);
     }
 
     public enact(unit: Unit, terrain: TerrainSegment) {
-        this.game.moveUnit(unit, terrain);
+        this.game.moveUnitTo(unit, terrain);
     }
 
     // TODO: fix with generics or smth

@@ -12,18 +12,20 @@ export class TerrainSegment extends Hex {
             game.types.terrain.getType(data.terrainType),
             data.q,
             data.r,
-            data.units.map((x) => Unit.deserialize(game, x)),
         );
     }
+
+    public units: Unit[];
 
     constructor(
         public id: GS.ID,
         public type: TerrainType,
         q: number,
         r: number,
-        public units: Unit[],
     ) {
         super(q, r);
+
+        this.units = [];
     }
 
     public canUnitBeAdded(unit: Unit) {
@@ -50,7 +52,6 @@ export class TerrainSegment extends Hex {
             q: this.q,
             r: this.r,
             terrainType: this.type.name,
-            units: this.units.map((x) => x.serialize()),
         };
     }
 }

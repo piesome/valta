@@ -24,6 +24,9 @@ export class Game extends EventEmitter {
     public factions: Faction[];
     public tick: number;
     public terrain: {[r: number]: {[q: number]: TerrainSegment}};
+    public units: {[id: string]: Unit};
+
+    private terrainById: {[id: string]: TerrainSegment};
 
     constructor(
         types?: Types,
@@ -37,6 +40,8 @@ export class Game extends EventEmitter {
         this.tick = 0;
         this.terrain = {};
         this.factions = [];
+        this.units = {};
+        this.terrainById = {};
 
         this.types = types || new Types();
         this.actionManager = new ActionManager(this);
@@ -76,9 +81,9 @@ export class Game extends EventEmitter {
         const startingPoints = (new TerrainGenerator(this, 10)).generate();
         for (const fact of this.factions) {
             const startingPoint = startingPoints[fact.order]; // TODO: fix order
-
-            const unit = this.createUnit(fact, "testunit");
-            this.addUnit(startingPoint, unit);
+            const terr = this.terrain[startingPoint.r][startingPoint.q];
+            const unit = this.createUnit("testunit", fact);
+            unit.moveTo(terr);
         }
         this.status = "started";
         this.endTurn();
@@ -156,47 +161,27 @@ export class Game extends EventEmitter {
         this.checkCanBeStarted();
     }
 
-    public createUnit(faction: Faction, unitType: string) {
+    public createUnit(unitType: string, faction: Faction) {
         const type = this.types.unit.getType("testunit");
         if (!type.isUnlocked(faction)) {
             throw new Error(`Unit type ${unitType} not unlocked`);
         }
 
-        const unit = new Unit(uuid(), type, faction);
+        const unit = new Unit(uuid(), type, faction, null);
+        this.units[unit.id] = unit;
         return unit;
     }
 
-    public addUnit(hex: Hex, unit: Unit) {
-        if (!this.terrain[hex.r] || !this.terrain[hex.r][hex.q]) {
-            throw new Error("Can't add unit into void");
-        }
-
-        const terrain = this.terrain[hex.r][hex.q];
-
-        if (!terrain.canUnitBeAdded(unit)) {
-            throw new Error("Unit can't be added there");
-        }
-
-        terrain.addUnit(unit);
-    }
-
-    public moveUnit(unit: Unit, terrain: TerrainSegment) {
-        if (!terrain.canUnitBeAdded(unit)) {
-            throw new Error("Unit can't be moved there");
-        }
-
-        const currentTerrain = this.findUnitsTerrain(unit);
-        // TODO: fixfixfix
-        currentTerrain.removeUnit(unit);
-        terrain.addUnit(unit);
+    public moveUnitTo(unit: Unit, terrain: TerrainSegment) {
+        unit.moveTo(terrain);
     }
 
     public factionsUnits(faction: Faction) {
-        return this.allUnits().filter((unit) => unit.faction.id === faction.id);
+        return R.filter((unit) => unit.faction.id === faction.id, R.values(this.units));
     }
 
     public getUnit(id: GS.ID) {
-        const ret = R.find((unit) => unit.id === id, this.allUnits());
+        const ret = this.units[id];
         if (!ret) {
             throw new Error(`No unit with id ${id}`);
         }
@@ -204,7 +189,7 @@ export class Game extends EventEmitter {
     }
 
     public getTerrain(id: GS.ID) {
-        const ret = R.find((terrain) => terrain.id === id, this.allTerrain());
+        const ret = this.terrainById[id];
         if (!ret) {
             throw new Error(`No terrain with id ${id}`);
         }
@@ -228,10 +213,6 @@ export class Game extends EventEmitter {
         }
 
         return terrains;
-    }
-
-    public allUnits(): Unit[] {
-        return R.flatten(R.map((ter) => ter.units, this.allTerrain()));
     }
 
     public findUnitsTerrain(unit: Unit): TerrainSegment {
@@ -258,6 +239,8 @@ export class Game extends EventEmitter {
     }
 
     public addTerrain(terrain: TerrainSegment) {
+        this.terrainById[terrain.id] = terrain;
+
         if (!this.terrain[terrain.r]) {
             this.terrain[terrain.r] = {};
         }
@@ -280,6 +263,7 @@ export class Game extends EventEmitter {
         this.tick = data.tick;
         this.factions = data.factions.map((x) => Faction.deserialize(this, x));
         this.deserializeTerrain(data.terrain);
+        this.deserializeUnits(data.units);
 
         this.emit("deserialized");
     }
@@ -292,6 +276,7 @@ export class Game extends EventEmitter {
             status: this.status,
             terrain: this.serializeTerrain(),
             tick: this.tick,
+            units: this.serializeUnits(),
         };
     }
 
@@ -302,6 +287,32 @@ export class Game extends EventEmitter {
             name: this.name,
             status: this.status,
         };
+    }
+
+    private serializeUnits(): GS.IUnits {
+        const data: GS.IUnits = {};
+        for (const id in this.units) {
+            if (!this.units.hasOwnProperty(id)) {
+                continue;
+            }
+
+            data[id] = this.units[id].serialize();
+        }
+
+        return data;
+    }
+
+    private deserializeUnits(data: GS.IUnits) {
+        this.units = {};
+
+        for (const id in data) {
+            if (!data.hasOwnProperty(id)) {
+                continue;
+            }
+
+            const unit = Unit.deserialize(this, data[id]);
+            this.units[unit.id] = unit;
+        }
     }
 
     private serializeTerrain(): GS.ITerrainData {
@@ -327,6 +338,7 @@ export class Game extends EventEmitter {
 
     private deserializeTerrain(data: GS.ITerrainData) {
         this.terrain = {};
+        this.terrainById = {};
 
         for (const row in data) {
             if (!data.hasOwnProperty(row)) {

@@ -3,6 +3,7 @@ import * as GS from "../GameState";
 import {UnitType} from "../Types";
 
 import {Faction} from "./Faction";
+import {TerrainSegment} from "./TerrainSegment";
 
 export class Unit {
     public static deserialize(game: Game, data: GS.IUnit): Unit {
@@ -10,6 +11,7 @@ export class Unit {
             data.id,
             game.types.unit.getType(data.unitType),
             game.getFaction(data.faction),
+            game.getTerrain(data.terrain),
             data.currentHealth,
             data.currentEnergy,
         );
@@ -22,6 +24,7 @@ export class Unit {
         public id: GS.ID,
         public type: UnitType,
         public faction: Faction,
+        public terrain: TerrainSegment,
         currentHealth?: number,
         currentEnergy?: number,
     ) {
@@ -36,6 +39,22 @@ export class Unit {
         } else {
             this.currentEnergy = currentEnergy;
         }
+
+        if (this.terrain) {
+            this.terrain.addUnit(this);
+        }
+    }
+
+    public moveTo(terrain: TerrainSegment) {
+        if (!terrain.canUnitBeAdded(this)) {
+            throw new Error("Unit can't be added there");
+        }
+
+        if (this.terrain) {
+            terrain.removeUnit(this);
+        }
+        terrain.addUnit(this);
+        this.terrain = terrain;
     }
 
     public resetEnergy() {
@@ -64,6 +83,7 @@ export class Unit {
             currentHealth: this.currentHealth,
             faction: this.faction.id,
             id: this.id,
+            terrain: this.terrain.id,
             unitType: this.type.name,
         };
     }

@@ -23,7 +23,7 @@ export abstract class Action<Actor extends IActorable, Target> {
 
         const energyConsumption = this.energyConsumption(actor, target);
         if (actor.currentEnergy < energyConsumption) {
-            throw new Error("Just can't");
+            throw new Error(`Not enough energy. Actor has ${actor.currentEnergy} but needs ${energyConsumption}`);
         }
 
         this.enact(actor, target);
