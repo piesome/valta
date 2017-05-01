@@ -9,7 +9,7 @@ export class Attack extends Action<Unit> {
     }
 
     public energyConsumption(unit: Unit, terrain: TerrainSegment) {
-        return unit.currentEnergy;
+        return Math.max(1, unit.currentEnergy);
     }
 
     public enact(unit: Unit, terrain: TerrainSegment) {
