@@ -3,7 +3,7 @@ import * as React from "react";
 
 import {Action} from "Common/Actions";
 import {Game} from "Common/Game";
-import {Faction, Unit} from "Common/Models";
+import {City, Faction, Unit} from "Common/Models";
 import * as RPC from "Common/RPC";
 import {Types} from "Common/Types";
 import {Hex} from "Common/Util";
@@ -26,6 +26,7 @@ export interface IGameInProgressProps {
 
 export interface IGameInProgressState {
     selectedUnit: Unit;
+    selectedCity: City;
     inAction: Action<any>;
 }
 
@@ -58,6 +59,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
                 <div className={style.container}>
                     <div className={style.sidebar}>
                         {this.renderInfo()}
+                        {this.renderSelectedCity()}
                         {this.renderSelectedUnit()}
                         {this.renderAction()}
                     </div>
@@ -99,6 +101,20 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
 
     private endTurn() {
         this.props.client.gameServer.endTurn();
+    }
+
+    private renderSelectedCity() {
+        if (!this.state || !this.state.selectedCity) {
+            return null;
+        }
+
+        const city = this.state.selectedCity;
+
+        return (
+            <div className={style.snippet}>
+                <div>{city.name}</div>
+            </div>
+        );
     }
 
     private selectAction(act: string) {
@@ -222,10 +238,43 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
                 return;
             }
 
-            this.setState({
-                inAction: null,
-                selectedUnit: terrain.units[0] || null,
-            });
+            this.setState({inAction: null});
+
+            const selectables = R.filter(R.identity, R.append(terrain.city, terrain.units));
+
+            if (selectables.length === 0) {
+                this.setState({
+                    selectedCity: null,
+                    selectedUnit: null,
+                });
+            }
+
+            // todo: make clearer
+            const select = (selectable: any): void => {
+                if (selectable.name !== undefined) {
+                    this.setState({
+                        selectedCity: (selectable as City),
+                        selectedUnit: null,
+                    });
+                } else {
+                    this.setState({
+                        selectedCity: null,
+                        selectedUnit: (selectable as Unit),
+                    });
+                }
+            };
+
+            const currentlySelected = this.state.selectedCity || this.state.selectedUnit || null;
+            if (!currentlySelected) {
+                return select(selectables[0]);
+            }
+
+            const ind = R.indexOf(currentlySelected.id, R.map((s: any) => s.id, selectables));
+            if (ind === -1 || ind === selectables.length - 1) {
+                return select(selectables[0]);
+            }
+
+            select(selectables[ind + 1]);
         });
 
         this.props.game.on("deserialized", () => {
@@ -240,6 +289,11 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
                 } catch (err) {
                     this.setState({selectedUnit: null});
                 }
+            }
+
+            if (this.state.selectedCity) {
+                const id = this.state.selectedCity.id;
+                this.setState({selectedCity: this.props.game.cities[id]});
             }
         });
     }

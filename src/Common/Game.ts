@@ -84,8 +84,12 @@ export class Game extends EventEmitter {
         for (const fact of this.factions) {
             const startingPoint = startingPoints[fact.order]; // TODO: fix order
             const terr = this.terrain[startingPoint.r][startingPoint.q];
-            const unit = this.createUnit("wagon", fact);
-            unit.moveTo(terr);
+
+            const wagon = this.createUnit("wagon", fact);
+            wagon.moveTo(terr);
+
+            const scout = this.createUnit("scout", fact);
+            scout.moveTo(terr);
         }
         this.status = "started";
         this.endTurn();

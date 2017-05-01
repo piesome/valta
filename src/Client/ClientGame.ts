@@ -58,16 +58,16 @@ export class ClientGame extends Game {
         ctx.fillStyle = terrain.type.debugColor;
         ctx.fill();
 
-        middlePoint.y -= 10;
+        middlePoint.y -= 13;
 
         if (terrain.city) {
             this.drawCity(middlePoint, terrain.city, ctx);
-            middlePoint.y += 10;
+            middlePoint.y += 13;
         }
 
         for (const unit of terrain.units) {
             this.drawUnit(middlePoint, unit, ctx);
-            middlePoint.y += 10;
+            middlePoint.y += 13;
         }
     }
 
