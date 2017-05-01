@@ -43,6 +43,7 @@ export class Game extends EventEmitter {
         this.terrain = {};
         this.factions = [];
         this.units = {};
+        this.cities = {};
         this.terrainById = {};
 
         this.types = types || new Types();
