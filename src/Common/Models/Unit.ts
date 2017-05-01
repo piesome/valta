@@ -54,6 +54,10 @@ export class Unit {
         return this.type.getDamage(this.faction);
     }
 
+    public takeDamage(damage: number) {
+        this.currentHealth = (damage >= this.currentHealth ? 0 : this.currentHealth - damage);
+    }
+
     public serialize(): GS.IUnit {
         return {
             currentEnergy: this.currentEnergy,
