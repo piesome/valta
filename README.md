@@ -13,6 +13,6 @@ yarn data
 
 # each in different shell
 yarn index-server
-yarn game-server
+yarn game-server:dev
 yarn client:dev
 ```
