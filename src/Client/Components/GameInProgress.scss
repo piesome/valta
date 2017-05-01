@@ -4,8 +4,29 @@
     height: 100vh;
 }
 
-.canvasContainer {
+.container {
     overflow: hidden;
     flex: 1;
-    background-color: #2b2b2b;
+    display: flex;
+    flex-direction: row;
+    .canvas {
+        flex: 4;
+        background-color: #2b2b2b;
+    }
+    .sidebar {
+        flex: 1;
+        border-right: thin solid #333;
+        .snippet {
+            padding: 0.5rem;
+            border-bottom: thin solid #333;
+        }
+    }
+}
+
+.info {
+    width: 100%;
+    margin-left: 1rem;
+    td {
+        width: 50%;
+    }
 }

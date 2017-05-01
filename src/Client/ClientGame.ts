@@ -9,9 +9,7 @@ export class ClientGame extends Game {
         this.drawTerrain(ctx);
     }
 
-    public drawHover(time: IGameTime, ctx: CanvasRenderingContext2D, hoverPoint: Point) {
-        const hex = hoverPoint.toHex().round();
-
+    public drawHover(time: IGameTime, ctx: CanvasRenderingContext2D, hex: Hex) {
         const middlePoint = hex.toPoint();
         const points = hex.corners();
 

@@ -11,7 +11,7 @@ export class UnitTypes extends TypeManager<UnitType> {
     public transformRaw(data: any): UnitType {
         return new UnitType(
             data.name,
-            data.heath,
+            data.health,
             data.damage,
             data.energy,
             data.actions,

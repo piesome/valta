@@ -1,11 +1,12 @@
 import {EventEmitter} from "eventemitter3";
 import * as R from "ramda";
 
-import {Point} from "Common/Util";
+import {Hex, Point} from "Common/Util";
 
 export interface ICameraEvent {
     button: number;
     point: Point;
+    hex: Hex;
 }
 
 export interface ICameraOptions {
@@ -131,12 +132,14 @@ export class Camera extends EventEmitter {
     }
 
     private createEvent(event: MouseEvent): ICameraEvent {
+        const point = new Point(
+            (event.offsetX - this.panX) / this.zoomLevel,
+            (event.offsetY - this.panY) / this.zoomLevel,
+        );
         return {
             button: event.button,
-            point: new Point(
-                (event.offsetX - this.panX) / this.zoomLevel,
-                (event.offsetY - this.panY) / this.zoomLevel,
-            ),
+            point,
+            hex: point.toHex().round(),
         };
     }
 

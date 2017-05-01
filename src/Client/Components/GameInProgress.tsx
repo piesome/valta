@@ -2,16 +2,17 @@ import * as R from "ramda";
 import * as React from "react";
 
 import {Game} from "Common/Game";
-import {Faction} from "Common/Models";
+import {Faction, Unit} from "Common/Models";
 import * as RPC from "Common/RPC";
 import {Types} from "Common/Types";
-import {Point} from "Common/Util";
+import {Hex} from "Common/Util";
 
 import {Camera, ICameraEvent} from "../Camera";
 import {Client} from "../Client";
 import {ClientGame} from "../ClientGame";
 import {IGameTime} from "../GameTime";
 import {Controls} from "./Controls";
+import {FactionCube} from "./FactionCube";
 
 const style = require("./GameInProgress.scss");
 
@@ -22,12 +23,16 @@ export interface IGameInProgressProps {
     switchToGameList: () => void;
 }
 
-export class GameInProgress extends React.Component<IGameInProgressProps, void> {
+export interface IGameInProgressState {
+    selectedUnit: Unit;
+}
+
+export class GameInProgress extends React.Component<IGameInProgressProps, IGameInProgressState> {
     private canvasElement: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
     private animationHandle: number;
     private camera: Camera;
-    private hover: Point;
+    private hover: Hex;
 
     constructor(props: IGameInProgressProps) {
         super(props);
@@ -38,6 +43,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
     }
 
     public componentWillUnmount() {
+        this.setState({selectedUnit: null});
         window.cancelAnimationFrame(this.animationHandle);
     }
 
@@ -47,9 +53,44 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
                 <Controls>
                     <button>Quit</button>
                 </Controls>
-                <div className={style.canvasContainer}>
-                    <canvas ref={this.bindCanvasElement}/>
+                <div className={style.container}>
+                    <div className={style.sidebar}>
+                        {this.renderSelectedUnit()}
+                    </div>
+                    <div className={style.canvas}>
+                        <canvas ref={this.bindCanvasElement}/>
+                    </div>
                 </div>
+            </div>
+        );
+    }
+
+    private renderSelectedUnit() {
+        if (!this.state || !this.state.selectedUnit) {
+            return null;
+        }
+
+        const unit = this.state.selectedUnit;
+
+        return (
+            <div className={style.snippet}>
+                <div>
+                    <FactionCube order={unit.faction.order} />
+                    &nbsp;
+                    {unit.type.name}
+                </div>
+                <table className={style.info}>
+                    <tbody>
+                        <tr>
+                            <td>health</td>
+                            <td>{unit.currentHealth} / {unit.maximumHealth}</td>
+                        </tr>
+                        <tr>
+                            <td>energy</td>
+                            <td>{unit.currentEnergy} / {unit.maximumEnergy}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         );
     }
@@ -65,11 +106,27 @@ export class GameInProgress extends React.Component<IGameInProgressProps, void> 
 
     private bindEvents() {
         this.camera.bindTo(this.canvasElement);
-        this.camera.on("hover", (args: ICameraEvent) => {
-            this.hover = args.point;
-        });
+
         window.addEventListener("resize", (event) => {
             this.recalculateSize();
+        });
+
+        this.camera.on("hover", (event: ICameraEvent) => {
+            this.hover = event.hex;
+        });
+
+        this.camera.on("select", (event: ICameraEvent) => {
+            const hex = event.hex;
+
+            if (!(hex.r in this.props.game.terrain && hex.q in this.props.game.terrain[hex.r])) {
+                return;
+            }
+
+            const terrain = this.props.game.terrain[hex.r][hex.q];
+
+            this.setState({
+                selectedUnit: terrain.units[0] || null,
+            });
         });
     }
 
