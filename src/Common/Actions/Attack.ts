@@ -3,6 +3,8 @@ import {TerrainSegment, Unit} from "../Models";
 import {Action} from "./Action";
 
 export class Attack extends Action<Unit> {
+    public name = "attack";
+
     public range(unit: Unit): number {
         // todo: ranged units
         return 1;

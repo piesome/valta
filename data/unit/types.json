@@ -15,7 +15,7 @@
     "damage": 0,
     "energy": 2,
     "actions": [
-      "move", "cityize"
+      "move", "settle"
     ],
     "type": "unit"
   }

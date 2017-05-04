@@ -75,9 +75,6 @@ function pathyPath<T extends Hex>(node: IAstarNode<T>, startThing: T): IPath<T> 
 
     path.reverse();
 
-    log(node.cost);
-    log(path);
-
     return {
         cost: node.cost,
         path,

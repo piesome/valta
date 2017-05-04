@@ -2,7 +2,9 @@ import {Game} from "../Game";
 import {TerrainSegment, Unit} from "../Models";
 import {Action} from "./Action";
 
-export class Cityize extends Action<Unit> {
+export class Settle extends Action<Unit> {
+    public name = "settle";
+
     public range(unit: Unit): number {
         return 0;
     }

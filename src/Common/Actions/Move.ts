@@ -5,6 +5,8 @@ import {astar, IPath} from "../Util/Astar";
 import {Action} from "./Action";
 
 export class Move extends Action<Unit> {
+    public name = "move";
+
     public range(unit: Unit): number {
         return unit.currentEnergy;
     }
