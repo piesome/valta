@@ -10,7 +10,7 @@ export class Settle extends Action<Unit> {
     }
 
     public energyConsumption(unit: Unit, terrain: TerrainSegment) {
-        return Math.max(1, unit.currentEnergy);
+        return unit.maximumEnergy;
     }
 
     public enact(unit: Unit, terrain: TerrainSegment) {
