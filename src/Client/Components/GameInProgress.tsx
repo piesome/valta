@@ -252,6 +252,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
             if (this.state.inAction && this.getActor()) {
                 try {
                     await this.doAction(this.state.inAction, this.getActor(), terrain);
+                    return;
                 } catch (err) {
                     return;
                 }
