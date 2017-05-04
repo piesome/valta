@@ -5,6 +5,7 @@ export {FactionType} from "./FactionType";
 export {TerrainType} from "./TerrainType";
 export {UnitType} from "./UnitType";
 export {UpgradeType} from "./UpgradeType";
+export {BuildingType} from "./BuildingType";
 
 export {TypeManager} from "./TypeManager";
 
@@ -13,6 +14,7 @@ import {FactionTypes} from "./FactionTypes";
 import {TerrainTypes} from "./TerrainTypes";
 import {UnitTypes} from "./UnitTypes";
 import {UpgradeTypes} from "./UpgradeTypes";
+export {BuildingTypes} from "./BuildingTypes";
 
 export {
     FactionTypes,
