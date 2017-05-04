@@ -3,7 +3,7 @@ import * as React from "react";
 
 import {Action} from "Common/Actions";
 import {Game} from "Common/Game";
-import {City, Faction, Unit} from "Common/Models";
+import {City, Faction, TerrainSegment, Unit} from "Common/Models";
 import * as RPC from "Common/RPC";
 import {Types} from "Common/Types";
 import {Hex} from "Common/Util";
@@ -47,8 +47,11 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         this.cancelAction = this.cancelAction.bind(this);
     }
 
+    public componentWillMount() {
+        this.setState({selectedUnit: null, inAction: null, selectedCity: null});
+    }
+
     public componentWillUnmount() {
-        this.setState({selectedUnit: null});
         window.cancelAnimationFrame(this.animationHandle);
     }
 
@@ -119,7 +122,13 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
 
     private selectAction(act: string) {
         return () => {
-            this.setState({inAction: this.props.game.actionManager.getAction(act)});
+            const action = this.props.game.actionManager.getAction(act);
+            const actor = this.getActor();
+            this.setState({inAction: action});
+
+            if (action && actor && action.range(actor) === 0) {
+                this.doAction(action, actor, actor.terrain);
+            }
         };
     }
 
@@ -203,6 +212,23 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         this.draw();
     }
 
+    private getActor() {
+        return this.state.selectedCity || this.state.selectedUnit;
+    }
+
+    private async doAction(action: Action<any>, actor: Unit|City, target: TerrainSegment) {
+        try {
+            await this.props.client.gameServer.action(action.serialize(actor, target));
+        } catch (err) {
+            console.error(err);
+            throw err;
+        }
+
+        this.setState({
+            inAction: null,
+        });
+    }
+
     private bindEvents() {
         this.camera.bindTo(this.canvasElement);
 
@@ -223,22 +249,13 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
 
             const terrain = this.props.game.terrain[hex.r][hex.q];
 
-            // TODO: fix generic
-            if (this.state && this.state.inAction && this.state.selectedUnit) {
-                const actor = this.state.selectedUnit;
-                const target = terrain;
+            if (this.state.inAction && this.getActor()) {
                 try {
-                    await this.props.client.gameServer.action(this.state.inAction.serialize(actor, target));
+                    await this.doAction(this.state.inAction, this.getActor(), terrain);
+                    return;
                 } catch (err) {
-                    console.error(err);
                     return;
                 }
-
-                this.setState({
-                    inAction: null,
-                });
-
-                return;
             }
 
             this.setState({inAction: null});
