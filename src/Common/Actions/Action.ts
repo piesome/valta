@@ -11,8 +11,9 @@ export interface IActorable {
 }
 
 export abstract class Action<Actor extends IActorable> {
+    public name: string;
+
     constructor(
-        public name: string,
         protected game: Game,
     ) {}
 

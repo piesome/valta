@@ -9,7 +9,7 @@ export class TerrainTypes extends TypeManager<TerrainType> {
     public transformRaw(data: any): TerrainType {
         return new TerrainType(
             data.name,
-            data.movementPenalty,
+            data.movementCost,
             data.debugColor,
         );
     }

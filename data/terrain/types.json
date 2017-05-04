@@ -1,12 +1,12 @@
 [
   {
     "name": "plains",
-    "movementPenalty": 0,
+    "movementCost": 1,
     "debugColor": "#85cc00"
   },
   {
     "name": "impassable",
-    "movementPenalty": 999,
+    "movementCost": 999999999,
     "debugColor": "#000000"
   }
 ]

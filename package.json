@@ -53,6 +53,7 @@
     "tslint": "4",
     "tslint-react": "^2.6.0",
     "typescript": "2.2",
+    "typescript-collections": "^1.2.3",
     "uuid": "^3.0.1",
     "watch-run": "^1.2.5",
     "webpack": "^2.4.1",
