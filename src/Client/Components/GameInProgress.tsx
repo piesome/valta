@@ -137,6 +137,8 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         });
         const actions = ours && unit.faction.canAct && unit.currentEnergy > 0 ? <div>{possibleActions}</div> : null;
 
+        const energy = ours ? <tr><td>energy</td><td>{unit.currentEnergy} / {unit.maximumEnergy}</td></tr> : null;
+
         return (
             <div className={style.snippet}>
                 <div>
@@ -151,9 +153,10 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
                             <td>{unit.currentHealth} / {unit.maximumHealth}</td>
                         </tr>
                         <tr>
-                            <td>energy</td>
-                            <td>{unit.currentEnergy} / {unit.maximumEnergy}</td>
+                            <td>damage</td>
+                            <td>{unit.damage}</td>
                         </tr>
+                        {energy}
                     </tbody>
                 </table>
                 {actions}
