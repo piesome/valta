@@ -1,4 +1,6 @@
+@import "Variables";
+
 .controls {
-    border-bottom: thin solid #333;
-    padding: 0.25rem;
+    border-bottom: thin solid $font-color;
+    padding: 0.5rem;
 }

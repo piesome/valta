@@ -11,15 +11,16 @@ export class FactionCube extends React.Component<IFactionCubeParams, object> {
         const style = {
             background: getHSL(this.props.order),
             border: "thin solid black",
-            borderRadius: "4px",
+            borderRadius: "2px",
             display: "inline-block",
-            height: "1rem",
+            fontSize: "1.5rem",
+            height: "1.5rem",
             textAlign: "center",
-            width: "1rem",
+            width: "1.5rem",
         };
 
         return (
-            <span style={style}>{this.props.order}</span>
+            <span style={style}>&nbsp;</span>
         );
     }
 }

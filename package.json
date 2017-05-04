@@ -39,6 +39,7 @@
     "knex": "^0.12.9",
     "node-sass": "^4.5.2",
     "nodemon": "1.10",
+    "normalize-scss": "^6.0.0",
     "npm-run-all": "^4.0.2",
     "ramda": "^0.23.0",
     "react": "^15.5.4",

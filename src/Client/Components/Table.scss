@@ -1,0 +1,17 @@
+@import "Variables";
+
+.table {
+    padding: 1rem;
+    width: 100%;
+    border-spacing: collapse;
+    border-spacing: 0;
+
+    th {
+        text-align: left;
+    }
+
+    td, th {
+        padding: 0.5rem 0;
+        border-bottom: thin solid $accent-color;
+    }
+}

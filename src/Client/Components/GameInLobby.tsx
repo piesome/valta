@@ -10,6 +10,8 @@ import {Client} from "../Client";
 import {Controls} from "./Controls";
 import {FactionCube} from "./FactionCube";
 
+const tableStyles = require("./Table.scss");
+
 export interface IGameInLobbyProps {
     client: Client;
     types: Types;
@@ -41,9 +43,8 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
             const isUs = this.props.client.id === fact.id;
             return (
                 <tr key={fact.id}>
-                    <td>{isUs ? "me" : null}</td>
                     <td><FactionCube order={fact.order} /></td>
-                    <td>{fact.id}</td>
+                    <td><code>{fact.id}</code></td>
                     <td>{isUs ? factionTypeSelection(fact) : fact.type.name}</td>
                 </tr>
             );
@@ -57,13 +58,12 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
                     {this.props.game.canBeStarted() ? <button onClick={this.startGame}>Start game</button> : null}
                 </Controls>
 
-                <table>
+                <table className={tableStyles.table}>
                     <thead>
                         <tr>
                             <th />
-                            <th />
-                            <th>id</th>
-                            <th>faction type</th>
+                            <th>Client ID</th>
+                            <th>Faction type</th>
                         </tr>
                     </thead>
                     <tbody>
