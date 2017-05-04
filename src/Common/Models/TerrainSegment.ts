@@ -3,6 +3,7 @@ import * as GS from "../GameState";
 import {TerrainType} from "../Types";
 import {Hex} from "../Util";
 import {City} from "./City";
+import {Faction} from "./Faction";
 import {Unit} from "./Unit";
 
 export class TerrainSegment extends Hex {
@@ -50,6 +51,25 @@ export class TerrainSegment extends Hex {
      */
     public getDefendingUnits(): Unit[] {
         return this.units;
+    }
+
+    public occupyingFaction(): Faction {
+        if (this.city) {
+            return this.city.faction;
+        }
+        if (this.units.length > 0) {
+            return this.units[0].faction;
+        }
+        return null;
+    }
+
+    public movementCostForFaction(faction: Faction): number {
+        const thisFaction = this.occupyingFaction();
+        if (thisFaction) {
+            return this.type.movementCost + ((thisFaction.id === faction.id) ? 0 : Number.MAX_SAFE_INTEGER / 2);
+        }
+
+        return this.type.movementCost;
     }
 
     public serialize(): GS.ITerrainSegment {

@@ -228,7 +228,11 @@ export class Game extends EventEmitter {
         this.terrain[terrain.r][terrain.q] = terrain;
     }
 
-    public getTerrainSegment(r: number, q: number): TerrainSegment|null {
+    public getTerrainSegmentByHex(hex: Hex): TerrainSegment {
+        return this.getTerrainSegmentByCoords(hex.r, hex.q);
+    }
+
+    public getTerrainSegmentByCoords(r: number, q: number): TerrainSegment|null {
         if (this.terrain[r] && this.terrain[r][q]) {
             return this.terrain[r][q];
         }

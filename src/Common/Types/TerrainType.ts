@@ -1,7 +1,7 @@
 export class TerrainType {
     constructor(
         public name: string,
-        public movementPenalty: number,
+        public movementCost: number,
         public debugColor: string,
     ) {}
 }

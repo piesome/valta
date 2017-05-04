@@ -83,6 +83,14 @@ export class Hex {
             this.r - other.r,
         );
     }
+
+    public equals(other: Hex): boolean {
+        return this.q === other.q && this.r === other.r;
+    }
+
+    public hash(): string {
+        return `${this.q},${this.r}`;
+    }
 }
 
 export const AXIAL_DIRECTIONS = [
