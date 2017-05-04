@@ -229,7 +229,7 @@ export class Game extends EventEmitter {
     }
 
     public getTerrainSegment(r: number, q: number): TerrainSegment|null {
-        if(this.terrain[r] && this.terrain[r][q]) {
+        if (this.terrain[r] && this.terrain[r][q]) {
             return this.terrain[r][q];
         }
         return null;

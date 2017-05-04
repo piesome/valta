@@ -67,8 +67,10 @@ export class Hex {
     }
 
     public sum(other: Hex): Hex {
-        if(!other)
+        if (!other) {
             return this;
+        }
+
         return new Hex(
             this.q + other.q,
             this.r + other.r,
