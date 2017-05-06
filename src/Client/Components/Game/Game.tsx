@@ -4,8 +4,8 @@ import {Game} from "Common/Game";
 import * as RPC from "Common/RPC";
 import {Types} from "Common/Types";
 
-import {Client} from "../Client";
-import {ClientGame} from "../ClientGame";
+import {Client} from "../../Client";
+import {ClientGame} from "../../ClientGame";
 import {GameInLobby} from "./GameInLobby";
 import {GameInProgress} from "./GameInProgress";
 

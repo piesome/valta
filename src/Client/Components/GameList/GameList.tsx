@@ -1,10 +1,9 @@
 import * as React from "react";
 
-import {Client} from "../Client";
-import {Controls} from "./Controls";
+import {Client} from "../../Client";
+import {Controls} from "../Common/Controls";
+import {Table} from "../Common/Table";
 import {GameListItem} from "./GameListItem";
-
-const tableStyles = require("./Table.scss");
 
 export interface IGameListProps {
     client: Client;
@@ -62,7 +61,7 @@ export class GameList extends React.Component<IGameListProps, IGameListState> {
                     <button onClick={this.createGame}>Create game</button>
                 </Controls>
 
-                <table className={tableStyles.table}>
+                <Table>
                     <thead>
                         <tr>
                             <th>Game ID</th>
@@ -76,7 +75,7 @@ export class GameList extends React.Component<IGameListProps, IGameListState> {
                     <tbody>
                         {games}
                     </tbody>
-                </table>
+                </Table>
             </div>
         );
     }

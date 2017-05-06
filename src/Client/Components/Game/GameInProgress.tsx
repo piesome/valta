@@ -8,13 +8,13 @@ import * as RPC from "Common/RPC";
 import {Types} from "Common/Types";
 import {Hex} from "Common/Util";
 
-import {Camera, ICameraEvent} from "../Camera";
-import {Client} from "../Client";
-import {ClientGame} from "../ClientGame";
-import {IGameTime} from "../GameTime";
-import {Controls} from "./Controls";
-import {EditableField} from "./EditableField";
-import {FactionCube} from "./FactionCube";
+import {Camera, ICameraEvent} from "../../Camera";
+import {Client} from "../../Client";
+import {ClientGame} from "../../ClientGame";
+import {IGameTime} from "../../GameTime";
+import {Controls} from "../Common/Controls";
+import {EditableField} from "../Common/EditableField";
+import {FactionCube} from "../Common/FactionCube";
 
 const style = require("./GameInProgress.scss");
 

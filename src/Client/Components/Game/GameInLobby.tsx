@@ -6,11 +6,10 @@ import {Faction} from "Common/Models";
 import * as RPC from "Common/RPC";
 import {Types} from "Common/Types";
 
-import {Client} from "../Client";
-import {Controls} from "./Controls";
-import {FactionCube} from "./FactionCube";
-
-const tableStyles = require("./Table.scss");
+import {Client} from "../../Client";
+import {Controls} from "../Common/Controls";
+import {FactionCube} from "../Common/FactionCube";
+import {Table} from "../Common/Table";
 
 export interface IGameInLobbyProps {
     client: Client;
@@ -58,7 +57,7 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
                     {this.props.game.canBeStarted() ? <button onClick={this.startGame}>Start game</button> : null}
                 </Controls>
 
-                <table className={tableStyles.table}>
+                <Table>
                     <thead>
                         <tr>
                             <th />
@@ -69,7 +68,7 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
                     <tbody>
                         {factions}
                     </tbody>
-                </table>
+                </Table>
             </div>
         );
     }
