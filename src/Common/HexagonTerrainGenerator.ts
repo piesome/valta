@@ -1,10 +1,11 @@
 import {v4 as uuid} from "uuid";
 
 import {Game} from "./Game";
+import {ITerrainGenerator} from "./ITerrainGenerator";
 import {TerrainSegment} from "./Models";
 import {Hex} from "./Util";
 
-export class TerrainGenerator {
+export class HexagonTerrainGenerator implements ITerrainGenerator {
     constructor(
         private game: Game,
         private size: number,

@@ -4,13 +4,14 @@ import {v4 as uuid} from "uuid";
 
 import {ActionManager} from "./Actions";
 import * as GS from "./GameState";
+import {HexagonTerrainGenerator} from "./HexagonTerrainGenerator";
 import {
     City,
     Faction,
     TerrainSegment,
     Unit,
 } from "./Models";
-import {TerrainGenerator} from "./TerrainGenerator";
+import {PerlinTerrainGenerator} from "./PerlinTerrainGenerator";
 import {Types} from "./Types";
 import {Hex} from "./Util";
 
@@ -81,7 +82,7 @@ export class Game extends EventEmitter {
             throw new Error("Game can't be started");
         }
 
-        const startingPoints = (new TerrainGenerator(this, 10)).generate();
+        const startingPoints = (new HexagonTerrainGenerator(this, 10)).generate();
         for (const fact of this.factions) {
             const startingPoint = startingPoints[fact.order]; // TODO: fix order
             const terr = this.terrain[startingPoint.r][startingPoint.q];

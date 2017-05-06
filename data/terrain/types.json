@@ -2,11 +2,26 @@
   {
     "name": "plains",
     "movementCost": 1,
-    "debugColor": "#85cc00"
+    "debugColor": "#2ECC40"
   },
   {
     "name": "impassable",
     "movementCost": 999999999,
     "debugColor": "#000000"
+  },
+  {
+    "name": "forest",
+    "movementCost": 2,
+    "debugColor": "#3D9970"
+  },
+  {
+    "name": "mountains",
+    "movementCost": 3,
+    "debugColor": "#AAAAAA"
+  },
+  {
+    "name": "sea",
+    "movementCost": 4,
+    "debugColor": "#0074D9"
   }
 ]
