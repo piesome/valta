@@ -24,7 +24,7 @@ export class PerlinTerrainGenerator implements ITerrainGenerator {
 
                 const terrain = new TerrainSegment(
                     uuid(),
-                    terrains[Math.round(this.clamp(this.clamp(simplex.noise2D(dx, dy)*2, 0, 1) * 10,
+                    terrains[Math.round(this.clamp(this.clamp(simplex.noise2D(dx, dy) * 2, 0, 1) * 10,
                     0, terrains.length - 1))],
                     dx,
                     dz,

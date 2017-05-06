@@ -1,0 +1,10 @@
+@import "../Common/Variables";
+
+.selectHud {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 20vw;
+    background-color: $background-color;
+    border-top-right-radius: 2px;
+}

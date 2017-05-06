@@ -1,0 +1,14 @@
+@import "../Common/Variables";
+
+.factionHud {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: auto;
+    background-color: $background-color;
+    border-bottom-left-radius: 4px;
+
+    td {
+        padding: 0.25rem;
+    }
+}

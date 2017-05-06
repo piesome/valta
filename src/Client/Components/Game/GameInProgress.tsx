@@ -12,9 +12,14 @@ import {Camera, ICameraEvent} from "../../Camera";
 import {Client} from "../../Client";
 import {ClientGame} from "../../ClientGame";
 import {IGameTime} from "../../GameTime";
+
 import {Controls} from "../Common/Controls";
 import {EditableField} from "../Common/EditableField";
 import {FactionCube} from "../Common/FactionCube";
+
+import {EndTurnHud} from "./EndTurnHud";
+import {FactionHud} from "./FactionHud";
+import {SelectHud} from "./SelectHud";
 
 const style = require("./GameInProgress.scss");
 
@@ -59,45 +64,20 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
     public render() {
         return (
             <div className={style.game}>
-                <Controls />
+                <Controls>
+                    <span style={{float: "right"}}>
+                        Tick: {this.props.game.tick}
+                    </span>
+                </Controls>
                 <div className={style.container}>
-                    <div className={style.sidebar}>
-                        {this.renderInfo()}
+                    <canvas ref={this.bindCanvasElement} />
+                    <FactionHud game={this.props.game} ourId={this.props.client.id} />
+                    <EndTurnHud game={this.props.game} ourId={this.props.client.id} endTurn={this.endTurn} />
+                    <SelectHud>
+                        {this.renderAction()}
                         {this.renderSelectedCity()}
                         {this.renderSelectedUnit()}
-                        {this.renderAction()}
-                    </div>
-                    <div className={style.canvas}>
-                        <canvas ref={this.bindCanvasElement}/>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    private renderInfo() {
-        const faction = this.props.game.getFaction(this.props.client.id);
-
-        return (
-            <div className={style.snippet}>
-                <table className={style.info}>
-                    <tbody>
-                        <tr>
-                            <td>Tick</td>
-                            <td>{this.props.game.tick}</td>
-                        </tr>
-                        <tr>
-                            <td>Faction</td>
-                            <td><FactionCube order={faction.order} /></td>
-                        </tr>
-                        <tr>
-                            <td>Can act</td>
-                            <td>{faction.canAct ? "yes" : "no"}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div>
-                    {faction.canAct ? <button onClick={this.endTurn}>End turn</button> : null}
+                    </SelectHud>
                 </div>
             </div>
         );

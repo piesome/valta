@@ -1,0 +1,14 @@
+@import "../Common/Variables";
+
+.endTurnHud {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: auto;
+    background-color: $background-color;
+    border-top-left-radius: 2px;
+
+    button {
+        margin-right: 0;
+    }
+}
