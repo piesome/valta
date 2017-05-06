@@ -219,6 +219,14 @@ export class Game extends EventEmitter {
         return ret;
     }
 
+    public getCity(id: GS.ID) {
+        const ret = this.cities[id];
+        if (!ret) {
+            throw new Error(`No such city with id ${id}`);
+        }
+        return ret;
+    }
+
     public addTerrain(terrain: TerrainSegment) {
         this.terrainById[terrain.id] = terrain;
 

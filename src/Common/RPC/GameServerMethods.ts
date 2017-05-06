@@ -26,6 +26,13 @@ export interface IActionParams {
 }
 export type IActionResponse = void;
 
+export const RenameCity = "RenameCity";
+export interface IRenameCityParams {
+    id: string;
+    name: string;
+}
+export type IRenameCityResponse = void;
+
 /**
  * Todo automatically populated from above
  */
@@ -35,4 +42,5 @@ export const SERVER_METHODS = [
     GetGameState,
     EndTurn,
     Action,
+    RenameCity,
 ];

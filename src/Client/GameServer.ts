@@ -40,6 +40,13 @@ export class GameServer extends RPC.RemotePeer {
         return this.callNoParams<void>(RPC.GameServerMethods.EndTurn);
     }
 
+    public renameCity(params: RPC.GameServerMethods.IRenameCityParams) {
+        return this.call<RPC.GameServerMethods.IRenameCityParams, RPC.GameServerMethods.IRenameCityResponse>(
+            RPC.GameServerMethods.RenameCity,
+            params,
+        );
+    }
+
     public close() {
         this.ws.close();
     }

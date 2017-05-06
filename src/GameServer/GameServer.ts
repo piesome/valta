@@ -224,4 +224,23 @@ export class GameServer extends RPC.Peer<GameClient> {
     ): RPC.GameServerMethods.IActionResponse {
         client.game.actionManager.deserialize(client.faction, params);
     }
+
+    @registerRPC(RPC.GameServerMethods.RenameCity)
+    private renameCity(
+        client: GameClient,
+        params: RPC.GameServerMethods.IRenameCityParams,
+    ): RPC.GameServerMethods.IRenameCityResponse {
+        const city = client.game.getCity(params.id);
+        if (city.faction.id !== client.faction.id) {
+            throw new Error(`Can't rename a city that's not owned by you`);
+        }
+
+        if (!params.name || params.name.length < 2) {
+            throw new Error(`City names must be at least 2 characters long`);
+        }
+
+        city.name = params.name;
+
+        client.game.emit("update");
+    }
 }

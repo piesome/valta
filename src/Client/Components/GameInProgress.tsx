@@ -13,6 +13,7 @@ import {Client} from "../Client";
 import {ClientGame} from "../ClientGame";
 import {IGameTime} from "../GameTime";
 import {Controls} from "./Controls";
+import {EditableField} from "./EditableField";
 import {FactionCube} from "./FactionCube";
 
 const style = require("./GameInProgress.scss");
@@ -112,10 +113,29 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         }
 
         const city = this.state.selectedCity;
+        const ours = city.faction.id === this.props.client.id;
+
+        const saveCityName = async (name: string) => {
+            try {
+                await this.props.client.gameServer.renameCity({
+                    id: city.id,
+                    name,
+                });
+            } catch (err) {
+                throw err;
+            }
+        };
 
         return (
             <div className={style.snippet}>
-                <div>{city.name}</div>
+                <div>
+                    <FactionCube order={city.faction.order} />
+                </div>
+                <EditableField
+                    value={city.name}
+                    enabled={ours}
+                    edited={saveCityName}
+                />
             </div>
         );
     }

@@ -1,0 +1,22 @@
+@import "Variables";
+
+.editableField {
+    display: flex;
+    input {
+        flex: 1 0 8rem;
+        min-width: 0;
+        border-radius: 2px;
+        border: thin solid $font-color;
+        border-right: none;
+        background-color: transparent;
+
+        &:disabled {
+            border-color: transparent;
+            color: $font-color;
+        }
+    }
+    button {
+        flex: 0 0 auto;
+        margin-right: 0;
+    }
+}
