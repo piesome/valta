@@ -1,5 +1,4 @@
 import OpenSimplexNoise from "@minttu/open-simplex-noise";
-import * as debug from "debug";
 import {v4 as uuid} from "uuid";
 
 import {Game} from "./Game";
@@ -18,8 +17,6 @@ export class PerlinTerrainGenerator implements ITerrainGenerator {
         const n = this.size;
         const terrains = [this.game.types.terrain.getType("sea"), this.game.types.terrain.getType("plains"),
         this.game.types.terrain.getType("forest"), this.game.types.terrain.getType("mountains")];
-
-        const log = debug("valta:GameServer");
 
         for (let dx = -n; dx <= n; dx++) {
             for (let dy = -n; dy <= n; dy++) {
