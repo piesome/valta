@@ -72,7 +72,7 @@ export class GameServer extends RPC.Peer<GameClient> {
             this.log(`New peer ${peer.id}`);
 
             if (!this.games[payload.game.id]) {
-                this.createGame(payload.game.id);
+                this.createGame(payload.game.id, payload.game.host);
             }
 
             const game = this.getGame(payload.game.id);
@@ -126,8 +126,8 @@ export class GameServer extends RPC.Peer<GameClient> {
         });
     }
 
-    private createGame(gameId: string) {
-        const game = this.games[gameId] = new ServerGame(gameId, this.types);
+    private createGame(gameId: string, host: string) {
+        const game = this.games[gameId] = new ServerGame(gameId, host, this.types);
         game.name = "unnamed";
 
         this.log(`Game ${game.id} created`);
@@ -140,15 +140,15 @@ export class GameServer extends RPC.Peer<GameClient> {
             .table("game")
             .select();
 
-        return Promise.all(R.map((game: any) => this.loadGame(game.id, JSON.parse(game.data)), games));
+        return Promise.all(R.map((game: any) => this.loadGame(game.id, game.host, JSON.parse(game.data)), games));
     }
 
-    private async loadGame(id: string, data: any) {
+    private async loadGame(id: string, host: string, data: any) {
         if (!data) {
             return;
         }
 
-        const game = new ServerGame(id, this.types);
+        const game = new ServerGame(id, host, this.types);
         try {
             game.deserialize(data);
         } catch (err) {

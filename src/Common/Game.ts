@@ -20,6 +20,7 @@ export class Game extends EventEmitter {
     public actionManager: ActionManager;
 
     public id: GS.ID;
+    public host: GS.ID;
     public name: string;
     public status: GS.GameStatus;
 
@@ -37,6 +38,7 @@ export class Game extends EventEmitter {
         super();
 
         this.id = uuid();
+        this.host = uuid();
         this.name = "";
         this.status = "lobby";
 
@@ -284,6 +286,7 @@ export class Game extends EventEmitter {
 
     public deserialize(data: GS.IGame) {
         this.id = data.id;
+        this.host = data.host;
         this.name = data.name;
         this.status = data.status;
         this.tick = data.tick;
@@ -299,6 +302,7 @@ export class Game extends EventEmitter {
         return {
             cities: this.serializeCities(),
             factions: this.factions.map((x) => x.serialize()),
+            host: this.host,
             id: this.id,
             name: this.name,
             status: this.status,
