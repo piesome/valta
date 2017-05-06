@@ -4,6 +4,9 @@
     "tslint-react"
   ],
   "rules": {
-    "no-var-requires": false
+    "no-var-requires": false,
+    "no-console": [
+      true, "log"
+    ]
   }
 }

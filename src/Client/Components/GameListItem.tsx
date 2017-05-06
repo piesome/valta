@@ -19,10 +19,7 @@ export class GameListItem extends React.Component<IGameListItemProps, undefined>
         return (
             <tr className="game-list-item row">
                 <td>
-                    <button onClick={this.join}>Join</button>
-                </td>
-                <td>
-                    {this.props.id}
+                    <code>{this.props.id}</code>
                 </td>
                 <td>
                     {this.props.name}
@@ -32,6 +29,9 @@ export class GameListItem extends React.Component<IGameListItemProps, undefined>
                 </td>
                 <td>
                     {this.props.status}
+                </td>
+                <td>
+                    <button onClick={this.join}>Join</button>
                 </td>
             </tr>
         );
