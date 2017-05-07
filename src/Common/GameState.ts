@@ -22,7 +22,6 @@ export type GameStatus = "lobby" | "started" | "ended";
 
 export interface IGame {
     id: ID;
-    host: ID;
     name: string;
     status: GameStatus;
 

@@ -55,7 +55,6 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
                 <Controls>
                     <button onClick={this.leaveGame}>Leave game</button>
                     {this.props.game.canBeStarted() ? <button onClick={this.startGame}>Start game</button> : null}
-                    {this.props.game.host === this.props.client.id ? <button onClick={this.showSettings}>Show settings</button> : null}
                 </Controls>
 
                 <Table>
@@ -87,9 +86,5 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
 
     private startGame() {
         this.props.client.gameServer.startGame();
-    }
-
-    private showSettings() {
-        return;
     }
 }

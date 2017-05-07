@@ -91,7 +91,6 @@ export class IndexServer extends RPC.Peer<IndexClient> {
     private generateConnectUrl(clientId: string, gameId: string, gameServer: IGameServer) {
         const payload = {
             game: {
-                host: clientId,
                 id: gameId,
             },
             peer: {

@@ -8,10 +8,9 @@ import {GameClient} from "./GameClient";
 export class ServerGame extends Game {
     public peers: GameClient[];
 
-    constructor(id: string, host: string, types: Types) {
+    constructor(id: string, types: Types) {
         super(types);
         this.id = id;
-        this.host = host;
         this.peers = [];
 
         this.on("update", () => {
