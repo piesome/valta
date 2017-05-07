@@ -1,4 +1,4 @@
-import {Hex, HEX_SIZE} from "./Hex";
+import {Hex, HEX_POSITION_SIZE} from "./Hex";
 
 export class Point {
     constructor(
@@ -15,8 +15,8 @@ export class Point {
 
     public toHex(): Hex {
         return new Hex(
-            this.x * 2 / 3 / HEX_SIZE,
-            (-this.x / 3 + Math.sqrt(3) / 3 * this.y) / HEX_SIZE,
+            this.x * 2 / 3 / HEX_POSITION_SIZE,
+            (-this.x / 3 + Math.sqrt(3) / 3 * this.y) / HEX_POSITION_SIZE,
         );
     }
 }

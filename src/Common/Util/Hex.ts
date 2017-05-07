@@ -7,6 +7,7 @@ import {Point} from "./Point";
 
 // dunno lol
 export const HEX_SIZE = 32;
+export const HEX_POSITION_SIZE = 32.5;
 
 export class Hex {
     public static deserializeHex(data: any) {
@@ -32,8 +33,8 @@ export class Hex {
 
     public toPoint(): Point {
         return new Point(
-            HEX_SIZE * (3 / 2) * this.q,
-            HEX_SIZE * Math.sqrt(3) * (this.r + this.q / 2),
+            HEX_POSITION_SIZE * (3 / 2) * this.q,
+            HEX_POSITION_SIZE * Math.sqrt(3) * (this.r + this.q / 2),
         );
     }
 
