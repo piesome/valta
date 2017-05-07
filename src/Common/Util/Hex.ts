@@ -9,6 +9,10 @@ import {Point} from "./Point";
 export const HEX_SIZE = 32;
 
 export class Hex {
+    public static deserializeHex(data: any) {
+        return new Hex(data.q, data.r);
+    }
+
     constructor(
         public q: number,
         public r: number,
@@ -33,17 +37,17 @@ export class Hex {
         );
     }
 
-    public cornerOffset(direction: number): Point {
+    public cornerOffset(direction: number, size = HEX_SIZE): Point {
         const angle = Math.PI / 180 * (60 * direction);
         return new Point(
-            HEX_SIZE * Math.cos(angle),
-            HEX_SIZE * Math.sin(angle),
+            size * Math.cos(angle),
+            size * Math.sin(angle),
         );
     }
 
-    public corners(): Point[] {
+    public corners(size = HEX_SIZE): Point[] {
         const center = this.toPoint();
-        return [0, 1, 2, 3, 4, 5].map((dir) => center.add(this.cornerOffset(dir)));
+        return [0, 1, 2, 3, 4, 5].map((dir) => center.add(this.cornerOffset(dir, size)));
     }
 
     public toCube(): Cube {
@@ -90,6 +94,13 @@ export class Hex {
 
     public hash(): string {
         return `${this.q},${this.r}`;
+    }
+
+    public serializeHex() {
+        return {
+            q: this.q,
+            r: this.r,
+        };
     }
 }
 

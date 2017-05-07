@@ -18,6 +18,7 @@ export class TerrainSegment extends Hex {
 
     public units: Unit[];
     public city: City;
+    public ownedBy: City;
 
     constructor(
         public id: GS.ID,

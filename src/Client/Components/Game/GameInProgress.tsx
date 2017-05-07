@@ -343,11 +343,14 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         this.ctx.save();
         this.camera.applyToCtx(this.ctx);
 
-        this.props.game.draw(time, this.ctx);
+        this.props.game.drawTerrain(this.ctx);
+        this.props.game.drawOutlines(this.ctx);
 
         if (this.hover) {
             this.props.game.drawHover(time, this.ctx, this.hover);
         }
+
+        this.props.game.drawUnits(this.ctx);
 
         this.ctx.restore();
 

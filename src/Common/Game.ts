@@ -194,7 +194,7 @@ export class Game extends EventEmitter {
 
     public createCity(faction: Faction, terrain: TerrainSegment) {
         const id = uuid();
-        const city = new City(id, id, faction, terrain, 100, 0);
+        const city = new City(id, id, faction, terrain, 100, 0, R.append(terrain, terrain.neighbours()));
         this.addCity(city);
         return city;
     }
@@ -263,6 +263,14 @@ export class Game extends EventEmitter {
 
     public addCity(city: City) {
         this.cities[city.id] = city;
+        city.owns.forEach((hex) => {
+            const terrain = this.getTerrainSegmentByHex(hex);
+            if (!terrain) {
+                return;
+            }
+
+            terrain.ownedBy = city;
+        });
 
         city.on("dead", () => {
             this.removeCity(city);
@@ -272,6 +280,15 @@ export class Game extends EventEmitter {
     public removeCity(city: City) {
         city.removeAllListeners();
         delete this.cities[city.id];
+
+        city.owns.forEach((hex) => {
+            const terrain = this.getTerrainSegmentByHex(hex);
+            if (!terrain) {
+                return;
+            }
+
+            terrain.ownedBy = null;
+        });
     }
 
     public async load() {
@@ -315,6 +332,22 @@ export class Game extends EventEmitter {
             name: this.name,
             status: this.status,
         };
+    }
+
+    public *terrains() {
+        for (const row in this.terrain) {
+            if (!this.terrain.hasOwnProperty(row)) {
+                continue;
+            }
+
+            for (const column in this.terrain[row]) {
+                if (!this.terrain[row].hasOwnProperty(column)) {
+                    continue;
+                }
+
+                yield this.terrain[row][column];
+            }
+        }
     }
 
     private serializeCities(): GS.ICities {
@@ -373,19 +406,11 @@ export class Game extends EventEmitter {
     private serializeTerrain(): GS.ITerrainData {
         const terrain: GS.ITerrainData = {};
 
-        for (const row in this.terrain) {
-            if (!this.terrain.hasOwnProperty(row)) {
-                continue;
+        for (const ter of this.terrains()) {
+            if (!terrain[ter.r]) {
+                terrain[ter.r] = {};
             }
-
-            terrain[row] = {};
-            for (const column in this.terrain[row]) {
-                if (!this.terrain[row].hasOwnProperty(column)) {
-                    continue;
-                }
-
-                terrain[row][column] = this.terrain[row][column].serialize();
-            }
+            terrain[ter.r][ter.q] = ter.serialize();
         }
 
         return terrain;

@@ -11,6 +11,7 @@
     "declaration": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "downlevelIteration": true,
     "outDir": "dist",
     "jsx": "react",
     "baseUrl": ".",

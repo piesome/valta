@@ -57,6 +57,11 @@ export interface ITerrainSegment {
     naturalResources: IResources;
 }
 
+export interface IHex {
+    q: number;
+    r: number;
+}
+
 export interface ICity {
     id: ID;
     name: string;
@@ -69,6 +74,7 @@ export interface ICity {
 
     productionQueue: IProductionQueueItem[];
     buildings: IBuilding[];
+    owns: IHex[];
 }
 
 export type BuildingType = string;

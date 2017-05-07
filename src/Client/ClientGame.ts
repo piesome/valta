@@ -1,17 +1,31 @@
 import {Game} from "Common/Game";
-import {City, TerrainSegment, Unit} from "Common/Models";
-import {getHSL, Hex, Point} from "Common/Util";
+import {City, Faction, TerrainSegment, Unit} from "Common/Models";
+import {getHSL, Hex, HEX_SIZE, Point} from "Common/Util";
 
 import {IGameTime} from "./GameTime";
 
 export class ClientGame extends Game {
     public draw(time: IGameTime, ctx: CanvasRenderingContext2D) {
         this.drawTerrain(ctx);
+        this.drawOutlines(ctx);
+    }
+
+    public drawTerrain(ctx: CanvasRenderingContext2D) {
+        for (const terrain of this.terrains()) {
+            this.drawTerrainSegment(terrain, ctx);
+        }
+    }
+
+    public drawOutlines(ctx: CanvasRenderingContext2D) {
+        for (const terrain of this.terrains()) {
+            const neigh = terrain.neighbours().map((n) => this.getTerrainSegmentByHex(n));
+            this.drawTerrainOutline(terrain, neigh, ctx);
+        }
     }
 
     public drawHover(time: IGameTime, ctx: CanvasRenderingContext2D, hex: Hex) {
         const middlePoint = hex.toPoint();
-        const points = hex.corners();
+        const points = hex.corners(HEX_SIZE - 1);
 
         ctx.beginPath();
         ctx.moveTo(points[0].x, points[0].y);
@@ -26,19 +40,9 @@ export class ClientGame extends Game {
         ctx.setLineDash([]);
     }
 
-    private drawTerrain(ctx: CanvasRenderingContext2D) {
-        for (const row in this.terrain) {
-            if (!this.terrain.hasOwnProperty(row)) {
-                continue;
-            }
-
-            for (const column in this.terrain[row]) {
-                if (!this.terrain[row].hasOwnProperty(column)) {
-                    continue;
-                }
-
-                this.drawTerrainSegment(this.terrain[row][column], ctx);
-            }
+    public drawUnits(ctx: CanvasRenderingContext2D) {
+        for (const terrain of this.terrains()) {
+            this.drawTerrainUnits(terrain, ctx);
         }
     }
 
@@ -57,6 +61,10 @@ export class ClientGame extends Game {
 
         ctx.fillStyle = terrain.type.debugColor;
         ctx.fill();
+    }
+
+    private drawTerrainUnits(terrain: TerrainSegment, ctx: CanvasRenderingContext2D) {
+        const middlePoint = terrain.toPoint();
 
         middlePoint.y -= 13;
 
@@ -109,5 +117,40 @@ export class ClientGame extends Game {
         ctx.textAlign = "center";
 
         ctx.fillText(displayedName, middlePoint.x, middlePoint.y);
+    }
+
+    private drawTerrainOutline(terrain: TerrainSegment, neighbours: TerrainSegment[], ctx: CanvasRenderingContext2D) {
+        if (!terrain.ownedBy) {
+            return;
+        }
+
+        const middlePoint = terrain.toPoint();
+        const points = terrain.corners(HEX_SIZE - 1);
+
+        this.conditionallyDrawCityOutline(points[0], points[1], terrain.ownedBy.faction, neighbours[0], ctx);
+        this.conditionallyDrawCityOutline(points[1], points[2], terrain.ownedBy.faction, neighbours[5], ctx);
+        this.conditionallyDrawCityOutline(points[2], points[3], terrain.ownedBy.faction, neighbours[4], ctx);
+        this.conditionallyDrawCityOutline(points[3], points[4], terrain.ownedBy.faction, neighbours[3], ctx);
+        this.conditionallyDrawCityOutline(points[4], points[5], terrain.ownedBy.faction, neighbours[2], ctx);
+        this.conditionallyDrawCityOutline(points[5], points[0], terrain.ownedBy.faction, neighbours[1], ctx);
+    }
+
+    private conditionallyDrawCityOutline(
+        point1: Point,
+        point2: Point,
+        faction: Faction,
+        neighbour: TerrainSegment,
+        ctx: CanvasRenderingContext2D,
+    ) {
+        if (neighbour && neighbour.ownedBy && neighbour.ownedBy.faction.id === faction.id) {
+            return;
+        }
+
+        ctx.beginPath();
+        ctx.strokeStyle = getHSL(faction.order);
+        ctx.lineWidth = 2;
+        ctx.moveTo(point1.x, point1.y);
+        ctx.lineTo(point2.x, point2.y);
+        ctx.stroke();
     }
 }
