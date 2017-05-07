@@ -24,12 +24,12 @@ export interface IGame {
     id: ID;
     name: string;
     status: GameStatus;
-
     tick: number;
     terrain: ITerrainData;
     factions: IFaction[];
     units: IUnits;
     cities: ICities;
+    settings: ISettings;
 }
 
 export type FactionType = string;
@@ -41,6 +41,10 @@ export interface IFaction {
     unlockedUpgrades: UpgradeName[];
     canAct: boolean;
     order: number;
+}
+
+export interface ISettings {
+    mapAlgorithm: string;
 }
 
 export type UpgradeName = string;
