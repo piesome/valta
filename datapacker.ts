@@ -23,6 +23,18 @@ function insertFile(pathParts: string[], dataToInsert: any) {
     pos[pathParts[pathParts.length - 1]] = dataToInsert;
 }
 
+function mime(ext: string) {
+    const mimes: {[ext: string]: string} = {
+        ".png": "image/png",
+    };
+
+    return mimes[ext] || "text/plain";
+}
+
+function baseEncode(ext: string, raw: Buffer) {
+    return `data:${mime(ext)};base64,${raw.toString("base64")}`;
+}
+
 function walk(pathParts: string[]) {
     const curPath = pathParts.join(path.sep);
 
@@ -42,7 +54,7 @@ function walk(pathParts: string[]) {
             dataToInsert = JSON.parse(raw);
         } else {
             const raw = fs.readFileSync(curPath);
-            dataToInsert = raw.toString("base64");
+            dataToInsert = baseEncode(path.extname(curPath), raw);
         }
 
         insertFile(pathParts, dataToInsert);
