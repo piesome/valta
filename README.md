@@ -1,6 +1,6 @@
 <div align="center">
     <img src="logo.png" />
-    <div><strong>Fantasy 4X strategy game</strong></div>
+    <div><strong>Multiplayer 4X strategy game</strong></div>
 </diV>
 
 ## dev start
