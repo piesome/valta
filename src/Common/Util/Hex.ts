@@ -7,7 +7,7 @@ import {Point} from "./Point";
 
 // dunno lol
 export const HEX_SIZE = 32;
-export const HEX_POSITION_SIZE = 32.5;
+export const HEX_POSITION_SIZE = 32;
 
 export class Hex {
     public static deserializeHex(data: any) {

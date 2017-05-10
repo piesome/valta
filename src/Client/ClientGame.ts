@@ -1,116 +1,152 @@
+import * as PIXI from "pixi.js";
+import * as tinycolor from "tinycolor2";
+
 import {Game} from "Common/Game";
 import {City, Faction, TerrainSegment, Unit} from "Common/Models";
+import {Types} from "Common/Types";
 import {getHSL, Hex, HEX_SIZE, Point} from "Common/Util";
+import {data} from "../../data";
 
 import {IGameTime} from "./GameTime";
 
 export class ClientGame extends Game {
-    public drawTerrain(ctx: CanvasRenderingContext2D) {
+    private textures: {[key: string]: PIXI.Texture};
+
+    constructor(types: Types) {
+        super(types);
+
+        this.textures = {};
+
+        this.loadTexture("plains", data.terrain["plains.svg"]);
+        this.loadTexture("select", data.ui["select.svg"]);
+    }
+
+    public drawTerrain(container: PIXI.Container) {
         for (const terrain of this.terrains()) {
-            this.drawTerrainSegment(terrain, ctx);
+            this.drawTerrainSegment(terrain, container);
         }
     }
 
-    public drawOutlines(ctx: CanvasRenderingContext2D) {
+    public drawOutlines(container: PIXI.Container) {
         for (const terrain of this.terrains()) {
             const neigh = terrain.neighbours().map((n) => this.getTerrainSegmentByHex(n));
-            this.drawTerrainOutline(terrain, neigh, ctx);
+            this.drawTerrainOutline(terrain, neigh, container);
         }
     }
 
-    public drawHover(time: IGameTime, ctx: CanvasRenderingContext2D, hex: Hex) {
-        const middlePoint = hex.toPoint();
-        const points = hex.corners(HEX_SIZE - 1);
+    public drawHover(container: PIXI.Container, hex: Hex) {
+        const point = hex.toPoint();
 
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        points.slice(1).map((point) => ctx.lineTo(point.x, point.y));
-        ctx.closePath();
-
-        ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 2;
-        ctx.setLineDash([15.5, 15.5]);
-        ctx.lineDashOffset = Math.floor(time.total / 16);
-        ctx.stroke();
-        ctx.setLineDash([]);
+        const test = new PIXI.Sprite(this.textures["select"]); // tslint:disable-line
+        test.width = 64;
+        test.height = 64;
+        test.x = point.x;
+        test.y = point.y;
+        test.anchor.set(0.5, 0.5);
+        container.addChild(test);
     }
 
-    public drawUnits(ctx: CanvasRenderingContext2D) {
+    public drawUnits(container: PIXI.Container) {
         for (const terrain of this.terrains()) {
-            this.drawTerrainUnits(terrain, ctx);
+            this.drawTerrainUnits(terrain, container);
         }
     }
 
-    private drawTerrainSegment(terrain: TerrainSegment, ctx: CanvasRenderingContext2D) {
-        const middlePoint = terrain.toPoint();
-        const points = terrain.corners();
-
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        points.slice(1).map((point) => ctx.lineTo(point.x, point.y));
-        ctx.closePath();
-
-        ctx.fillStyle = terrain.type.debugColor;
-        ctx.fill();
+    private loadTexture(name: string, data: any) {
+        this.textures[name] = PIXI.Texture.fromImage(data, false, PIXI.SCALE_MODES.LINEAR, 3);
     }
 
-    private drawTerrainUnits(terrain: TerrainSegment, ctx: CanvasRenderingContext2D) {
+    private drawTerrainSegment(terrain: TerrainSegment, container: PIXI.Container) {
+        const point = terrain.toPoint();
+
+        const test = new PIXI.Sprite(this.textures[terrain.type.name]);
+        test.width = 64;
+        test.height = 64;
+        test.x = point.x;
+        test.y = point.y;
+        test.anchor.set(0.5, 0.5);
+        container.addChild(test);
+    }
+
+    private drawTerrainUnits(terrain: TerrainSegment, container: PIXI.Container) {
         const middlePoint = terrain.toPoint();
 
-        middlePoint.y -= 13;
+        middlePoint.y -= 20;
 
         if (terrain.city) {
-            this.drawCity(middlePoint, terrain.city, ctx);
-            middlePoint.y += 13;
+            this.drawCity(middlePoint, terrain.city, container);
+            middlePoint.y += 20;
         }
 
         for (const unit of terrain.units) {
-            this.drawUnit(middlePoint, unit, ctx);
-            middlePoint.y += 13;
+            this.drawUnit(middlePoint, unit, container);
+            middlePoint.y += 20;
         }
     }
 
-    private drawCity(middlePoint: Point, city: City, ctx: CanvasRenderingContext2D) {
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "#333";
-        ctx.fillStyle = getHSL(city.faction.order);
+    private drawCity(point: Point, city: City, container: PIXI.Container) {
+        const textStyle: PIXI.TextStyleOptions = {
+            align: "center",
+            fill: 0xffffff,
+            fontFamily: "Arial",
+            fontSize: 64,
+        };
 
-        const displayedName = city.name.length > 10 ? city.name.substr(0, 10) : city.name;
-        const width = ctx.measureText(displayedName).width;
+        const text = new PIXI.Text(city.name.substr(0, 10), textStyle);
+        text.x = point.x;
+        text.y = point.y;
 
-        ctx.beginPath();
-        ctx.rect(middlePoint.x - (width / 2) - 1, middlePoint.y - 10, width + 2, 12);
-        ctx.fill();
-        ctx.stroke();
+        const scale = 6;
+        text.height /= scale;
+        text.width /= scale;
+        text.anchor.x = 0.5;
 
-        ctx.fillStyle = "#000000";
-        ctx.textAlign = "center";
+        const color = tinycolor(getHSL(city.faction.order)).toRgb();
 
-        ctx.fillText(displayedName, middlePoint.x, middlePoint.y);
+        const bg = new PIXI.Graphics();
+        bg.beginFill(PIXI.utils.rgb2hex([color.r / 255, color.g / 255, color.b / 255]));
+        bg.lineStyle(1, 0x000000);
+        bg.drawRect(0, 0, text.width + 4, text.height + 4);
+        bg.x = point.x - text.width / 2 - 2;
+        bg.y = point.y - text.height / 2 + 4;
+
+        container.addChild(bg);
+        container.addChild(text);
     }
 
-    private drawUnit(middlePoint: Point, unit: Unit, ctx: CanvasRenderingContext2D) {
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "#333";
-        ctx.fillStyle = getHSL(unit.faction.order);
+    private drawUnit(point: Point, unit: Unit, container: PIXI.Container) {
+        const textStyle: PIXI.TextStyleOptions = {
+            align: "center",
+            fill: 0xffffff,
+            fontFamily: "Arial",
+            fontSize: 64,
+        };
 
-        const displayedName = unit.type.name.length > 10 ? unit.type.name.substr(0, 10) : unit.type.name;
-        const width = ctx.measureText(displayedName).width;
+        const text = new PIXI.Text(unit.type.name, textStyle);
+        text.x = point.x;
+        text.y = point.y;
 
-        ctx.beginPath();
-        ctx.arc(middlePoint.x - (width / 2) + 4, middlePoint.y - 2, 6, Math.PI / 2, Math.PI * 3 / 2);
-        ctx.arc(middlePoint.x + (width / 2) - 4, middlePoint.y - 2, 6, Math.PI * 3 / 2, Math.PI / 2);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
+        const scale = 6;
+        text.height /= scale;
+        text.width /= scale;
+        text.anchor.x = 0.5;
 
-        ctx.fillStyle = "#000000";
-        ctx.textAlign = "center";
+        const color = tinycolor(getHSL(unit.faction.order)).toRgb();
 
-        ctx.fillText(displayedName, middlePoint.x, middlePoint.y);
+        const bg = new PIXI.Graphics();
+        bg.beginFill(PIXI.utils.rgb2hex([color.r / 255, color.g / 255, color.b / 255]));
+        bg.lineStyle(1, 0x000000);
+        bg.arc(0, 0, 6, Math.PI / 2, Math.PI * 3 / 2);
+        bg.arc(text.width, 0, 6, Math.PI * 3 / 2, Math.PI / 2);
+        bg.lineTo(0, 6);
+        bg.x = point.x - text.width / 2;
+        bg.y = point.y + text.height / 2;
+
+        container.addChild(bg);
+        container.addChild(text);
     }
 
-    private drawTerrainOutline(terrain: TerrainSegment, neighbours: TerrainSegment[], ctx: CanvasRenderingContext2D) {
+    private drawTerrainOutline(terrain: TerrainSegment, neighbours: TerrainSegment[], container: PIXI.Container) {
         if (!terrain.ownedBy) {
             return;
         }
@@ -118,12 +154,12 @@ export class ClientGame extends Game {
         const middlePoint = terrain.toPoint();
         const points = terrain.corners(HEX_SIZE - 1);
 
-        this.conditionallyDrawCityOutline(points[0], points[1], terrain.ownedBy.faction, neighbours[0], ctx);
-        this.conditionallyDrawCityOutline(points[1], points[2], terrain.ownedBy.faction, neighbours[5], ctx);
-        this.conditionallyDrawCityOutline(points[2], points[3], terrain.ownedBy.faction, neighbours[4], ctx);
-        this.conditionallyDrawCityOutline(points[3], points[4], terrain.ownedBy.faction, neighbours[3], ctx);
-        this.conditionallyDrawCityOutline(points[4], points[5], terrain.ownedBy.faction, neighbours[2], ctx);
-        this.conditionallyDrawCityOutline(points[5], points[0], terrain.ownedBy.faction, neighbours[1], ctx);
+        this.conditionallyDrawCityOutline(points[0], points[1], terrain.ownedBy.faction, neighbours[0], container);
+        this.conditionallyDrawCityOutline(points[1], points[2], terrain.ownedBy.faction, neighbours[5], container);
+        this.conditionallyDrawCityOutline(points[2], points[3], terrain.ownedBy.faction, neighbours[4], container);
+        this.conditionallyDrawCityOutline(points[3], points[4], terrain.ownedBy.faction, neighbours[3], container);
+        this.conditionallyDrawCityOutline(points[4], points[5], terrain.ownedBy.faction, neighbours[2], container);
+        this.conditionallyDrawCityOutline(points[5], points[0], terrain.ownedBy.faction, neighbours[1], container);
     }
 
     private conditionallyDrawCityOutline(
@@ -131,17 +167,21 @@ export class ClientGame extends Game {
         point2: Point,
         faction: Faction,
         neighbour: TerrainSegment,
-        ctx: CanvasRenderingContext2D,
+        container: PIXI.Container,
     ) {
         if (neighbour && neighbour.ownedBy && neighbour.ownedBy.faction.id === faction.id) {
             return;
         }
 
-        ctx.beginPath();
-        ctx.strokeStyle = getHSL(faction.order);
-        ctx.lineWidth = 2;
-        ctx.moveTo(point1.x, point1.y);
-        ctx.lineTo(point2.x, point2.y);
-        ctx.stroke();
+        const line = new PIXI.Graphics();
+
+        const color = tinycolor(getHSL(faction.order)).toRgb();
+
+        line.lineStyle(2, PIXI.utils.rgb2hex([color.r / 255, color.g / 255, color.b / 255]));
+
+        line.moveTo(point1.x, point1.y);
+        line.lineTo(point2.x, point2.y);
+
+        container.addChild(line);
     }
 }

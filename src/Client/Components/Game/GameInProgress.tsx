@@ -1,3 +1,4 @@
+import * as PIXI from "pixi.js";
 import * as R from "ramda";
 import * as React from "react";
 
@@ -6,7 +7,7 @@ import {Game} from "Common/Game";
 import {City, Faction, TerrainSegment, Unit} from "Common/Models";
 import * as RPC from "Common/RPC";
 import {Types} from "Common/Types";
-import {Hex} from "Common/Util";
+import {getHSL, Hex} from "Common/Util";
 
 import {Camera, ICameraEvent} from "../../Camera";
 import {Client} from "../../Client";
@@ -39,14 +40,18 @@ export interface IGameInProgressState {
 export class GameInProgress extends React.Component<IGameInProgressProps, IGameInProgressState> {
     private canvasElement: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
+    private app: PIXI.Application;
     private animationHandle: number;
     private camera: Camera;
     private hover: Hex;
+    private hoverContainer: PIXI.Container;
+    private textures: {[key: string]: PIXI.Texture};
 
     constructor(props: IGameInProgressProps) {
         super(props);
 
         this.camera = new Camera();
+        this.textures = {};
 
         this.bindCanvasElement = this.bindCanvasElement.bind(this);
         this.endTurn = this.endTurn.bind(this);
@@ -208,8 +213,22 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         this.recalculateSize();
         this.bindEvents();
 
-        this.ctx = this.canvasElement.getContext("2d");
-        this.draw();
+        this.app = new PIXI.Application(
+            this.canvasElement.width,
+            this.canvasElement.height,
+            {view: this.canvasElement, backgroundColor: 0x2b2b2b},
+        );
+
+        this.hoverContainer = new PIXI.Container();
+
+        this.camera.on("update", () => {
+            this.app.stage.scale.x = this.camera.zoomLevel;
+            this.app.stage.scale.y = this.camera.zoomLevel;
+            this.app.stage.position.x = this.camera.panX;
+            this.app.stage.position.y = this.camera.panY;
+        });
+
+        this.populateStage();
     }
 
     private getActor() {
@@ -238,6 +257,8 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
 
         this.camera.on("hover", (event: ICameraEvent) => {
             this.hover = event.hex;
+            this.hoverContainer.removeChildren();
+            this.props.game.drawHover(this.hoverContainer, this.hover);
         });
 
         this.camera.on("select", async (event: ICameraEvent) => {
@@ -315,6 +336,8 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
                 const id = this.state.selectedCity.id;
                 this.setState({selectedCity: this.props.game.cities[id]});
             }
+
+            this.populateStage();
         });
     }
 
@@ -330,30 +353,14 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         this.canvasElement.height = (this.canvasElement.parentNode as HTMLDivElement).clientHeight;
     }
 
-    private draw(total = 0, previous = 0) {
-        const time: IGameTime = {
-            delta: previous - total,
-            total,
-        };
+    private populateStage() {
+        this.app.stage.removeChildren();
 
-        this.ctx.save();
-        this.ctx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
-        this.ctx.restore();
+        this.props.game.drawTerrain(this.app.stage);
+        this.props.game.drawOutlines(this.app.stage);
 
-        this.ctx.save();
-        this.camera.applyToCtx(this.ctx);
+        this.app.stage.addChild(this.hoverContainer);
 
-        this.props.game.drawTerrain(this.ctx);
-        this.props.game.drawOutlines(this.ctx);
-
-        if (this.hover) {
-            this.props.game.drawHover(time, this.ctx, this.hover);
-        }
-
-        this.props.game.drawUnits(this.ctx);
-
-        this.ctx.restore();
-
-        this.animationHandle = window.requestAnimationFrame((timeNow) => this.draw(timeNow, time.total));
+        this.props.game.drawUnits(this.app.stage);
     }
 }

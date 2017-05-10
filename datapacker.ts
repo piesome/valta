@@ -26,6 +26,7 @@ function insertFile(pathParts: string[], dataToInsert: any) {
 function mime(ext: string) {
     const mimes: {[ext: string]: string} = {
         ".png": "image/png",
+        ".svg": "image/svg+xml",
     };
 
     return mimes[ext] || "text/plain";

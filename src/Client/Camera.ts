@@ -38,11 +38,12 @@ function dist(x1: number, y1: number, x2: number, y2: number) {
 }
 
 export class Camera extends EventEmitter {
+    public zoomLevel: number = 1;
+    public panX: number = 0;
+    public panY: number = 0;
+
     private options: ICameraOptions;
 
-    private zoomLevel: number = 1;
-    private panX: number = 0;
-    private panY: number = 0;
     private inPan: boolean = false;
     private inClick: boolean = false;
     private clickX: number;
@@ -69,8 +70,8 @@ export class Camera extends EventEmitter {
             this.panX += mouseX - (mouseX * (this.zoomLevel / zoomNow));
             this.panY += mouseY - (mouseY * (this.zoomLevel / zoomNow));
 
+            this.emit("update");
             event.preventDefault();
-
         }, true);
 
         canvasElement.addEventListener("mousedown", (event) => {
@@ -100,6 +101,8 @@ export class Camera extends EventEmitter {
 
             this.panX = this.clickX + event.offsetX;
             this.panY = this.clickY + event.offsetY;
+
+            this.emit("update");
         }, true);
 
         canvasElement.addEventListener("mouseup", (event) => {
@@ -125,10 +128,6 @@ export class Camera extends EventEmitter {
             event.preventDefault();
             return false;
         }, true);
-    }
-
-    public applyToCtx(ctx: CanvasRenderingContext2D) {
-        ctx.setTransform(this.zoomLevel, 0, 0, this.zoomLevel, this.panX, this.panY);
     }
 
     private createEvent(event: MouseEvent): ICameraEvent {
