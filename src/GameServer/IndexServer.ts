@@ -18,7 +18,7 @@ export class IndexServer extends RPC.RemotePeer {
         this.log = debug("valta:IndexServer");
     }
 
-    public connect(): Promise<void> {
+    public connect() {
         this.ws = new WS(this.indexUrl);
 
         this.log(`Connecting to ${this.indexUrl}`);
@@ -38,10 +38,11 @@ export class IndexServer extends RPC.RemotePeer {
             this.onMessage(data);
         });
 
-        return new Promise<void>((accept, reject) => {
-            this.ws.on("open", () => {
-                this.log(`Connection opened`);
-                this.onOpen().then(() => accept(), (err) => reject(err));
+        this.ws.on("open", () => {
+            this.log(`Connection opened`);
+
+            this.onOpen().then(() => {
+                this.emit("opened");
             });
         });
     }

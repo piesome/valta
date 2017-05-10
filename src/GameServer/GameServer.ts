@@ -42,14 +42,26 @@ export class GameServer extends RPC.Peer<GameClient> {
         registerRPCs(this);
 
         this.db = Knex(require("../../knexfile")[process.env.NODE_ENV]);
-        this.index = new IndexServer(this.db, process.env.INDEX_URL);
-        await this.index.connect();
 
         this.wss.on("connection", (x) => this.onConnection(x));
 
         await this.types.load();
 
         await this.loadGames();
+
+        this.index = new IndexServer(this.db, process.env.INDEX_URL);
+
+        this.index.connect();
+
+        this.index.on("opened", () => {
+            for (const gameId in this.games) {
+                if (!this.games.hasOwnProperty(gameId)) {
+                    continue;
+                }
+
+                this.index.setGameStatus(this.games[gameId].serializeShort());
+            }
+        });
     }
 
     private onConnection(ws: WS) {
@@ -166,8 +178,6 @@ export class GameServer extends RPC.Peer<GameClient> {
         this.games[id] = game;
 
         this.watchGame(game);
-
-        this.index.setGameStatus(game.serializeShort());
     }
 
     private removeGame(gameId: string) {
