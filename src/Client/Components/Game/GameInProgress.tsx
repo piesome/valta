@@ -39,19 +39,15 @@ export interface IGameInProgressState {
 
 export class GameInProgress extends React.Component<IGameInProgressProps, IGameInProgressState> {
     private canvasElement: HTMLCanvasElement;
-    private ctx: CanvasRenderingContext2D;
     private app: PIXI.Application;
-    private animationHandle: number;
     private camera: Camera;
     private hover: Hex;
     private hoverContainer: PIXI.Container;
-    private textures: {[key: string]: PIXI.Texture};
 
     constructor(props: IGameInProgressProps) {
         super(props);
 
         this.camera = new Camera();
-        this.textures = {};
 
         this.bindCanvasElement = this.bindCanvasElement.bind(this);
         this.endTurn = this.endTurn.bind(this);
@@ -63,7 +59,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
     }
 
     public componentWillUnmount() {
-        window.cancelAnimationFrame(this.animationHandle);
+        this.app.destroy(false);
     }
 
     public render() {
