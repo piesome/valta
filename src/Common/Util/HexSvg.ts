@@ -11,11 +11,12 @@ program
     .option("-O, --fillOpacity [opacity]", "Fill opacity 0 to 1", parseFloat, 1)
     .option("-c, --strokeColor [color]", "Stroke color", R.identity, "#006c00")
     .option("-o, --strokeOpacity [opacity]", "Stroke opacity 0 to 1", parseFloat, 1)
-    .option("-w, --strokeWidth [width]", "Stroke width", parseInt, 2)
+    .option("-w, --strokeWidth [width]", "Stroke width", parseFloat, 2)
     .parse(process.argv);
 
 const hex = new Hex(0, 0);
-const points = hex.corners(64 - (program.strokeWidth / 2)).map((point) => `${point.x} ${point.y}`);
+const size = (64 - (program.strokeWidth / 2) - program.strokeWidth * 0.07);
+const points = hex.corners(size).map((point) => `${point.x} ${point.y}`);
 const path = `M ${points[0]} L` + points.slice(1).join(" L ") + "Z";
 
 const xml = builder.create("svg")
