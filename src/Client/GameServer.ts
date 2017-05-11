@@ -47,6 +47,13 @@ export class GameServer extends RPC.RemotePeer {
         );
     }
 
+    public pushProductionQueue(params: RPC.GameServerMethods.IPushProductionQueueParams) {
+        return this.call<RPC.GameServerMethods.IPushProductionQueueParams, null>(
+            RPC.GameServerMethods.PushProductionQueue,
+            params,
+        );
+    }
+
     public close() {
         this.ws.close();
     }

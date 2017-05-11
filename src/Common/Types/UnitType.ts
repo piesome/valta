@@ -1,5 +1,7 @@
-import {CombatModifierType} from ".";
+import * as GS from "../GameState";
 import {Faction} from "../Models/Faction";
+
+import {CombatModifierType} from ".";
 import {calculateValue, unlocked} from "./Effect";
 
 export class UnitType {
@@ -10,6 +12,7 @@ export class UnitType {
         public baseEnergy: number,
         public actions: string[],
         public type: string,
+        public cost: GS.INaturalResources,
         public modifiers?: CombatModifierType[],
     ) {}
 

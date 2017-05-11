@@ -33,6 +33,13 @@ export interface IRenameCityParams {
 }
 export type IRenameCityResponse = void;
 
+export const PushProductionQueue = "PushProductionQueue";
+export interface IPushProductionQueueParams {
+    city: string;
+    unitType: string;
+}
+export type IPushProductionQueueResponse = void;
+
 /**
  * Todo automatically populated from above
  */
@@ -43,4 +50,5 @@ export const SERVER_METHODS = [
     EndTurn,
     Action,
     RenameCity,
+    PushProductionQueue,
 ];

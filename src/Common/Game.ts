@@ -269,7 +269,15 @@ export class Game extends EventEmitter {
     public newTickCity(city: City) {
         this.calculateCityResources(city);
 
-        // advance production queue
+        const prodReady = city.calculateProduction();
+        if (!prodReady) {
+            return;
+        }
+
+        const unitType = city.productionQueue.pop();
+
+        const unit = this.createUnit(unitType.name, city.faction);
+        this.moveUnitTo(unit, city.terrain);
     }
 
     public calculateCityResources(city: City) {
@@ -301,8 +309,6 @@ export class Game extends EventEmitter {
 
             terrain.ownedBy = city;
         });
-
-        this.calculateCityResources(city);
 
         city.on("dead", () => {
             this.removeCity(city);

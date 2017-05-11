@@ -61,6 +61,11 @@ export class City extends EventEmitter {
         this.currentEnergy = this.maximumEnergy;
     }
 
+    public calculateProduction() {
+        this.resources = this.productionQueue.takeResources(this.resources);
+        return this.productionQueue.isReady();
+    }
+
     public serialize(): GS.ICity {
         return {
             buildings: [],

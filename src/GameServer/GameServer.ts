@@ -240,6 +240,10 @@ export class GameServer extends RPC.Peer<GameClient> {
         client: GameClient,
         params: RPC.GameServerMethods.IRenameCityParams,
     ): RPC.GameServerMethods.IRenameCityResponse {
+        if (!client.faction.canAct) {
+            throw new Error(`Client can't act currently`);
+        }
+
         const city = client.game.getCity(params.id);
         if (city.faction.id !== client.faction.id) {
             throw new Error(`Can't rename a city that's not owned by you`);
@@ -250,6 +254,27 @@ export class GameServer extends RPC.Peer<GameClient> {
         }
 
         city.name = params.name;
+
+        client.game.emit("update");
+    }
+
+    @registerRPC(RPC.GameServerMethods.PushProductionQueue)
+    private pushProductionQueue(
+        client: GameClient,
+        params: RPC.GameServerMethods.IPushProductionQueueParams,
+    ): RPC.GameServerMethods.IPushProductionQueueResponse {
+        if (!client.faction.canAct) {
+            throw new Error(`Client can't act currently`);
+        }
+
+        const city = client.game.getCity(params.city);
+        if (city.faction.id !== client.faction.id) {
+            throw new Error(`Can't produce at a city you don't own`);
+        }
+
+        const unitType = client.game.types.unit.getType(params.unitType);
+
+        city.productionQueue.queue.push(unitType);
 
         client.game.emit("update");
     }

@@ -111,6 +111,33 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
             </table>
         ) : null;
 
+        const unlockedTypes = this.props.types.unit.unlockedFor(city.faction);
+
+        const produce = (unitType: string) => {
+            return (() => {
+                this.props.client.gameServer.pushProductionQueue({
+                    city: city.id,
+                    unitType,
+                });
+            });
+        };
+
+        const queueButtons = ours && city.faction.canAct ? (
+            <div>
+                <div><strong>Add to production queue</strong></div>
+                {unlockedTypes.map((type) => <button key={type.name} onClick={produce(type.name)}>{type.name}</button>)}
+            </div>
+        ) : null;
+
+        const productionQueue = ours ? (
+            <div>
+                <div><strong>Production queue</strong></div>
+                <div>Reserved food {city.productionQueue.contributedCost.food}</div>
+                <div>Reserved production {city.productionQueue.contributedCost.production}</div>
+                {city.productionQueue.queue.map((type, ind) => <div key={ind}>{ind + 1}. {type.name}</div>)}
+            </div>
+        ) : null;
+
         const saveCityName = async (name: string) => {
             try {
                 await this.props.client.gameServer.renameCity({
@@ -129,10 +156,12 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
                 </div>
                 <EditableField
                     value={city.name}
-                    enabled={ours}
+                    enabled={ours && city.faction.canAct}
                     edited={saveCityName}
                 />
                 {info}
+                {queueButtons}
+                {productionQueue}
             </div>
         );
     }
