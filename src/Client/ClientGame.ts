@@ -53,7 +53,7 @@ export class ClientGame extends Game {
     }
 
     private loadTexture(name: string, data: any) {
-        this.textures[name] = PIXI.Texture.fromImage(data, false, PIXI.SCALE_MODES.LINEAR, 3);
+        this.textures[name] = PIXI.Texture.fromImage(data, false, PIXI.SCALE_MODES.LINEAR, 4);
     }
 
     private drawTerrainSegment(terrain: TerrainSegment, container: PIXI.Container) {
