@@ -42,3 +42,4 @@ dist
 ts-node-*
 data.js
 *.sqlite3
+.vscode
