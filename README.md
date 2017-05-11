@@ -16,3 +16,9 @@ yarn index-server
 yarn game-server:dev
 yarn client:dev
 ```
+
+## generating a terrain svg
+
+```sh
+./node_modules/.bin/ts-node src/Common/Util/HexSvg.ts -C '#ffffff' -c '#000000' > thing.svg
+```
