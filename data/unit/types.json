@@ -7,7 +7,10 @@
     "actions": [
       "move", "attack"
     ],
-    "type": "unit"
+    "type": "unit",
+    "cost": {
+      "production": 10
+    }
   },
   {
     "name": "wagon",
@@ -17,6 +20,9 @@
     "actions": [
       "move", "settle"
     ],
-    "type": "unit"
+    "type": "unit",
+    "cost": {
+      "production": 30
+    }
   }
 ]

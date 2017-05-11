@@ -5,6 +5,7 @@ import * as GS from "../GameState";
 import {Hex} from "../Util/Hex";
 
 import {Faction} from "./Faction";
+import {ProductionQueue} from "./ProductionQueue";
 import {TerrainSegment} from "./TerrainSegment";
 
 export class City extends EventEmitter {
@@ -17,11 +18,16 @@ export class City extends EventEmitter {
             data.currentHealth,
             data.currentEnergy,
             data.owns.map((hex) => Hex.deserializeHex(hex)),
+            ProductionQueue.deserialize(game, data.productionQueue),
+            data.resources,
         );
     }
 
     public maximumEnergy = 1;
     public maximumHealth = 100;
+
+    public productionQueue: ProductionQueue;
+    public resources: GS.INaturalResources;
 
     constructor(
         public id: GS.ID,
@@ -31,12 +37,24 @@ export class City extends EventEmitter {
         public currentHealth: number,
         public currentEnergy: number,
         public owns: Hex[],
+        productionQueue?: ProductionQueue,
+        resources?: GS.INaturalResources,
     ) {
         super();
 
         if (this.terrain) {
             this.terrain.city = this;
         }
+
+        if (!productionQueue) {
+            productionQueue = new ProductionQueue();
+        }
+        this.productionQueue = productionQueue;
+
+        if (!resources) {
+            resources = {};
+        }
+        this.resources = resources;
     }
 
     public resetEnergy() {
@@ -52,7 +70,8 @@ export class City extends EventEmitter {
             id: this.id,
             name: this.name,
             owns: this.owns.map((hex) => hex.serializeHex()),
-            productionQueue: [],
+            productionQueue: this.productionQueue.serialize(),
+            resources: this.resources,
             terrain: this.terrain.id,
         };
     }

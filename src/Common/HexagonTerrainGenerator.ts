@@ -22,6 +22,7 @@ export class HexagonTerrainGenerator implements ITerrainGenerator {
                     this.game.types.terrain.getType("plains"),
                     dx,
                     dz,
+                    {food: 1, production: 1},
                 );
 
                 this.game.addTerrain(terrain);

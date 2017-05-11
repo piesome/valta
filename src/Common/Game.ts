@@ -115,6 +115,7 @@ export class Game extends EventEmitter {
 
         newFaction.canAct = true;
         this.factionsUnits(newFaction).map((unit) => unit.resetEnergy());
+        this.factionsCities(newFaction).map((city) => this.newTickCity(city));
 
         this.tick += 1;
         this.emit("update");
@@ -203,6 +204,10 @@ export class Game extends EventEmitter {
         return R.filter((unit) => unit.faction.id === faction.id, R.values(this.units));
     }
 
+    public factionsCities(faction: Faction) {
+        return R.filter((city) => city.faction.id === faction.id, R.values(this.cities));
+    }
+
     public getUnit(id: GS.ID) {
         const ret = this.units[id];
         if (!ret) {
@@ -261,6 +266,31 @@ export class Game extends EventEmitter {
         delete this.units[unit.id];
     }
 
+    public newTickCity(city: City) {
+        this.calculateCityResources(city);
+
+        // advance production queue
+    }
+
+    public calculateCityResources(city: City) {
+        const resources: GS.INaturalResources = {
+            food: 0,
+            production: 0,
+        };
+
+        city.owns.forEach((hex) => {
+            const terrain = this.getTerrainSegmentByHex(hex);
+            if (!terrain) {
+                return;
+            }
+
+            resources.food += terrain.naturalResources.food || 0;
+            resources.production += terrain.naturalResources.production || 0;
+        });
+
+        city.resources = resources;
+    }
+
     public addCity(city: City) {
         this.cities[city.id] = city;
         city.owns.forEach((hex) => {
@@ -271,6 +301,8 @@ export class Game extends EventEmitter {
 
             terrain.ownedBy = city;
         });
+
+        this.calculateCityResources(city);
 
         city.on("dead", () => {
             this.removeCity(city);

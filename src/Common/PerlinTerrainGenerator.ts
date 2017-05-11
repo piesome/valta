@@ -28,6 +28,7 @@ export class PerlinTerrainGenerator implements ITerrainGenerator {
                     0, terrains.length - 1))],
                     dx,
                     dz,
+                    {food: 1, production: 1},
                 );
 
                 this.game.addTerrain(terrain);

@@ -96,6 +96,21 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         const city = this.state.selectedCity;
         const ours = city.faction.id === this.props.client.id;
 
+        const info = ours ? (
+            <table className={style.info}>
+                    <tbody>
+                        <tr>
+                            <td>food</td>
+                            <td>{city.resources.food}</td>
+                        </tr>
+                        <tr>
+                            <td>production</td>
+                            <td>{city.resources.production}</td>
+                        </tr>
+                    </tbody>
+            </table>
+        ) : null;
+
         const saveCityName = async (name: string) => {
             try {
                 await this.props.client.gameServer.renameCity({
@@ -117,6 +132,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
                     enabled={ours}
                     edited={saveCityName}
                 />
+                {info}
             </div>
         );
     }

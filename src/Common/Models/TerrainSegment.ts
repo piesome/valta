@@ -13,6 +13,7 @@ export class TerrainSegment extends Hex {
             game.types.terrain.getType(data.terrainType),
             data.q,
             data.r,
+            data.naturalResources,
         );
     }
 
@@ -25,6 +26,7 @@ export class TerrainSegment extends Hex {
         public type: TerrainType,
         q: number,
         r: number,
+        public naturalResources: GS.INaturalResources,
     ) {
         super(q, r);
 
@@ -76,7 +78,7 @@ export class TerrainSegment extends Hex {
     public serialize(): GS.ITerrainSegment {
         return {
             id: this.id,
-            naturalResources: {},
+            naturalResources: this.naturalResources,
             q: this.q,
             r: this.r,
             terrainType: this.type.name,

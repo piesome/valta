@@ -54,7 +54,7 @@ export interface ITerrainSegment {
     r: number;
 
     terrainType: TerrainType;
-    naturalResources: IResources;
+    naturalResources: INaturalResources;
 }
 
 export interface IHex {
@@ -72,7 +72,9 @@ export interface ICity {
     currentHealth: number;
     currentEnergy: number;
 
-    productionQueue: IProductionQueueItem[];
+    resources: INaturalResources;
+    productionQueue: IProductionQueue;
+
     buildings: IBuilding[];
     owns: IHex[];
 }
@@ -98,18 +100,21 @@ export interface IUnit {
     unitType: UnitType;
 }
 
-export interface IProductionQueueItem {
-    id: ID;
+export interface IProductionQueue {
+    /**
+     * How many resources the city has already gathered for the production of the next thing.
+     *
+     * It's calculated from the excess resources of a city at the start of its factions turn.
+     * When an item is ready to be popped, the contributedCosts are zeroed
+     */
+    contributedCost: INaturalResources;
+    // Is the next things spawn blocked, eg. by another unit
+    spawnBlocked: boolean;
 
-    name: string;
-    costInResources: IResources;
-    resultingUnitType: UnitType;
-    resultingBuildingType: BuildingType;
+    queue: UnitType[];
 }
 
-export interface IResources {
-    gold?: number;
+export interface INaturalResources {
     food?: number;
-    tools?: number;
-    magic?: number;
+    production?: number;
 }
