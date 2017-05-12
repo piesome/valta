@@ -44,7 +44,8 @@ export interface IFaction {
 }
 
 export interface ISettings {
-    mapAlgorithm: string;
+    possibleMapTypes: string[];
+    selectedMapType: string;
 }
 
 export type UpgradeName = string;

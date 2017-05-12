@@ -9,7 +9,9 @@ import {Types} from "Common/Types";
 import {Client} from "../../Client";
 import {Controls} from "../Common/Controls";
 import {FactionCube} from "../Common/FactionCube";
+import {FlexContainer} from "../Common/FlexContainer";
 import {Table} from "../Common/Table";
+import {Settings} from "./Settings";
 
 export interface IGameInLobbyProps {
     client: Client;
@@ -57,6 +59,7 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
                     {this.props.game.canBeStarted() ? <button onClick={this.startGame}>Start game</button> : null}
                 </Controls>
 
+                <FlexContainer>
                 <Table>
                     <thead>
                         <tr>
@@ -69,6 +72,9 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
                         {factions}
                     </tbody>
                 </Table>
+
+                <Settings />
+                </FlexContainer>
             </div>
         );
     }
