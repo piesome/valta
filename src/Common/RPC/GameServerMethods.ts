@@ -6,11 +6,11 @@ export interface ISelectFactionParams {
 }
 export type ISelectFactionResponse = void;
 
-export const SelectMapType = "SelectMapType";
-export interface ISelectMapTypeParams {
-    mapType: string,
+export const ChangeSettings = "ChangeSettings";
+export interface IChangeSettingsParams {
+    settings: GS.MapSettings,
 }
-export type ISelectMapTypeResponse = void;
+export type IChangeSettingsTypeResponse = void;
 
 export const StartGame = "StartGame";
 export type IStartGameParams = void;

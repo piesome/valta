@@ -186,9 +186,9 @@ export class Game extends EventEmitter {
         this.checkCanBeStarted();
     }
 
-    public selectMapType(id: GS.ID, mapType: string) {
+    public changeSettings(id: GS.ID, settings: GS.MapSettings) {
         this.assertLobby();
-        this.settings.selectedMapType = mapType;
+        this.settings = settings;
     }
 
     public createUnit(unitType: string, faction: Faction) {

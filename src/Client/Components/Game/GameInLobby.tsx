@@ -114,7 +114,7 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
 
     private selectMapType(ev: React.ChangeEvent<any>) {
         this.props.client.gameServer.selectMapType({
-            mapType: ev.target.value,
+            settings: this.props.game.settings
         });
     }
 }
