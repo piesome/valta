@@ -1,15 +1,17 @@
 import * as R from "ramda";
 import * as React from "react";
 
-import {Game} from "Common/Game";
-import {Faction} from "Common/Models";
+import { Game } from "Common/Game";
+import { Faction } from "Common/Models";
 import * as RPC from "Common/RPC";
-import {Types} from "Common/Types";
+import { Types } from "Common/Types";
 
-import {Client} from "../../Client";
-import {Controls} from "../Common/Controls";
-import {FactionCube} from "../Common/FactionCube";
-import {Table} from "../Common/Table";
+import { Client } from "../../Client";
+import { Controls } from "../Common/Controls";
+import { FactionCube } from "../Common/FactionCube";
+import { Table } from "../Common/Table";
+import { Flex } from "../Common/Flex";
+import { Settings } from "./Settings";
 
 export interface IGameInLobbyProps {
     client: Client;
@@ -48,7 +50,12 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
                 </tr>
             );
         };
+
         const factions = R.map((fact) => renderFaction(fact), this.props.game.factions);
+        
+        const mapTypes = this.props.game.settings.possibleMapTypes.map(function(mapType){
+            return <option key={mapType} value={mapType}>{mapType}</option>
+        });
 
         return (
             <div>
@@ -57,18 +64,29 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
                     {this.props.game.canBeStarted() ? <button onClick={this.startGame}>Start game</button> : null}
                 </Controls>
 
-                <Table>
-                    <thead>
-                        <tr>
-                            <th />
-                            <th>Client ID</th>
-                            <th>Faction type</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {factions}
-                    </tbody>
-                </Table>
+                <Flex>
+                    <div>
+                        <Table>
+                            <thead>
+                                <tr>
+                                    <th />
+                                    <th>Client ID</th>
+                                    <th>Faction type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {factions}
+                            </tbody>
+                        </Table>
+                    </div>
+                    <div>
+                        <Settings>
+                            <select>
+                                {mapTypes}
+                            </select>
+                        </Settings>
+                    </div>
+                </Flex>
             </div>
         );
     }

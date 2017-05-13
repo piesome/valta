@@ -28,6 +28,7 @@ export class Game extends EventEmitter {
     public terrain: {[r: number]: {[q: number]: TerrainSegment}};
     public units: {[id: string]: Unit};
     public cities: {[id: string]: City};
+    public settings: GS.MapSettings;
 
     private terrainById: {[id: string]: TerrainSegment};
 
@@ -45,6 +46,7 @@ export class Game extends EventEmitter {
         this.factions = [];
         this.units = {};
         this.cities = {};
+        this.settings = new GS.MapSettings();
         this.terrainById = {};
 
         this.types = types || new Types();
@@ -343,6 +345,7 @@ export class Game extends EventEmitter {
         this.status = data.status;
         this.tick = data.tick;
         this.factions = data.factions.map((x) => Faction.deserialize(this, x));
+        this.settings = data.settings;
         this.deserializeTerrain(data.terrain);
         this.deserializeUnits(data.units);
         this.deserializeCities(data.cities);
@@ -356,6 +359,7 @@ export class Game extends EventEmitter {
             factions: this.factions.map((x) => x.serialize()),
             id: this.id,
             name: this.name,
+            settings: this.settings,
             status: this.status,
             terrain: this.serializeTerrain(),
             tick: this.tick,
