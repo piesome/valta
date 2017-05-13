@@ -15,7 +15,7 @@ export class Faction {
         );
     }
 
-    constructor(
+    constructor(    
         public id: GS.ID,
         public type: FactionType,
         public canAct: boolean,

@@ -28,7 +28,7 @@ export class Game extends EventEmitter {
     public terrain: {[r: number]: {[q: number]: TerrainSegment}};
     public units: {[id: string]: Unit};
     public cities: {[id: string]: City};
-    public settings: GS.ISettings;
+    public settings: GS.MapSettings;
 
     private terrainById: {[id: string]: TerrainSegment};
 
@@ -46,6 +46,7 @@ export class Game extends EventEmitter {
         this.factions = [];
         this.units = {};
         this.cities = {};
+        this.settings = new GS.MapSettings();
         this.terrainById = {};
 
         this.types = types || new Types();

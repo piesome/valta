@@ -29,7 +29,7 @@ export interface IGame {
     factions: IFaction[];
     units: IUnits;
     cities: ICities;
-    settings: ISettings;
+    settings: MapSettings;
 }
 
 export type FactionType = string;
@@ -43,9 +43,13 @@ export interface IFaction {
     order: number;
 }
 
-export interface ISettings {
+export class MapSettings {
     possibleMapTypes: string[];
     selectedMapType: string;
+    constructor(){
+        this.possibleMapTypes = ["hex", "perlin"];
+        this.selectedMapType = "";
+    }
 }
 
 export type UpgradeName = string;
