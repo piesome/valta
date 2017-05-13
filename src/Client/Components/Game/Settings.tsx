@@ -7,7 +7,7 @@ export class Settings extends React.Component<null, ISettings> {
     public render() {
         return(
             <div className={style.controls}>
-                Settings
+                {this.props.children}
             </div>
         );
     }

@@ -1,5 +1,8 @@
 @import "Variables";
 
-.flexcontainer {
+.flex {
     display: flex;
+    div{
+        flex:1;
+    }
 }
