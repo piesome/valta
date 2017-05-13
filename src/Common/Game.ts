@@ -1,19 +1,19 @@
-import {EventEmitter} from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import * as R from "ramda";
-import {v4 as uuid} from "uuid";
+import { v4 as uuid } from "uuid";
 
-import {ActionManager} from "./Actions";
+import { ActionManager } from "./Actions";
 import * as GS from "./GameState";
-import {HexagonTerrainGenerator} from "./HexagonTerrainGenerator";
+import { HexagonTerrainGenerator } from "./HexagonTerrainGenerator";
 import {
     City,
     Faction,
     TerrainSegment,
     Unit,
 } from "./Models";
-import {PerlinTerrainGenerator} from "./PerlinTerrainGenerator";
-import {Types} from "./Types";
-import {Hex} from "./Util";
+import { PerlinTerrainGenerator } from "./PerlinTerrainGenerator";
+import { Types } from "./Types";
+import { Hex } from "./Util";
 
 export class Game extends EventEmitter {
     public types: Types;
@@ -25,12 +25,12 @@ export class Game extends EventEmitter {
 
     public factions: Faction[];
     public tick: number;
-    public terrain: {[r: number]: {[q: number]: TerrainSegment}};
-    public units: {[id: string]: Unit};
-    public cities: {[id: string]: City};
+    public terrain: { [r: number]: { [q: number]: TerrainSegment } };
+    public units: { [id: string]: Unit };
+    public cities: { [id: string]: City };
     public settings: GS.MapSettings;
 
-    private terrainById: {[id: string]: TerrainSegment};
+    private terrainById: { [id: string]: TerrainSegment };
 
     constructor(
         types?: Types,
@@ -84,7 +84,14 @@ export class Game extends EventEmitter {
             throw new Error("Game can't be started");
         }
 
-        const startingPoints = (new HexagonTerrainGenerator(this, 10)).generate();
+        let startingPoints = new Array<Hex>();
+        if (this.settings.selectedMapType === "hex") {
+            startingPoints = (new HexagonTerrainGenerator(this, 10)).generate();
+        }
+        // else if (this.settings.selectedMapType === "perlin") {
+        //     startingPoints = (new PerlinTerrainGenerator(this, 10)).generate();
+        // }
+
         for (const fact of this.factions) {
             const startingPoint = startingPoints[fact.order]; // TODO: fix order
             const terr = this.terrain[startingPoint.r][startingPoint.q];
@@ -248,7 +255,7 @@ export class Game extends EventEmitter {
         return this.getTerrainSegmentByCoords(hex.r, hex.q);
     }
 
-    public getTerrainSegmentByCoords(r: number, q: number): TerrainSegment|null {
+    public getTerrainSegmentByCoords(r: number, q: number): TerrainSegment | null {
         if (this.terrain[r] && this.terrain[r][q]) {
             return this.terrain[r][q];
         }
