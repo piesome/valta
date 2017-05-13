@@ -44,9 +44,10 @@ export interface IFaction {
 }
 
 export class MapSettings {
-    possibleMapTypes: string[];
-    selectedMapType: string;
-    constructor(){
+    public possibleMapTypes: string[];
+    public selectedMapType: string;
+
+    constructor() {
         this.possibleMapTypes = ["hex", "perlin"];
         this.selectedMapType = "";
     }

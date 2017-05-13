@@ -52,9 +52,9 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
         };
 
         const factions = R.map((fact) => renderFaction(fact), this.props.game.factions);
-        
-        const mapTypes = this.props.game.settings.possibleMapTypes.map(function(mapType){
-            return <option key={mapType} value={mapType}>{mapType}</option>
+
+        const mapTypes = this.props.game.settings.possibleMapTypes.map(function(mapType) {
+            return (<option key={mapType} value={mapType}>{mapType}</option>);
         });
 
         return (

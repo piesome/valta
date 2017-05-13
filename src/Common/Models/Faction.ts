@@ -1,8 +1,8 @@
 import * as R from "ramda";
 
-import {Game} from "../Game";
+import { Game } from "../Game";
 import * as GS from "../GameState";
-import {FactionType, IEffect, IEffectTarget, UpgradeType} from "../Types";
+import { FactionType, IEffect, IEffectTarget, UpgradeType } from "../Types";
 
 export class Faction {
     public static deserialize(game: Game, data: GS.IFaction): Faction {
@@ -15,13 +15,13 @@ export class Faction {
         );
     }
 
-    constructor(    
+    constructor(
         public id: GS.ID,
         public type: FactionType,
         public canAct: boolean,
         public upgrades: UpgradeType[],
         public order: number,
-    ) {}
+    ) { }
 
     public effects(): IEffect[] {
         return R.flatten(R.map((x) => x.effects, this.upgrades));
