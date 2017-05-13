@@ -26,6 +26,7 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
 
         this.leaveGame = this.leaveGame.bind(this);
         this.selectFaction = this.selectFaction.bind(this);
+        this.selectMapType = this.selectMapType.bind(this);
         this.startGame = this.startGame.bind(this);
     }
 
@@ -53,8 +54,12 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
 
         const factions = R.map((fact) => renderFaction(fact), this.props.game.factions);
 
-        const mapTypes = this.props.game.settings.possibleMapTypes.map(function(mapType) {
-            return (<option key={mapType} value={mapType}>{mapType}</option>);
+        const mapTypes = this.props.game.settings.possibleMapTypes.map(function (mapType) {
+            return (
+                <option key={mapType} value={mapType}>
+                    {mapType}
+                </option>
+            );
         });
 
         return (
@@ -81,7 +86,8 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
                     </div>
                     <div>
                         <Settings>
-                            <select>
+                            <label>Map type: </label>
+                            <select name="maptypeselect" onChange={this.selectMapType}>
                                 {mapTypes}
                             </select>
                         </Settings>
@@ -104,5 +110,11 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
 
     private startGame() {
         this.props.client.gameServer.startGame();
+    }
+
+    private selectMapType(ev: React.ChangeEvent<any>) {
+        this.props.client.gameServer.selectMapType({
+            mapType: ev.target.value,
+        });
     }
 }

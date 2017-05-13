@@ -14,6 +14,7 @@ import {
 import { PerlinTerrainGenerator } from "./PerlinTerrainGenerator";
 import { Types } from "./Types";
 import { Hex } from "./Util";
+import * as debug from "debug";
 
 export class Game extends EventEmitter {
     public types: Types;
@@ -31,6 +32,7 @@ export class Game extends EventEmitter {
     public settings: GS.MapSettings;
 
     private terrainById: { [id: string]: TerrainSegment };
+    private log: debug.IDebugger;
 
     constructor(
         types?: Types,
@@ -51,6 +53,7 @@ export class Game extends EventEmitter {
 
         this.types = types || new Types();
         this.actionManager = new ActionManager(this);
+        this.log = debug("valta:Game");
     }
 
     public assertLobby() {
@@ -84,13 +87,17 @@ export class Game extends EventEmitter {
             throw new Error("Game can't be started");
         }
 
-        let startingPoints = new Array<Hex>();
-        if (this.settings.selectedMapType === "hex") {
-            startingPoints = (new HexagonTerrainGenerator(this, 10)).generate();
-        }
+        this.log(this.settings.selectedMapType);
+
+        // var startingPoints = new Array<Hex>();
+        // if (this.settings.selectedMapType === "hex") {
+        //     startingPoints = (new HexagonTerrainGenerator(this, 10)).generate();
+        // }
         // else if (this.settings.selectedMapType === "perlin") {
         //     startingPoints = (new PerlinTerrainGenerator(this, 10)).generate();
         // }
+
+        const startingPoints = (new HexagonTerrainGenerator(this, 10)).generate();
 
         for (const fact of this.factions) {
             const startingPoint = startingPoints[fact.order]; // TODO: fix order
@@ -177,6 +184,11 @@ export class Game extends EventEmitter {
         this.factions.map((fact, ind) => fact.order = ind);
 
         this.checkCanBeStarted();
+    }
+
+    public selectMapType(id: GS.ID, mapType: string) {
+        this.assertLobby();
+        this.settings.selectedMapType = mapType;
     }
 
     public createUnit(unitType: string, faction: Faction) {

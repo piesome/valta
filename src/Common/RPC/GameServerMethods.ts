@@ -6,6 +6,12 @@ export interface ISelectFactionParams {
 }
 export type ISelectFactionResponse = void;
 
+export const SelectMapType = "SelectMapType";
+export interface ISelectMapTypeParams {
+    mapType: string,
+}
+export type ISelectMapTypeResponse = void;
+
 export const StartGame = "StartGame";
 export type IStartGameParams = void;
 export type IStartGameResponse = void;

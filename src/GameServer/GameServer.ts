@@ -203,6 +203,14 @@ export class GameServer extends RPC.Peer<GameClient> {
         client.game.selectFactionType(client.id, params.factionType);
     }
 
+    @registerRPC(RPC.GameServerMethods.SelectMapType)
+    private selectMapType(
+        client: GameClient,
+        params: RPC.GameServerMethods.ISelectMapTypeParams,
+    ): RPC.GameServerMethods.ISelectFactionResponse {
+        client.game.selectMapType(client.id, params.mapType);
+    }
+
     @registerRPC(RPC.GameServerMethods.StartGame)
     private startGame(
         client: GameClient,
