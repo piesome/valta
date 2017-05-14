@@ -22,3 +22,7 @@ yarn client:dev
 ```sh
 ./node_modules/.bin/ts-node src/Common/Util/HexSvg.ts -C '#ffffff' -c '#000000' > thing.svg
 ```
+
+## license
+
+All code and assets are licensed under the MIT License (Expat) unless otherwise noted.
