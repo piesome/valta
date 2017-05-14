@@ -14,10 +14,6 @@ export class Settle extends Action<Unit> {
     }
 
     public enact(unit: Unit, terrain: TerrainSegment) {
-        if (unit.terrain.city) {
-            throw new Error(`There's a city there already`);
-        }
-
         this.game.createCity(unit.faction, unit.terrain);
         unit.kill();
     }

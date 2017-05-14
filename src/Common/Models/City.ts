@@ -45,10 +45,6 @@ export class City extends EventEmitter {
     ) {
         super();
 
-        if (this.terrain) {
-            this.terrain.city = this;
-        }
-
         if (!productionQueue) {
             productionQueue = new ProductionQueue();
         }
@@ -84,7 +80,7 @@ export class City extends EventEmitter {
 
     public canBeAdded() {
         for (const terrain of this.ownedTiles()) {
-            if (terrain.ownedBy && terrain.ownedBy.faction.id !== this.faction.id) {
+            if ((terrain.ownedBy && terrain.ownedBy.faction.id !== this.faction.id) || terrain.city) {
                 return false;
             }
         }
@@ -111,12 +107,16 @@ export class City extends EventEmitter {
         for (const terrain of this.ownedTiles()) {
             terrain.ownedBy = this;
         }
+
+        this.terrain.city = this;
     }
 
     private onRemoved() {
         for (const terrain of this.ownedTiles()) {
             terrain.ownedBy = null;
         }
+
+        this.terrain.city = null;
     }
 
     private onTick() {
