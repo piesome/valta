@@ -1,0 +1,22 @@
+@import "../Common/Variables";
+
+.messageHud {
+    position: absolute;
+    bottom: 27px;
+    right: 0;
+    width: 25vw;
+    height: 20vh;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: $background-color;
+    overflow-y: scroll;
+}
+
+.errorMessage::before {
+    color: red;
+    content: "error ";
+}
+
+.infoMessage::before {
+    color: yellow;
+    content: "info ";
+}

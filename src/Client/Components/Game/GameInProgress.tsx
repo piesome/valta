@@ -20,6 +20,7 @@ import {FactionCube} from "../Common/FactionCube";
 
 import {EndTurnHud} from "./EndTurnHud";
 import {FactionHud} from "./FactionHud";
+import {IMessage, MessageHud} from "./MessageHud";
 import {SelectHud} from "./SelectHud";
 
 const style = require("./GameInProgress.scss");
@@ -35,6 +36,7 @@ export interface IGameInProgressState {
     selectedUnit: Unit;
     selectedCity: City;
     inAction: Action<any>;
+    messages: IMessage[];
 }
 
 export class GameInProgress extends React.Component<IGameInProgressProps, IGameInProgressState> {
@@ -55,11 +57,15 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
     }
 
     public componentWillMount() {
-        this.setState({selectedUnit: null, inAction: null, selectedCity: null});
+        this.setState({selectedUnit: null, inAction: null, selectedCity: null, messages: []});
     }
 
     public componentWillUnmount() {
         this.app.destroy(false);
+    }
+
+    public addMessage(message: IMessage) {
+        this.setState({messages: R.append(message, this.state.messages)});
     }
 
     public render() {
@@ -74,6 +80,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
                     <canvas ref={this.bindCanvasElement} />
                     <FactionHud game={this.props.game} ourId={this.props.client.id} />
                     <EndTurnHud game={this.props.game} ourId={this.props.client.id} endTurn={this.endTurn} />
+                    <MessageHud messages={this.state.messages} />
                     <SelectHud>
                         {this.renderAction()}
                         {this.renderSelectedCity()}
@@ -296,7 +303,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         try {
             await this.props.client.gameServer.action(action.serialize(actor, target));
         } catch (err) {
-            console.error(err);
+            this.addMessage({type: "error", content: err.toString()});
             throw err;
         }
 
