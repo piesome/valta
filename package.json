@@ -13,7 +13,8 @@
     "game-server:dev": "nodemon --watch 'src/**/*.ts' -e ts --exec 'yarn game-server'",
     "index-server": "DEBUG=valta:* NODE_ENV=index-server-development ts-node -r tsconfig-paths/register src/IndexServer/index.ts",
     "client": "webpack",
-    "client:dev": "webpack-dev-server --port 3000 --content-base ."
+    "client:dev": "webpack-dev-server --port 3000 --content-base .",
+    "test": "yarn lint"
   },
   "dependencies": {
     "@minttu/open-simplex-noise": "^1.3.0",
