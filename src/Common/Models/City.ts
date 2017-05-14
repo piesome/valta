@@ -82,6 +82,16 @@ export class City extends EventEmitter {
         return this.productionQueue.isReady();
     }
 
+    public canBeAdded() {
+        for (const terrain of this.ownedTiles()) {
+            if (terrain.ownedBy && terrain.ownedBy.faction.id !== this.faction.id) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public serialize(): GS.ICity {
         return {
             buildings: [],

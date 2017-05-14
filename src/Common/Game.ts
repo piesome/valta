@@ -219,6 +219,9 @@ export class Game extends EventEmitter {
     public createCity(faction: Faction, terrain: TerrainSegment) {
         const id = uuid();
         const city = new City(this, id, id, faction, terrain, 100, 0, R.append(terrain, terrain.neighbours()));
+        if (!city.canBeAdded()) {
+            throw new Error(`City can't be created there`);
+        }
         this.addCity(city);
         return city;
     }
