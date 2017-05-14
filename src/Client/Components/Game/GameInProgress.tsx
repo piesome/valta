@@ -98,16 +98,16 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
 
         const info = ours ? (
             <table className={style.info}>
-                    <tbody>
-                        <tr>
-                            <td>food</td>
-                            <td>{city.resources.food}</td>
-                        </tr>
-                        <tr>
-                            <td>production</td>
-                            <td>{city.resources.production}</td>
-                        </tr>
-                    </tbody>
+                <tbody>
+                    <tr>
+                        <td>food</td>
+                        <td>{city.resources.food}</td>
+                    </tr>
+                    <tr>
+                        <td>production</td>
+                        <td>{city.resources.production}</td>
+                    </tr>
+                </tbody>
             </table>
         ) : null;
 
@@ -132,8 +132,24 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
         const productionQueue = ours ? (
             <div>
                 <div><strong>Production queue</strong></div>
-                <div>Reserved food {city.productionQueue.contributedCost.food}</div>
-                <div>Reserved production {city.productionQueue.contributedCost.production}</div>
+                <table className={style.info}>
+                    <tbody>
+                        <tr>
+                            <td>food</td>
+                            <td>
+                                {city.productionQueue.contributedCost.food}
+                                &nbsp;/ {city.productionQueue.totalResources().food}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>production</td>
+                            <td>
+                                {city.productionQueue.contributedCost.production}
+                                &nbsp;/ {city.productionQueue.totalResources().production}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
                 {city.productionQueue.queue.map((type, ind) => <div key={ind}>{ind + 1}. {type.name}</div>)}
             </div>
         ) : null;

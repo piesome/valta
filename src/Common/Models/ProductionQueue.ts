@@ -29,12 +29,16 @@ export class ProductionQueue {
         return this.queue.splice(0, 1)[0];
     }
 
-    public neededResources(): NaturalResources {
+    public totalResources(): NaturalResources {
         if (this.queue.length === 0) {
             return new NaturalResources();
         }
 
-        return NaturalResources.deserialize(this.queue[0].cost).sub(this.contributedCost);
+        return NaturalResources.deserialize(this.queue[0].cost);
+    }
+
+    public neededResources(): NaturalResources {
+        return this.totalResources().sub(this.contributedCost);
     }
 
     public isReady(): boolean {
