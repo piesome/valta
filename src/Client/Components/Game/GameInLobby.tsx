@@ -9,8 +9,8 @@ import { Types } from "Common/Types";
 import { Client } from "../../Client";
 import { Controls } from "../Common/Controls";
 import { FactionCube } from "../Common/FactionCube";
-import { Table } from "../Common/Table";
 import { Flex } from "../Common/Flex";
+import { Table } from "../Common/Table";
 import { Settings } from "./Settings";
 
 export interface IGameInLobbyProps {
@@ -54,7 +54,7 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
 
         const factions = R.map((fact) => renderFaction(fact), this.props.game.factions);
 
-        const mapTypes = this.props.game.settings.possibleMapTypes.map(function (mapType) {
+        const mapTypes = this.props.game.settings.possibleMapTypes.map((mapType) => {
             return (
                 <option key={mapType} value={mapType}>
                     {mapType}
@@ -114,7 +114,7 @@ export class GameInLobby extends React.Component<IGameInLobbyProps, void> {
 
     private selectMapType(ev: React.ChangeEvent<any>) {
         this.props.client.gameServer.selectMapType({
-            settings: this.props.game.settings
+            settings: this.props.game.settings,
         });
     }
 }

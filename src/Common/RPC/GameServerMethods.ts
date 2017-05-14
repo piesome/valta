@@ -8,7 +8,7 @@ export type ISelectFactionResponse = void;
 
 export const ChangeSettings = "ChangeSettings";
 export interface IChangeSettingsParams {
-    settings: GS.MapSettings,
+    settings: GS.MapSettings;
 }
 export type IChangeSettingsTypeResponse = void;
 

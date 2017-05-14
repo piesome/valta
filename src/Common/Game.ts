@@ -1,3 +1,4 @@
+import * as debug from "debug";
 import { EventEmitter } from "eventemitter3";
 import * as R from "ramda";
 import { v4 as uuid } from "uuid";
@@ -14,7 +15,6 @@ import {
 import { PerlinTerrainGenerator } from "./PerlinTerrainGenerator";
 import { Types } from "./Types";
 import { Hex } from "./Util";
-import * as debug from "debug";
 
 export class Game extends EventEmitter {
     public types: Types;

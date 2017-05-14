@@ -30,7 +30,10 @@ export class GameServer extends RPC.RemotePeer {
     }
 
     public selectMapType(params: RPC.GameServerMethods.IChangeSettingsParams) {
-        return this.call<RPC.GameServerMethods.IChangeSettingsParams, null>(RPC.GameServerMethods.ChangeSettings, params);
+        return this.call<RPC.GameServerMethods.IChangeSettingsParams, null>(
+            RPC.GameServerMethods.ChangeSettings,
+            params,
+        );
     }
 
     public action(params: RPC.GameServerMethods.IActionParams) {
