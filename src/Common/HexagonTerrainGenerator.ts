@@ -2,7 +2,7 @@ import {v4 as uuid} from "uuid";
 
 import {Game} from "./Game";
 import {ITerrainGenerator} from "./ITerrainGenerator";
-import {TerrainSegment} from "./Models";
+import {NaturalResources, TerrainSegment} from "./Models";
 import {Hex} from "./Util";
 
 export class HexagonTerrainGenerator implements ITerrainGenerator {
@@ -22,7 +22,7 @@ export class HexagonTerrainGenerator implements ITerrainGenerator {
                     this.game.types.terrain.getType("plains"),
                     dx,
                     dz,
-                    {food: 1, production: 1},
+                    new NaturalResources(1, 1),
                 );
 
                 this.game.addTerrain(terrain);

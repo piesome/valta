@@ -3,7 +3,7 @@ import {v4 as uuid} from "uuid";
 
 import {Game} from "./Game";
 import {ITerrainGenerator} from "./ITerrainGenerator";
-import {TerrainSegment} from "./Models";
+import {NaturalResources, TerrainSegment} from "./Models";
 import {Hex} from "./Util";
 
 export class PerlinTerrainGenerator implements ITerrainGenerator {
@@ -28,7 +28,7 @@ export class PerlinTerrainGenerator implements ITerrainGenerator {
                     0, terrains.length - 1))],
                     dx,
                     dz,
-                    {food: 1, production: 1},
+                    new NaturalResources(1, 1),
                 );
 
                 this.game.addTerrain(terrain);

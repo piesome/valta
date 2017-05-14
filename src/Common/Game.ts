@@ -9,6 +9,7 @@ import { HexagonTerrainGenerator } from "./HexagonTerrainGenerator";
 import {
     City,
     Faction,
+    NaturalResources,
     TerrainSegment,
     Unit,
 } from "./Models";
@@ -130,10 +131,11 @@ export class Game extends EventEmitter {
         }
 
         newFaction.canAct = true;
-        this.factionsUnits(newFaction).map((unit) => unit.resetEnergy());
-        this.factionsCities(newFaction).map((city) => this.newTickCity(city));
-
         this.tick += 1;
+
+        this.factionsUnits(newFaction).map((unit) => unit.emit("tick"));
+        this.factionsCities(newFaction).map((city) => city.emit("tick"));
+
         this.emit("update");
     }
 
@@ -216,7 +218,7 @@ export class Game extends EventEmitter {
 
     public createCity(faction: Faction, terrain: TerrainSegment) {
         const id = uuid();
-        const city = new City(id, id, faction, terrain, 100, 0, R.append(terrain, terrain.neighbours()));
+        const city = new City(this, id, id, faction, terrain, 100, 0, R.append(terrain, terrain.neighbours()));
         this.addCity(city);
         return city;
     }
@@ -287,50 +289,10 @@ export class Game extends EventEmitter {
         delete this.units[unit.id];
     }
 
-    public newTickCity(city: City) {
-        this.calculateCityResources(city);
-
-        const prodReady = city.calculateProduction();
-        if (!prodReady) {
-            return;
-        }
-
-        const unitType = city.productionQueue.pop();
-
-        const unit = this.createUnit(unitType.name, city.faction);
-        this.moveUnitTo(unit, city.terrain);
-    }
-
-    public calculateCityResources(city: City) {
-        const resources: GS.INaturalResources = {
-            food: 0,
-            production: 0,
-        };
-
-        city.owns.forEach((hex) => {
-            const terrain = this.getTerrainSegmentByHex(hex);
-            if (!terrain) {
-                return;
-            }
-
-            resources.food += terrain.naturalResources.food || 0;
-            resources.production += terrain.naturalResources.production || 0;
-        });
-
-        city.resources = resources;
-    }
-
     public addCity(city: City) {
         this.cities[city.id] = city;
-        city.owns.forEach((hex) => {
-            const terrain = this.getTerrainSegmentByHex(hex);
-            if (!terrain) {
-                return;
-            }
 
-            terrain.ownedBy = city;
-        });
-
+        city.emit("added");
         city.on("dead", () => {
             this.removeCity(city);
         });
@@ -340,14 +302,7 @@ export class Game extends EventEmitter {
         city.removeAllListeners();
         delete this.cities[city.id];
 
-        city.owns.forEach((hex) => {
-            const terrain = this.getTerrainSegmentByHex(hex);
-            if (!terrain) {
-                return;
-            }
-
-            terrain.ownedBy = null;
-        });
+        city.emit("removed");
     }
 
     public async load() {

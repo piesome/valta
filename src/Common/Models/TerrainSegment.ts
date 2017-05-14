@@ -4,6 +4,7 @@ import {TerrainType} from "../Types";
 import {Hex} from "../Util";
 import {City} from "./City";
 import {Faction} from "./Faction";
+import {NaturalResources} from "./NaturalResources";
 import {Unit} from "./Unit";
 
 export class TerrainSegment extends Hex {
@@ -13,7 +14,7 @@ export class TerrainSegment extends Hex {
             game.types.terrain.getType(data.terrainType),
             data.q,
             data.r,
-            data.naturalResources,
+            NaturalResources.deserialize(data.naturalResources),
         );
     }
 
@@ -26,7 +27,7 @@ export class TerrainSegment extends Hex {
         public type: TerrainType,
         q: number,
         r: number,
-        public naturalResources: GS.INaturalResources,
+        public naturalResources: NaturalResources,
     ) {
         super(q, r);
 
@@ -78,7 +79,7 @@ export class TerrainSegment extends Hex {
     public serialize(): GS.ITerrainSegment {
         return {
             id: this.id,
-            naturalResources: this.naturalResources,
+            naturalResources: this.naturalResources.serialize(),
             q: this.q,
             r: this.r,
             terrainType: this.type.name,

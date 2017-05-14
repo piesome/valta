@@ -2,17 +2,19 @@ import {Game} from "../Game";
 import * as GS from "../GameState";
 import {UnitType} from "../Types";
 
+import {NaturalResources} from "./NaturalResources";
+
 export class ProductionQueue {
     public static deserialize(game: Game, data: GS.IProductionQueue): ProductionQueue {
         return new ProductionQueue(
-            data.contributedCost,
+            NaturalResources.deserialize(data.contributedCost),
             data.spawnBlocked,
             data.queue.map((name) => game.types.unit.getType(name)),
         );
     }
 
     constructor(
-        public contributedCost: GS.INaturalResources = {food: 0, production: 0},
+        public contributedCost: NaturalResources = new NaturalResources(),
         public spawnBlocked: boolean = false,
         public queue: UnitType[] = [],
     ) {}
@@ -22,26 +24,17 @@ export class ProductionQueue {
             throw new Error("Production queue isn't ready yet");
         }
 
-        this.contributedCost = {food: 0, production: 0};
+        this.contributedCost = new NaturalResources();
 
         return this.queue.splice(0, 1)[0];
     }
 
-    public neededResources(): GS.INaturalResources {
+    public neededResources(): NaturalResources {
         if (this.queue.length === 0) {
-            return {};
+            return new NaturalResources();
         }
 
-        const base = Object.assign({}, this.queue[0].cost);
-
-        if (base.food) {
-            base.food -= (this.contributedCost.food || 0);
-        }
-        if (base.production) {
-            base.production -= (this.contributedCost.production || 0);
-        }
-
-        return base;
+        return NaturalResources.deserialize(this.queue[0].cost).sub(this.contributedCost);
     }
 
     public isReady(): boolean {
@@ -49,46 +42,18 @@ export class ProductionQueue {
         return this.queue.length > 0 && !needed.food && !needed.production;
     }
 
-    public takeResources(cityRes: GS.INaturalResources): GS.INaturalResources {
+    public takeResources(cityRes: NaturalResources): NaturalResources {
         const needed = this.neededResources();
-        const ret = Object.assign({}, cityRes);
-
-        if (needed.food && ret.food) {
-            const take = Math.min(ret.food, needed.food);
-            this.contributeFood(take);
-            ret.food -= take;
-        }
-
-        if (needed.production && ret.production) {
-            const take = Math.min(ret.production, needed.production);
-            this.contributeProduction(take);
-            ret.production -= take;
-        }
-
-        return ret;
+        const toBeTaken = cityRes.min(needed);
+        this.contributedCost = this.contributedCost.add(toBeTaken);
+        return cityRes.sub(toBeTaken);
     }
 
     public serialize(): GS.IProductionQueue {
         return {
-            contributedCost: this.contributedCost,
+            contributedCost: this.contributedCost.serialize(),
             queue: this.queue.map((x) => x.name),
             spawnBlocked: this.spawnBlocked,
         };
-    }
-
-    private contributeFood(val: number) {
-        if (!this.contributedCost.food) {
-            this.contributedCost.food = 0;
-        }
-
-        this.contributedCost.food += val;
-    }
-
-    private contributeProduction(val: number) {
-        if (!this.contributedCost.production) {
-            this.contributedCost.production = 0;
-        }
-
-        this.contributedCost.production += val;
     }
 }

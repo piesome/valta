@@ -47,6 +47,8 @@ export class Unit extends EventEmitter {
         if (this.terrain) {
             this.terrain.addUnit(this);
         }
+
+        this.on("tick", this.onTick.bind(this));
     }
 
     public moveTo(terrain: TerrainSegment) {
@@ -100,5 +102,13 @@ export class Unit extends EventEmitter {
             terrain: this.terrain.id,
             unitType: this.type.name,
         };
+    }
+
+    private onTick() {
+        if (!this.faction.canAct) {
+            return;
+        }
+
+        this.resetEnergy();
     }
 }

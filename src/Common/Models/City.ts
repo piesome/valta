@@ -5,12 +5,14 @@ import * as GS from "../GameState";
 import {Hex} from "../Util/Hex";
 
 import {Faction} from "./Faction";
+import {NaturalResources} from "./NaturalResources";
 import {ProductionQueue} from "./ProductionQueue";
 import {TerrainSegment} from "./TerrainSegment";
 
 export class City extends EventEmitter {
     public static deserialize(game: Game, data: GS.ICity): City {
         return new City(
+            game,
             data.id,
             data.name,
             game.getFaction(data.faction),
@@ -19,7 +21,7 @@ export class City extends EventEmitter {
             data.currentEnergy,
             data.owns.map((hex) => Hex.deserializeHex(hex)),
             ProductionQueue.deserialize(game, data.productionQueue),
-            data.resources,
+            NaturalResources.deserialize(data.resources),
         );
     }
 
@@ -27,9 +29,10 @@ export class City extends EventEmitter {
     public maximumHealth = 100;
 
     public productionQueue: ProductionQueue;
-    public resources: GS.INaturalResources;
+    public resources: NaturalResources;
 
     constructor(
+        private game: Game,
         public id: GS.ID,
         public name: string,
         public faction: Faction,
@@ -38,7 +41,7 @@ export class City extends EventEmitter {
         public currentEnergy: number,
         public owns: Hex[],
         productionQueue?: ProductionQueue,
-        resources?: GS.INaturalResources,
+        resources?: NaturalResources,
     ) {
         super();
 
@@ -52,16 +55,29 @@ export class City extends EventEmitter {
         this.productionQueue = productionQueue;
 
         if (!resources) {
-            resources = {};
+            resources = new NaturalResources();
         }
         this.resources = resources;
+
+        this.on("added", this.onAdded.bind(this));
+        this.on("removed", this.onRemoved.bind(this));
+        this.on("tick", this.onTick.bind(this));
+    }
+
+    public * ownedTiles() {
+        for (const hex of this.owns) {
+            const terrain = this.game.getTerrainSegmentByHex(hex);
+            if (terrain) {
+                yield terrain;
+            }
+        }
     }
 
     public resetEnergy() {
         this.currentEnergy = this.maximumEnergy;
     }
 
-    public calculateProduction() {
+    public readyToProduce() {
         this.resources = this.productionQueue.takeResources(this.resources);
         return this.productionQueue.isReady();
     }
@@ -76,8 +92,40 @@ export class City extends EventEmitter {
             name: this.name,
             owns: this.owns.map((hex) => hex.serializeHex()),
             productionQueue: this.productionQueue.serialize(),
-            resources: this.resources,
+            resources: this.resources.serialize(),
             terrain: this.terrain.id,
         };
+    }
+
+    private onAdded() {
+        for (const terrain of this.ownedTiles()) {
+            terrain.ownedBy = this;
+        }
+    }
+
+    private onRemoved() {
+        for (const terrain of this.ownedTiles()) {
+            terrain.ownedBy = null;
+        }
+    }
+
+    private onTick() {
+        if (!this.faction.canAct) {
+            return;
+        }
+
+        let resources = new NaturalResources();
+        for (const terrain of this.ownedTiles()) {
+            resources = resources.add(terrain.naturalResources);
+        }
+        this.resources = resources;
+
+        if (!this.readyToProduce()) {
+            return;
+        }
+
+        const unitType = this.productionQueue.pop();
+        const unit = this.game.createUnit(unitType.name, this.faction);
+        this.game.moveUnitTo(unit, this.terrain);
     }
 }
