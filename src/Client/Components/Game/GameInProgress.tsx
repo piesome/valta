@@ -107,11 +107,19 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
             <table className={style.info}>
                 <tbody>
                     <tr>
-                        <td>food</td>
+                        <td>population</td>
+                        <td>{city.population}</td>
+                    </tr>
+                    <tr>
+                        <td>food for next population</td>
+                        <td>{city.foodForNextPopulation} / {city.foodRequiredForNextPopulation()}</td>
+                    </tr>
+                    <tr>
+                        <td>excess food</td>
                         <td>{city.resources.food}</td>
                     </tr>
                     <tr>
-                        <td>production</td>
+                        <td>excess production</td>
                         <td>{city.resources.production}</td>
                     </tr>
                 </tbody>

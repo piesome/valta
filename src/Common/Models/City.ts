@@ -22,6 +22,8 @@ export class City extends EventEmitter {
             data.owns.map((hex) => Hex.deserializeHex(hex)),
             ProductionQueue.deserialize(game, data.productionQueue),
             NaturalResources.deserialize(data.resources),
+            data.population,
+            data.foodForNextPopulation,
         );
     }
 
@@ -42,6 +44,8 @@ export class City extends EventEmitter {
         public owns: Hex[],
         productionQueue?: ProductionQueue,
         resources?: NaturalResources,
+        public population = 1,
+        public foodForNextPopulation = 0,
     ) {
         super();
 
@@ -80,12 +84,16 @@ export class City extends EventEmitter {
 
     public canBeAdded() {
         for (const terrain of this.ownedTiles()) {
-            if ((terrain.ownedBy && terrain.ownedBy.faction.id !== this.faction.id) || terrain.city) {
+            if (terrain.ownedBy || terrain.city) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    public foodRequiredForNextPopulation() {
+        return 10 + this.population * (this.population);
     }
 
     public serialize(): GS.ICity {
@@ -94,9 +102,11 @@ export class City extends EventEmitter {
             currentEnergy: this.currentEnergy,
             currentHealth: this.currentHealth,
             faction: this.faction.id,
+            foodForNextPopulation: this.foodForNextPopulation,
             id: this.id,
             name: this.name,
             owns: this.owns.map((hex) => hex.serializeHex()),
+            population: this.population,
             productionQueue: this.productionQueue.serialize(),
             resources: this.resources.serialize(),
             terrain: this.terrain.id,
@@ -124,18 +134,37 @@ export class City extends EventEmitter {
             return;
         }
 
+        // Collect resources of tiles
         let resources = new NaturalResources();
         for (const terrain of this.ownedTiles()) {
             resources = resources.add(terrain.naturalResources);
         }
         this.resources = resources;
 
-        if (!this.readyToProduce()) {
-            return;
+        // Calculate production cost and push units etc
+        if (this.readyToProduce()) {
+            const unitType = this.productionQueue.pop();
+            const unit = this.game.createUnit(unitType.name, this.faction);
+            this.game.moveUnitTo(unit, this.terrain);
         }
 
-        const unitType = this.productionQueue.pop();
-        const unit = this.game.createUnit(unitType.name, this.faction);
-        this.game.moveUnitTo(unit, this.terrain);
+        // food consumption by population
+        const foodReduced = this.population * 2;
+        this.resources.food -= foodReduced;
+
+        // overfood
+        if (this.resources.food > 0) {
+            this.foodForNextPopulation += this.resources.food;
+            this.resources.food = 0;
+        } else if (this.resources.food < 0) {
+            // starvation
+            this.population -= 1;
+        }
+
+        // enough food for population up
+        if (this.foodForNextPopulation >= this.foodRequiredForNextPopulation()) {
+            this.population += 1;
+            this.foodForNextPopulation = 0;
+        }
     }
 }

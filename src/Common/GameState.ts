@@ -79,6 +79,9 @@ export interface ICity {
     terrain: ID;
     faction: ID;
 
+    population: number;
+    foodForNextPopulation: number;
+
     currentHealth: number;
     currentEnergy: number;
 
