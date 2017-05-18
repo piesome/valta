@@ -13,7 +13,7 @@ export class Unit extends EventEmitter {
             data.id,
             game.types.unit.getType(data.unitType),
             game.getFaction(data.faction),
-            game.getTerrain(data.terrain),
+            game.terrain.get(data.terrain),
             data.currentHealth,
             data.currentEnergy,
         );

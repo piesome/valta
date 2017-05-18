@@ -19,6 +19,6 @@ export class Settle extends Action<Unit> {
     }
 
     public deserializeActor(data: any) {
-        return this.game.getUnit(data as string);
+        return this.game.units.get(data as string);
     }
 }

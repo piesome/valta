@@ -58,6 +58,6 @@ export abstract class Action<Actor extends IActorable> {
     public abstract deserializeActor(data: any): Actor;
 
     public deserializeTarget(data: any) {
-        return this.game.getTerrain(data);
+        return this.game.terrain.get(data);
     }
 }

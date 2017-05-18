@@ -335,12 +335,13 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
 
         this.camera.on("select", async (event: ICameraEvent) => {
             const hex = event.hex;
+            let terrain: TerrainSegment;
 
-            if (!(hex.r in this.props.game.terrain && hex.q in this.props.game.terrain[hex.r])) {
+            try {
+                terrain = this.props.game.terrain.getByHex(hex);
+            } catch (err) {
                 return;
             }
-
-            const terrain = this.props.game.terrain[hex.r][hex.q];
 
             if (this.state.inAction && this.getActor()) {
                 try {
@@ -398,7 +399,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
             if (this.state.selectedUnit) {
                 const id = this.state.selectedUnit.id;
                 try {
-                    this.setState({selectedUnit: this.props.game.getUnit(id)});
+                    this.setState({selectedUnit: this.props.game.units.get(id)});
                 } catch (err) {
                     this.setState({selectedUnit: null});
                 }
@@ -406,7 +407,7 @@ export class GameInProgress extends React.Component<IGameInProgressProps, IGameI
 
             if (this.state.selectedCity) {
                 const id = this.state.selectedCity.id;
-                this.setState({selectedCity: this.props.game.cities[id]});
+                this.setState({selectedCity: this.props.game.cities.get(id)});
             }
 
             this.populateStage();

@@ -31,7 +31,7 @@ export class PerlinTerrainGenerator implements ITerrainGenerator {
                     new NaturalResources(1, 1),
                 );
 
-                this.game.addTerrain(terrain);
+                this.game.terrain.add(terrain);
             }
         }
 

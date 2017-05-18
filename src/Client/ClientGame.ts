@@ -22,14 +22,14 @@ export class ClientGame extends Game {
     }
 
     public drawTerrain(container: PIXI.Container) {
-        for (const terrain of this.terrains()) {
+        for (const terrain of this.terrain.all()) {
             this.drawTerrainSegment(terrain, container);
         }
     }
 
     public drawOutlines(container: PIXI.Container) {
-        for (const terrain of this.terrains()) {
-            const neigh = terrain.neighbours().map((n) => this.getTerrainSegmentByHex(n));
+        for (const terrain of this.terrain.all()) {
+            const neigh = terrain.neighbours().map((n) => this.terrain.getByHex(n));
             this.drawTerrainOutline(terrain, neigh, container);
         }
     }
@@ -47,7 +47,7 @@ export class ClientGame extends Game {
     }
 
     public drawUnits(container: PIXI.Container) {
-        for (const terrain of this.terrains()) {
+        for (const terrain of this.terrain.all()) {
             this.drawTerrainUnits(terrain, container);
         }
     }

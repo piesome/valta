@@ -20,12 +20,12 @@ export class Move extends Action<Unit> {
     }
 
     public deserializeActor(data: any) {
-        return this.game.getUnit(data as string);
+        return this.game.units.get(data as string);
     }
 
     private getAMoves(unit: Unit, target: TerrainSegment): IPath<TerrainSegment> {
         const neighbours = (t: TerrainSegment) => {
-            return t.neighbours().map((hex) => this.game.getTerrainSegmentByHex(hex)).filter((x) => x !== null);
+            return t.neighbours().map((hex) => this.game.terrain.getByHex(hex)).filter((x) => x !== null);
         };
 
         const cost = (_: TerrainSegment, t: TerrainSegment) => {

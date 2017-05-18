@@ -252,7 +252,7 @@ export class GameServer extends RPC.Peer<GameClient> {
             throw new Error(`Client can't act currently`);
         }
 
-        const city = client.game.getCity(params.id);
+        const city = client.game.cities.get(params.id);
         if (city.faction.id !== client.faction.id) {
             throw new Error(`Can't rename a city that's not owned by you`);
         }
@@ -275,7 +275,7 @@ export class GameServer extends RPC.Peer<GameClient> {
             throw new Error(`Client can't act currently`);
         }
 
-        const city = client.game.getCity(params.city);
+        const city = client.game.cities.get(params.city);
         if (city.faction.id !== client.faction.id) {
             throw new Error(`Can't produce at a city you don't own`);
         }

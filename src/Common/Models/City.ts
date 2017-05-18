@@ -16,7 +16,7 @@ export class City extends EventEmitter {
             data.id,
             data.name,
             game.getFaction(data.faction),
-            game.getTerrain(data.terrain),
+            game.terrain.get(data.terrain),
             data.currentHealth,
             data.currentEnergy,
             data.owns.map((hex) => Hex.deserializeHex(hex)),
@@ -66,7 +66,7 @@ export class City extends EventEmitter {
 
     public * ownedTiles() {
         for (const hex of this.owns) {
-            const terrain = this.game.getTerrainSegmentByHex(hex);
+            const terrain = this.game.terrain.getByHex(hex);
             if (terrain) {
                 yield terrain;
             }
