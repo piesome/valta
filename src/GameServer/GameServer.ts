@@ -4,19 +4,19 @@ import * as debug from "debug";
 import * as jwt from "jsonwebtoken";
 import * as Knex from "knex";
 import * as R from "ramda";
-import {v4 as uuid} from "uuid";
+import { v4 as uuid } from "uuid";
 import * as WS from "ws";
 
 import * as RPC from "Common/RPC";
-import {registerRPC, registerRPCs} from "Common/RPC";
-import {Types} from "Common/Types";
+import { registerRPC, registerRPCs } from "Common/RPC";
+import { Types } from "Common/Types";
 
-import {GameClient} from "./GameClient";
-import {IndexServer} from "./IndexServer";
-import {ServerGame} from "./ServerGame";
+import { GameClient } from "./GameClient";
+import { IndexServer } from "./IndexServer";
+import { ServerGame } from "./ServerGame";
 
 export class GameServer extends RPC.Peer<GameClient> {
-    private games: {[id: string]: ServerGame};
+    private games: { [id: string]: ServerGame };
     private types: Types;
 
     private wss: WS.Server;
@@ -182,7 +182,7 @@ export class GameServer extends RPC.Peer<GameClient> {
 
     private removeGame(gameId: string) {
         delete this.games[gameId];
-        this.index.deleteGameStatus({id: gameId});
+        this.index.deleteGameStatus({ id: gameId });
     }
 
     private getGame(gameid: string): ServerGame {
@@ -204,7 +204,7 @@ export class GameServer extends RPC.Peer<GameClient> {
     }
 
     @registerRPC(RPC.GameServerMethods.ChangeSettings)
-    private ChangeSettings(
+    private changeSettings(
         client: GameClient,
         params: RPC.GameServerMethods.IChangeSettingsParams,
     ): RPC.GameServerMethods.ISelectFactionResponse {
