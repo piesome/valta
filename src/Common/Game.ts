@@ -3,6 +3,7 @@ import { EventEmitter } from "eventemitter3";
 import * as R from "ramda";
 import { v4 as uuid } from "uuid";
 
+import * as validator from "class-validator";
 import { ActionManager } from "./Actions";
 import { CityContainer } from "./CityContainer";
 import * as GS from "./GameState";
@@ -196,7 +197,13 @@ export class Game extends EventEmitter {
 
     public changeSettings(id: GS.ID, settings: GS.MapSettings) {
         this.assertLobby();
-        this.settings = settings;
+        validator.validate(settings).then((errors) => {
+            if (errors.length > 0) {
+                throw new Error(`Settings-object validation failed: ` + errors.toString());
+            } else {
+                this.settings = settings;
+            }
+        });
     }
 
     public createUnit(unitType: string, faction: Faction) {

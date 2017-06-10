@@ -1,3 +1,5 @@
+import * as validator from "class-validator";
+
 /**
  * Interfaces and types for serialization of the game state
  */
@@ -44,7 +46,13 @@ export interface IFaction {
 }
 
 export class MapSettings {
+
+    @validator.IsArray()
+    @validator.ArrayNotEmpty()
+    @validator.ArrayUnique()
     public possibleMapTypes: string[];
+
+    @validator.IsIn(this.possibleMapTypes)
     public selectedMapType: string;
 
     constructor() {
